@@ -14,7 +14,8 @@ class ImportEpisodesCommand extends Command
                           {--update : Update existing episodes}
                           {--sync : Remove episodes that no longer exist in source}
                           {--batch=100 : Number of anime to process in batch}
-                          {--offset=0 : Starting offset for batch processing}';
+                          {--offset=0 : Starting offset for batch processing}
+                          {--skip-existing : Skip anime that already have episodes}';
 
     protected $description = 'Import episodes from Kodik API';
 
@@ -58,10 +59,11 @@ class ImportEpisodesCommand extends Command
         $batch = (int) $this->option('batch');
         $offset = (int) $this->option('offset');
 
-        $query = Anime::query()
-            ->orderBy('id')
-            ->skip($offset)
-            ->take($batch);
+        $query = Anime::query()->orderBy('id')->skip($offset)->take($batch);
+
+        if ($this->option('skip-existing')) {
+            $query->doesntHave('episodes');
+        }
 
         $totalAnime = $query->count();
         $this->info("Processing {$totalAnime} anime (offset: {$offset}, batch: {$batch})");
@@ -73,7 +75,7 @@ class ImportEpisodesCommand extends Command
             $this->processAnime($anime, $kodikService);
             $progressBar->advance();
             
-            sleep(2);
+            usleep(1500000);
         }
 
         $progressBar->finish();
@@ -83,50 +85,47 @@ class ImportEpisodesCommand extends Command
     private function processAnime(Anime $anime, KodikService $kodikService): void
     {
         try {
-            $this->info("Searching for: {$anime->title}");
-            $kodikData = $kodikService->searchByTitle($anime->title);
-    
-            if (empty($kodikData)) {
+            if ($this->option('skip-existing') && $anime->episodes()->exists()) {
                 $this->stats['skipped']++;
-                $this->warn("Not found in Kodik");
                 return;
             }
-    
-            $this->info("Found: " . ($kodikData[0]['title'] ?? 'unknown'));
-    
+
+            $kodikData = $kodikService->searchByTitle($anime->title);
+
+            if (empty($kodikData)) {
+                $this->stats['skipped']++;
+                return;
+            }
+
             $kodikId = $kodikData[0]['id'] ?? null;
             if (!$kodikId) {
                 $this->stats['skipped']++;
                 return;
             }
-    
+
             $episodes = $kodikService->getEpisodes($kodikId);
-            $this->info("Episodes found: " . count($episodes));
-    
+
             if (empty($episodes)) {
                 $this->stats['skipped']++;
                 return;
             }
-    
+
             foreach ($episodes as $episodeData) {
                 try {
                     $this->importEpisode($anime, $episodeData, $kodikData[0]);
                 } catch (\Exception $e) {
-                    $this->error("Episode error: " . $e->getMessage());
                     $this->stats['errors']++;
                 }
             }
-    
+
             if ($this->option('sync')) {
                 $this->syncEpisodes($anime, $episodes);
             }
-    
+
         } catch (\Exception $e) {
             $this->stats['errors']++;
-            $this->error("Error: " . $e->getMessage());
         }
     }
-    
 
     private function importEpisode(Anime $anime, array $episodeData, array $sourceData): void
     {

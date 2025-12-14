@@ -5,22 +5,15 @@ namespace App\Http\Resources\Api\V1;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class EpisodeResource extends JsonResource
+class RatingResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
+            'user_id' => $this->user_id,
             'anime_id' => $this->anime_id,
-            'title' => $this->title,
-            'episode_number' => $this->episode_number,
-            'season_number' => $this->season_number,
-            'duration' => $this->duration,
-            'aired_date' => $this->aired_date,
-            'translator' => $this->translator,
-            'video_url' => $this->video_url,
-            'thumbnail_url' => $this->thumbnail_url,
-            'description' => $this->description,
+            'rating' => $this->rating,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'anime' => [

@@ -12,10 +12,19 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->alias([
-            'admin' => \App\Http\Middleware\CheckAdminRole::class,
+        $middleware->web(append: [
+            \App\Http\Middleware\BlockAdminFromNgrok::class,
+        ]);
+        
+        $middleware->api(prepend: [
+            \App\Http\Middleware\NgrokBypass::class,
+            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
+        ]);
+        
+        $middleware->validateCsrfTokens(except: [
+            'api/*',
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
+    ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();

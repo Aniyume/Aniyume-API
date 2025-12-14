@@ -12,12 +12,16 @@ Route::get('/', function () {
     return redirect('/admin/login');
 });
 
+Route::get('/login', function () {
+    return response()->json(['message' => 'Unauthenticated.'], 401);
+})->name('login');
+
 Route::prefix('admin')->name('admin.')->group(function () {
     
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AuthController::class, 'login'])->name('login.post');
     
-    Route::middleware(['auth', 'admin'])->group(function () {
+    Route::middleware(['auth'])->group(function () {
         Route::prefix('episodes')->name('episodes.')->group(function () {
             Route::get('/', [App\Http\Controllers\Admin\EpisodeManagementController::class, 'index'])->name('index');
             Route::post('/import-all', [App\Http\Controllers\Admin\EpisodeManagementController::class, 'importAll'])->name('import-all');

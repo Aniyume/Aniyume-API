@@ -1,19 +1,20 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\AnimeResource;
+use App\Http\Resources\Api\V1\AnimeResource;
 use App\Http\Resources\EpisodeResource;
 use App\Models\Anime;
 use App\Models\Episode;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AnimeController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Anime::with(['genres', 'studios']);
+        $query = Anime::query();
 
         if ($request->has('type')) {
             $query->where('type', $request->type);
@@ -21,18 +22,6 @@ class AnimeController extends Controller
 
         if ($request->has('status')) {
             $query->where('status', $request->status);
-        }
-
-        if ($request->has('genre')) {
-            $query->whereHas('genres', function ($q) use ($request) {
-                $q->where('slug', $request->genre);
-            });
-        }
-
-        if ($request->has('studio')) {
-            $query->whereHas('studios', function ($q) use ($request) {
-                $q->where('slug', $request->studio);
-            });
         }
 
         if ($request->has('year')) {
@@ -50,20 +39,41 @@ class AnimeController extends Controller
         if ($request->has('sort')) {
             switch ($request->sort) {
                 case 'rating':
-                    $query->orderByDesc('rating');
+                    $query->orderByRaw('rating DESC NULLS LAST');
                     break;
                 case 'popularity':
-                    $query->orderByDesc('popularity');
+                    $query->orderByRaw('popularity DESC NULLS LAST');
                     break;
                 case 'newest':
-                    $query->orderByDesc('aired_from');
+                    $query->where('aired_from', '<=', now())
+                          ->orderByRaw('aired_from DESC NULLS LAST');
+                    break;
+                case 'upcoming':
+                    $query->where('aired_from', '>', now())
+                          ->orderByRaw('aired_from ASC NULLS LAST');
+                    break;
+                case 'oldest':
+                    $query->orderByRaw('aired_from ASC NULLS LAST');
+                    break;
+                case 'title':
+                    $query->orderByRaw("REGEXP_REPLACE(LOWER(title), '[^a-z0-9]', '', 'g') ASC");
+                    break;
+                case 'title_raw':
+                    $query->orderBy('title', 'asc');
+                    break;
+                case 'id_asc':
+                    $query->orderBy('id', 'asc');
+                    break;
+                case 'id_desc':
+                    $query->orderByDesc('id');
                     break;
                 default:
-                    $query->orderByDesc('created_at');
+                    $query->orderBy('id', 'asc');
             }
         } else {
-            $query->orderByDesc('created_at');
+            $query->orderBy('id', 'asc');
         }
+        
 
         $anime = $query->paginate(20);
 

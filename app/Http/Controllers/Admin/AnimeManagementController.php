@@ -28,7 +28,17 @@ class AnimeManagementController extends Controller
             $query->where('type', $request->type);
         }
 
-        $anime = $query->latest()->paginate(20);
+        $sortBy = $request->get('sort', 'created_at');
+        $sortOrder = $request->get('order', 'desc');
+        
+        $allowedSorts = ['id', 'title', 'created_at', 'year', 'rating'];
+        if (in_array($sortBy, $allowedSorts)) {
+            $query->orderBy($sortBy, $sortOrder);
+        } else {
+            $query->latest();
+        }
+
+        $anime = $query->paginate(20);
 
         return view('admin.anime.index', compact('anime'));
     }
@@ -89,7 +99,6 @@ class AnimeManagementController extends Controller
         
         return view('admin.anime.show', compact('anime', 'episodes'));
     }
-    
 
     public function edit(string $id)
     {
