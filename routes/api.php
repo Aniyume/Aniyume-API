@@ -2,37 +2,20 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AnimeController;
-use App\Http\Controllers\Api\V1\TagController;
-use App\Http\Controllers\Api\V1\AuthController;
-use App\Http\Controllers\Api\V1\Admin\AnimeController as AdminAnimeController;
-use App\Http\Controllers\Api\V1\Admin\ImportController;
+use App\Http\Controllers\Api\V1\EpisodeController;
 
 Route::prefix('v1')->group(function () {
-    
-    Route::post('auth/login', [AuthController::class, 'login']);
-    
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::post('auth/logout', [AuthController::class, 'logout']);
-        Route::get('auth/me', [AuthController::class, 'me']);
-    });
-    Route::prefix('v1')->group(function () {
-        Route::get('anime', [AnimeController::class, 'index']);
-        Route::get('anime/{anime}', [AnimeController::class, 'show']);
-        Route::get('anime/{anime}/episodes', [AnimeController::class, 'episodes']);
-        Route::get('anime/{anime}/episodes/{episode}', [AnimeController::class, 'episode']);
-        
-        Route::get('genres', [AnimeController::class, 'genres']);
-        Route::get('studios', [AnimeController::class, 'studios']);
-    });
     Route::get('anime', [AnimeController::class, 'index']);
-    Route::get('anime/{slug}', [AnimeController::class, 'show']);
-    
-    Route::get('tags', [TagController::class, 'index']);
-    Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
-        Route::apiResource('anime', AdminAnimeController::class);
-        
-        Route::post('import/run', [ImportController::class, 'run']);
-        Route::get('import/logs', [ImportController::class, 'logs']);
-        Route::get('import/status/{id}', [ImportController::class, 'status']);
+    Route::get('anime/{anime:slug}', [AnimeController::class, 'show']);
+    Route::get('genres', [AnimeController::class, 'genres']);
+    Route::get('studios', [AnimeController::class, 'studios']);
+    Route::get('episodes', [EpisodeController::class, 'index']);
+    Route::get('episodes/{episode}', [EpisodeController::class, 'show']);
+    Route::get('anime/{anime:slug}/episodes', [EpisodeController::class, 'getByAnime']);
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::post('history', [AnimeController::class, 'addToHistory']);
+        Route::get('history', [AnimeController::class, 'getHistory']);
+        Route::post('favorites', [AnimeController::class, 'addFavorite']);
+        Route::get('favorites', [AnimeController::class, 'getFavorites']);
     });
 });
