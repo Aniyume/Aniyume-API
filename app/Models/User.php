@@ -41,4 +41,24 @@ class User extends Authenticatable
     {
         return $this->roles()->where('name', $role)->exists();
     }
+    public function watchHistory()
+{
+    return $this->hasMany(WatchHistory::class);
+}
+
+public function favorites()
+{
+    return $this->hasMany(Favorite::class);
+}
+
+public function ratings()
+{
+    return $this->hasMany(Rating::class);
+}
+
+public function comments()
+{
+    return $this->hasMany(Comment::class);
+}
+
 }

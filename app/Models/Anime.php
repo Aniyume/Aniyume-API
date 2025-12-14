@@ -4,27 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-/**
- * @OA\Schema(
- *     schema="Anime",
- *     type="object",
- *     title="Anime",
- *     @OA\Property(property="id", type="integer", example=1),
- *     @OA\Property(property="title", type="string", example="Cowboy Bebop"),
- *     @OA\Property(property="title_english", type="string", example="Cowboy Bebop"),
- *     @OA\Property(property="title_japanese", type="string", example="カウボーイビバップ"),
- *     @OA\Property(property="slug", type="string", example="cowboy-bebop"),
- *     @OA\Property(property="type", type="string", example="TV"),
- *     @OA\Property(property="status", type="string", example="completed"),
- *     @OA\Property(property="episodes_count", type="integer", example=26),
- *     @OA\Property(property="description", type="string"),
- *     @OA\Property(property="poster_url", type="string"),
- *     @OA\Property(property="rating", type="number", format="float", example=8.75),
- *     @OA\Property(property="popularity", type="integer", example=95000),
- *     @OA\Property(property="aired_from", type="string", format="date", example="1998-04-03"),
- *     @OA\Property(property="aired_to", type="string", format="date", example="1999-04-24")
- * )
- */
 
 class Anime extends Model
 {
@@ -49,23 +28,51 @@ class Anime extends Model
         'nsfw_flag',
         'popularity',
         'favorites',
-        'score_count',
     ];
 
     protected $casts = [
         'aired_from' => 'date',
         'aired_to' => 'date',
         'nsfw_flag' => 'boolean',
-        'rating' => 'decimal:1',
     ];
 
-    public function episodes()
+    public function genres()
     {
-        return $this->hasMany(Episode::class);
+        return $this->belongsToMany(Genre::class, 'anime_genre');
+    }
+
+    public function studios()
+    {
+        return $this->belongsToMany(Studio::class, 'anime_studio');
     }
 
     public function tags()
     {
         return $this->belongsToMany(Tag::class, 'anime_tag');
     }
+
+    public function episodes()
+    {
+        return $this->hasMany(Episode::class);
+    }
+    public function watchHistory()
+{
+    return $this->hasMany(WatchHistory::class);
+}
+
+public function favorites()
+{
+    return $this->hasMany(Favorite::class);
+}
+
+public function ratings()
+{
+    return $this->hasMany(Rating::class);
+}
+
+public function comments()
+{
+    return $this->hasMany(Comment::class);
+}
+
 }
