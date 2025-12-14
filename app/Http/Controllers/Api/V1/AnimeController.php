@@ -122,4 +122,76 @@ class AnimeController extends Controller
 
         return response()->json($studios);
     }
+    public function search(Request $request)
+{
+    $query = Anime::query();
+
+    if ($request->filled('q')) {
+        $query->where(function ($q) use ($request) {
+            $q->where('title', 'ILIKE', '%' . $request->q . '%')
+              ->orWhere('description', 'ILIKE', '%' . $request->q . '%');
+        });
+    }
+
+    if ($request->filled('type')) {
+        $query->where('type', $request->type);
+    }
+
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    if ($request->filled('year')) {
+        $query->where('year', $request->year);
+    }
+
+    if ($request->filled('year_from')) {
+        $query->where('year', '>=', $request->year_from);
+    }
+
+    if ($request->filled('year_to')) {
+        $query->where('year', '<=', $request->year_to);
+    }
+
+    if ($request->filled('rating_min')) {
+        $query->where('rating', '>=', $request->rating_min);
+    }
+
+    if ($request->filled('genre')) {
+        $query->whereHas('genres', function ($q) use ($request) {
+            $q->where('slug', $request->genre);
+        });
+    }
+
+    if ($request->filled('tag')) {
+        $query->whereHas('tags', function ($q) use ($request) {
+            $q->where('slug', $request->tag);
+        });
+    }
+
+    $sortBy = $request->get('sort', 'popularity');
+    $sortOrder = $request->get('order', 'desc');
+    
+    switch ($sortBy) {
+        case 'rating':
+            $query->orderByRaw('rating DESC NULLS LAST');
+            break;
+        case 'popularity':
+            $query->orderByRaw('popularity DESC NULLS LAST');
+            break;
+        case 'year':
+            $query->orderByRaw("year $sortOrder NULLS LAST");
+            break;
+        case 'title':
+            $query->orderByRaw("REGEXP_REPLACE(LOWER(title), '[^a-z0-9]', '', 'g') ASC");
+            break;
+        default:
+            $query->orderByRaw('popularity DESC NULLS LAST');
+    }
+
+    $anime = $query->paginate(20);
+
+    return AnimeResource::collection($anime);
+}
+
 }
