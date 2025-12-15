@@ -79,11 +79,17 @@ class AnimeController extends Controller
 
         return AnimeResource::collection($anime);
     }
-
-    public function show(Anime $anime)
+    public function show($id)
     {
-        $anime->load(['genres', 'studios', 'tags']);
-        return new AnimeResource($anime);
+        try {
+            $anime = Anime::findOrFail($id);
+            return new AnimeResource($anime);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Anime not found',
+                'message' => $e->getMessage()
+            ], 404);
+        }
     }
 
     public function episodes(Anime $anime)
@@ -107,20 +113,13 @@ class AnimeController extends Controller
 
     public function genres()
     {
-        $genres = \App\Models\Genre::withCount('anime')
-            ->orderBy('name')
-            ->get();
-
-        return response()->json($genres);
+        return response()->json([]);
     }
+    
 
     public function studios()
     {
-        $studios = \App\Models\Studio::withCount('anime')
-            ->orderBy('name')
-            ->get();
-
-        return response()->json($studios);
+        return response()->json([]);
     }
     public function search(Request $request)
 {

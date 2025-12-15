@@ -57,4 +57,40 @@ class EpisodeController extends Controller
 
         return EpisodeResource::collection($episodes);
     }
+
+    public function getPlayer(Episode $episode)
+    {
+        if (!$episode->player_url && !$episode->player_iframe) {
+            return response()->json([
+                'error' => 'Video not available',
+                'message' => 'This episode does not have a video source yet',
+                'episode_number' => $episode->episode_number,
+                'translator' => $episode->translator,
+                'anime_title' => $episode->anime->title
+            ], 404);
+        }
+        
+        return response()->json([
+            'success' => true,
+            'player_url' => $episode->player_url,
+            'player_iframe' => $episode->player_iframe,
+            'thumbnail_url' => $episode->thumbnail_url,
+            'poster_url' => $episode->poster_url,
+            'quality' => $episode->quality,
+            'episode_number' => $episode->episode_number,
+            'season_number' => $episode->season_number,
+            'translator' => $episode->translator,
+            'translation_type' => $episode->translation_type,
+            'title' => $episode->title,
+            'duration' => $episode->duration,
+            'source' => $episode->source,
+            'anime' => [
+                'id' => $episode->anime->id,
+                'title' => $episode->anime->title,
+                'slug' => $episode->anime->slug,
+                'poster_url' => $episode->anime->poster_url
+            ]
+        ]);
+    }
+    
 }

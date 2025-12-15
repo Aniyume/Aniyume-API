@@ -2,232 +2,233 @@
     "openapi": "3.0.0",
     "info": {
         "title": "AniYume API",
-        "description": "REST API для AniYume - аниме платформы с поддержкой множественных озвучек",
+        "description": "REST API for AniYume - Anime Streaming Platform",
+        "contact": {
+            "email": "support@aniyume.com"
+        },
         "version": "1.0.0"
     },
     "servers": [
         {
-            "url": "http://localhost:8000/api",
-            "description": "Local API Server"
+            "url": "http://127.0.0.1:8000/api/v1",
+            "description": "Development Server"
         }
     ],
     "paths": {
-        "/v1/anime": {
-            "get": {
-                "tags": ["Anime"],
-                "summary": "Получить список аниме",
-                "description": "Получить список всех аниме с фильтрацией",
-                "parameters": [
-                    {
-                        "name": "type",
-                        "in": "query",
-                        "description": "Тип аниме (TV, Movie, OVA, Special, ONA)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": ["tv", "movie", "ova", "special", "ona"]
-                        }
-                    },
-                    {
-                        "name": "status",
-                        "in": "query",
-                        "description": "Статус (ongoing, completed, upcoming)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": ["ongoing", "finished", "upcoming"]
-                        }
-                    },
-                    {
-                        "name": "genre",
-                        "in": "query",
-                        "description": "Slug жанра",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "studio",
-                        "in": "query",
-                        "description": "Slug студии",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "year",
-                        "in": "query",
-                        "description": "Год выхода",
-                        "required": false,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "search",
-                        "in": "query",
-                        "description": "Поиск по названию",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "sort",
-                        "in": "query",
-                        "description": "Сортировка",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "enum": ["rating", "popularity", "newest"]
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Номер страницы",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 1
-                        }
-                    }
+        "/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
                 ],
+                "summary": "Register new user",
+                "operationId": "e6d1fcf1feab4f92eacb72353c6dfbcd",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
-                    "200": {
-                        "description": "Успешный ответ"
+                    "201": {
+                        "description": "User registered successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string"
+                                        },
+                                        "user": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
                     }
                 }
             }
         },
-        "/v1/anime/{id}": {
-            "get": {
-                "tags": ["Anime"],
-                "summary": "Получить детали аниме",
-                "description": "Получить подробную информацию об аниме по ID",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID аниме",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
+        "/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
                 ],
+                "summary": "Login user",
+                "operationId": "72bf786ad8ff53c7391309c836350a8d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
-                        "description": "Успешный ответ"
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string"
+                                        },
+                                        "user": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
-                    "404": {
-                        "description": "Аниме не найдено"
+                    "422": {
+                        "description": "Invalid credentials"
+                    },
+                    "403": {
+                        "description": "Account not active"
                     }
                 }
             }
         },
-        "/v1/anime/{id}/episodes": {
-            "get": {
-                "tags": ["Episodes"],
-                "summary": "Получить эпизоды аниме",
-                "description": "Получить все эпизоды с озвучками для конкретного аниме",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID аниме",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Номер страницы",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "default": 1
-                        }
-                    }
+        "/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
                 ],
+                "summary": "Logout user",
+                "operationId": "5660f1ae61b95f0283dfc205d5ffdad5",
                 "responses": {
                     "200": {
-                        "description": "Список эпизодов с озвучками"
-                    }
-                }
-            }
-        },
-        "/v1/anime/{anime_id}/episodes/{episode_id}": {
-            "get": {
-                "tags": ["Episodes"],
-                "summary": "Получить конкретный эпизод",
-                "description": "Получить информацию о конкретном эпизоде",
-                "parameters": [
-                    {
-                        "name": "anime_id",
-                        "in": "path",
-                        "description": "ID аниме",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
+                        "description": "Logout successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logged out successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
                         }
                     },
-                    {
-                        "name": "episode_id",
-                        "in": "path",
-                        "description": "ID эпизода",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
+                    "401": {
+                        "description": "Unauthenticated"
                     }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/user": {
+            "get": {
+                "tags": [
+                    "Authentication"
                 ],
+                "summary": "Get current user",
+                "operationId": "59b49a75cc04d469e841f57f587060b9",
                 "responses": {
                     "200": {
-                        "description": "Данные эпизода"
+                        "description": "Current user data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
-                    "404": {
-                        "description": "Эпизод не найден"
+                    "401": {
+                        "description": "Unauthenticated"
                     }
-                }
-            }
-        },
-        "/v1/genres": {
-            "get": {
-                "tags": ["Genres"],
-                "summary": "Получить список жанров",
-                "description": "Получить все жанры с количеством аниме",
-                "responses": {
-                    "200": {
-                        "description": "Список жанров"
+                },
+                "security": [
+                    {
+                        "sanctum": []
                     }
-                }
-            }
-        },
-        "/v1/studios": {
-            "get": {
-                "tags": ["Studios"],
-                "summary": "Получить список студий",
-                "description": "Получить все студии с количеством аниме",
-                "responses": {
-                    "200": {
-                        "description": "Список студий"
-                    }
-                }
+                ]
             }
         }
     },
     "components": {
         "securitySchemes": {
-            "bearerAuth": {
+            "sanctum": {
                 "type": "http",
                 "scheme": "bearer",
-                "bearerFormat": "JWT"
+                "bearerFormat": "JWT",
+                "description": "Enter token in format: Bearer {token}"
             }
         }
-    }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Authentication"
+        }
+    ]
 }
