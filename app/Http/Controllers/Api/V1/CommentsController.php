@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreCommentRequest;
+use App\Http\Requests\UpdateCommentRequest;
 use App\Http\Resources\Api\V1\CommentResource;
 use App\Models\Comment;
 use App\Models\Anime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class CommentsController extends Controller
 {
@@ -25,30 +26,18 @@ class CommentsController extends Controller
         return CommentResource::collection($comments);
     }
 
-    public function store(Request $request)
+    public function store(StoreCommentRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'anime_id' => 'required|exists:anime,id',
-            'comment' => 'required|string|min:3|max:1000',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
         DB::beginTransaction();
         try {
             $comment = Comment::create([
                 'user_id' => $request->user()->id,
-                'anime_id' => $request->anime_id,
-                'comment' => $request->comment,
+                'anime_id' => $request->validated('anime_id'),
+                'comment' => $request->validated('comment'),
                 'is_approved' => true,
             ]);
 
-            $anime = Anime::find($request->anime_id);
+            $anime = Anime::find($request->validated('anime_id'));
             $anime->increment('comments_count');
 
             DB::commit();
@@ -60,30 +49,18 @@ class CommentsController extends Controller
             DB::rollBack();
             return response()->json([
                 'message' => 'Failed to add comment',
-                'error' => $e->getMessage()
             ], 500);
         }
     }
 
-    public function update(Request $request, Comment $comment)
+    public function update(UpdateCommentRequest $request, Comment $comment)
     {
         if ($comment->user_id !== $request->user()->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $validator = Validator::make($request->all(), [
-            'comment' => 'required|string|min:3|max:1000',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
         $comment->update([
-            'comment' => $request->comment,
+            'comment' => $request->validated('comment'),
         ]);
 
         $comment->load(['user', 'anime']);
@@ -114,7 +91,6 @@ class CommentsController extends Controller
             DB::rollBack();
             return response()->json([
                 'message' => 'Failed to delete comment',
-                'error' => $e->getMessage()
             ], 500);
         }
     }
