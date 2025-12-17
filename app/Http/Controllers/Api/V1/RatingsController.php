@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreRatingRequest;
 use App\Http\Resources\Api\V1\RatingResource;
 use App\Models\Rating;
 use App\Models\Anime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class RatingsController extends Controller
 {
@@ -22,52 +22,33 @@ class RatingsController extends Controller
         return RatingResource::collection($ratings);
     }
 
-    public function store(Request $request)
+    public function store(StoreRatingRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'anime_id' => 'required|exists:anime,id',
-            'rating' => 'required|numeric|min:1|max:10',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
+        $userId = $request->user()->id;
+        $animeId = $request->validated('anime_id');
+        $ratingValue = $request->validated('rating');
 
         DB::beginTransaction();
         try {
-            $existingRating = Rating::where('user_id', $request->user()->id)
-                ->where('anime_id', $request->anime_id)
-                ->first();
+            $rating = Rating::updateOrCreate(
+                [
+                    'user_id' => $userId,
+                    'anime_id' => $animeId,
+                ],
+                [
+                    'rating' => $ratingValue,
+                ]
+            );
 
-            if ($existingRating) {
-                $oldRating = $existingRating->rating;
-                $existingRating->update(['rating' => $request->rating]);
-                
-                $anime = Anime::find($request->anime_id);
-                $anime->rating_sum = $anime->rating_sum - $oldRating + $request->rating;
-                $anime->rating = round($anime->rating_sum / $anime->ratings_count, 1);
-                $anime->save();
+            $anime = Anime::find($animeId);
+            $totalRatings = Rating::where('anime_id', $animeId)->count();
+            $sumRatings = Rating::where('anime_id', $animeId)->sum('rating');
 
-                DB::commit();
-
-                $existingRating->load('anime');
-                return new RatingResource($existingRating);
-            }
-
-            $rating = Rating::create([
-                'user_id' => $request->user()->id,
-                'anime_id' => $request->anime_id,
-                'rating' => $request->rating,
+            $anime->update([
+                'ratings_count' => $totalRatings,
+                'rating_sum' => $sumRatings,
+                'rating' => $totalRatings > 0 ? round($sumRatings / $totalRatings, 1) : null,
             ]);
-
-            $anime = Anime::find($request->anime_id);
-            $anime->increment('ratings_count');
-            $anime->rating_sum += $request->rating;
-            $anime->rating = round($anime->rating_sum / $anime->ratings_count, 1);
-            $anime->save();
 
             DB::commit();
 
@@ -78,7 +59,6 @@ class RatingsController extends Controller
             DB::rollBack();
             return response()->json([
                 'message' => 'Failed to add rating',
-                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -97,19 +77,17 @@ class RatingsController extends Controller
 
         DB::beginTransaction();
         try {
-            $ratingValue = $rating->rating;
             $rating->delete();
 
             $anime = Anime::find($animeId);
-            $anime->decrement('ratings_count');
-            $anime->rating_sum -= $ratingValue;
-            
-            if ($anime->ratings_count > 0) {
-                $anime->rating = round($anime->rating_sum / $anime->ratings_count, 1);
-            } else {
-                $anime->rating = null;
-            }
-            $anime->save();
+            $totalRatings = Rating::where('anime_id', $animeId)->count();
+            $sumRatings = Rating::where('anime_id', $animeId)->sum('rating');
+
+            $anime->update([
+                'ratings_count' => $totalRatings,
+                'rating_sum' => $sumRatings,
+                'rating' => $totalRatings > 0 ? round($sumRatings / $totalRatings, 1) : null,
+            ]);
 
             DB::commit();
 
@@ -121,7 +99,6 @@ class RatingsController extends Controller
             DB::rollBack();
             return response()->json([
                 'message' => 'Failed to delete rating',
-                'error' => $e->getMessage()
             ], 500);
         }
     }
