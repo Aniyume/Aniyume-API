@@ -13,19 +13,6 @@ use Illuminate\Support\Facades\DB;
 
 class CommentsController extends Controller
 {
-    public function index(Request $request, $animeSlug)
-    {
-        $anime = Anime::where('slug', $animeSlug)->firstOrFail();
-
-        $comments = Comment::with('user')
-            ->where('anime_id', $anime->id)
-            ->where('is_approved', true)
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
-
-        return CommentResource::collection($comments);
-    }
-
     public function store(StoreCommentRequest $request)
     {
         DB::beginTransaction();
@@ -38,7 +25,9 @@ class CommentsController extends Controller
             ]);
 
             $anime = Anime::find($request->validated('anime_id'));
-            $anime->increment('comments_count');
+            if ($anime) {
+                $anime->increment('comments_count');
+            }
 
             DB::commit();
 
@@ -75,7 +64,9 @@ class CommentsController extends Controller
             $comment->delete();
 
             $anime = Anime::find($animeId);
-            $anime->decrement('comments_count');
+            if ($anime) {
+                $anime->decrement('comments_count');
+            }
 
             DB::commit();
 
