@@ -63,20 +63,13 @@ class RatingsController extends Controller
         }
     }
 
-    public function destroy(Request $request, $animeId)
+    public function destroy(Request $request, Rating $rating)
     {
-        $rating = Rating::where('user_id', $request->user()->id)
-            ->where('anime_id', $animeId)
-            ->first();
-
-        if (!$rating) {
-            return response()->json([
-                'message' => 'Rating not found'
-            ], 404);
-        }
+        $this->authorize('delete', $rating);
 
         DB::beginTransaction();
         try {
+            $animeId = $rating->anime_id;
             $rating->delete();
 
             $anime = Anime::find($animeId);
