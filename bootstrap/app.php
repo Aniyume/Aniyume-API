@@ -34,6 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'block.tunnel' => \App\Http\Middleware\BlockTunnelAccess::class,
             'readonly.tunnel' => \App\Http\Middleware\ReadOnlyTunnel::class,
+            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
