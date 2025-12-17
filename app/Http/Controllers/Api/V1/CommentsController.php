@@ -55,9 +55,7 @@ class CommentsController extends Controller
 
     public function update(UpdateCommentRequest $request, Comment $comment)
     {
-        if ($comment->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        $this->authorize('update', $comment);
 
         $comment->update([
             'comment' => $request->validated('comment'),
@@ -69,9 +67,7 @@ class CommentsController extends Controller
 
     public function destroy(Request $request, Comment $comment)
     {
-        if ($comment->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        $this->authorize('delete', $comment);
 
         DB::beginTransaction();
         try {
