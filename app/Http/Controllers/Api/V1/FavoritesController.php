@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreFavoriteRequest;
 use App\Http\Resources\Api\V1\FavoriteResource;
 use App\Models\Favorite;
 use App\Models\Anime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class FavoritesController extends Controller
 {
@@ -22,21 +22,10 @@ class FavoritesController extends Controller
         return FavoriteResource::collection($favorites);
     }
 
-    public function store(Request $request)
+    public function store(StoreFavoriteRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'anime_id' => 'required|exists:anime,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
         $exists = Favorite::where('user_id', $request->user()->id)
-            ->where('anime_id', $request->anime_id)
+            ->where('anime_id', $request->validated('anime_id'))
             ->exists();
 
         if ($exists) {
@@ -49,10 +38,10 @@ class FavoritesController extends Controller
         try {
             $favorite = Favorite::create([
                 'user_id' => $request->user()->id,
-                'anime_id' => $request->anime_id,
+                'anime_id' => $request->validated('anime_id'),
             ]);
 
-            $anime = Anime::find($request->anime_id);
+            $anime = Anime::find($request->validated('anime_id'));
             $anime->increment('favorites');
 
             DB::commit();
@@ -64,7 +53,6 @@ class FavoritesController extends Controller
             DB::rollBack();
             return response()->json([
                 'message' => 'Failed to add to favorites',
-                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -98,7 +86,6 @@ class FavoritesController extends Controller
             DB::rollBack();
             return response()->json([
                 'message' => 'Failed to remove from favorites',
-                'error' => $e->getMessage()
             ], 500);
         }
     }
