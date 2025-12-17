@@ -1,7 +1,6 @@
 <?php
 
-use Illuminate
-Support\Facades\Route;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\AnimeController;
 use App\Http\Controllers\Api\V1\EpisodeController;
@@ -19,8 +18,10 @@ Route::prefix('v1')->group(function () {
     Route::get('/genres', [AnimeController::class, 'genres']);
     Route::get('/studios', [AnimeController::class, 'studios']);
 
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::middleware('throttle:6,1')->group(function () {
+        Route::post('/register', [AuthController::class, 'register']);
+        Route::post('/login', [AuthController::class, 'login']);
+    });
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
