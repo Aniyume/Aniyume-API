@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreWatchHistoryRequest;
+use App\Http\Requests\UpdateWatchHistoryRequest;
 use App\Http\Resources\Api\V1\WatchHistoryResource;
 use App\Models\WatchHistory;
 use App\Models\Anime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class WatchHistoryController extends Controller
 {
@@ -22,39 +23,25 @@ class WatchHistoryController extends Controller
         return WatchHistoryResource::collection($history);
     }
 
-    public function store(Request $request)
+    public function store(StoreWatchHistoryRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'anime_id' => 'required|exists:anime,id',
-            'episode_id' => 'required|exists:episodes,id',
-            'progress' => 'nullable|integer|min:0',
-            'completed' => 'nullable|boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
         DB::beginTransaction();
         try {
             $watchHistory = WatchHistory::updateOrCreate(
                 [
                     'user_id' => $request->user()->id,
-                    'anime_id' => $request->anime_id,
-                    'episode_id' => $request->episode_id,
+                    'anime_id' => $request->validated('anime_id'),
+                    'episode_id' => $request->validated('episode_id'),
                 ],
                 [
-                    'progress' => $request->progress ?? 0,
-                    'completed' => $request->completed ?? false,
+                    'progress' => $request->validated('progress') ?? 0,
+                    'completed' => $request->validated('completed') ?? false,
                     'watched_at' => now(),
                 ]
             );
 
             if ($watchHistory->wasRecentlyCreated) {
-                $anime = Anime::find($request->anime_id);
+                $anime = Anime::find($request->validated('anime_id'));
                 $anime->increment('viewed_count');
                 $anime->increment('popularity');
             }
@@ -68,32 +55,17 @@ class WatchHistoryController extends Controller
             DB::rollBack();
             return response()->json([
                 'message' => 'Failed to add to watch history',
-                'error' => $e->getMessage()
             ], 500);
         }
     }
 
-    public function update(Request $request, WatchHistory $watchHistory)
+    public function update(UpdateWatchHistoryRequest $request, WatchHistory $watchHistory)
     {
-        if ($watchHistory->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'progress' => 'nullable|integer|min:0',
-            'completed' => 'nullable|boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
+        $this->authorize('update', $watchHistory);
 
         $watchHistory->update([
-            'progress' => $request->progress ?? $watchHistory->progress,
-            'completed' => $request->completed ?? $watchHistory->completed,
+            'progress' => $request->validated('progress') ?? $watchHistory->progress,
+            'completed' => $request->validated('completed') ?? $watchHistory->completed,
             'watched_at' => now(),
         ]);
 
@@ -103,9 +75,7 @@ class WatchHistoryController extends Controller
 
     public function destroy(Request $request, WatchHistory $watchHistory)
     {
-        if ($watchHistory->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        $this->authorize('delete', $watchHistory);
 
         $watchHistory->delete();
 
