@@ -34,5 +34,20 @@ class EpisodeResource extends JsonResource
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];
+
+    }
+
+    public function getTranslatorsByAnime(Anime $anime)
+    {
+        $translators = Episode::where('anime_id', $anime->id)
+            ->whereNotNull('translator')
+            ->select('translator', 'translation_type')
+            ->groupBy('translator', 'translation_type')
+            ->orderBy('translator')
+            ->get();
+
+        return response()->json([
+            'data' => $translators,
+        ]);
     }
 }

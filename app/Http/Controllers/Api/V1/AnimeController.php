@@ -8,7 +8,6 @@ use App\Http\Resources\EpisodeResource;
 use App\Models\Anime;
 use App\Models\Episode;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class AnimeController extends Controller
 {
@@ -31,8 +30,8 @@ class AnimeController extends Controller
         if ($request->has('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('title', 'like', "%{$request->search}%")
-                  ->orWhere('title_english', 'like', "%{$request->search}%")
-                  ->orWhere('title_japanese', 'like', "%{$request->search}%");
+                    ->orWhere('title_english', 'like', "%{$request->search}%")
+                    ->orWhere('title_japanese', 'like', "%{$request->search}%");
             });
         }
 
@@ -46,11 +45,11 @@ class AnimeController extends Controller
                     break;
                 case 'newest':
                     $query->where('aired_from', '<=', now())
-                          ->orderByRaw('aired_from DESC NULLS LAST');
+                        ->orderByRaw('aired_from DESC NULLS LAST');
                     break;
                 case 'upcoming':
                     $query->where('aired_from', '>', now())
-                          ->orderByRaw('aired_from ASC NULLS LAST');
+                        ->orderByRaw('aired_from ASC NULLS LAST');
                     break;
                 case 'oldest':
                     $query->orderByRaw('aired_from ASC NULLS LAST');
@@ -73,21 +72,22 @@ class AnimeController extends Controller
         } else {
             $query->orderBy('id', 'asc');
         }
-        
 
-        $anime = $query->paginate(20);
+        $anime = $query->with('tags')->paginate(20);
 
         return AnimeResource::collection($anime);
     }
+
     public function show($id)
     {
         try {
-            $anime = Anime::findOrFail($id);
+            $anime = Anime::with('tags')->findOrFail($id);
+
             return new AnimeResource($anime);
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Anime not found',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 404);
         }
     }
@@ -115,82 +115,81 @@ class AnimeController extends Controller
     {
         return response()->json([]);
     }
-    
 
     public function studios()
     {
         return response()->json([]);
     }
+
     public function search(Request $request)
-{
-    $query = Anime::query();
+    {
+        $query = Anime::query();
 
-    if ($request->filled('q')) {
-        $query->where(function ($q) use ($request) {
-            $q->where('title', 'ILIKE', '%' . $request->q . '%')
-              ->orWhere('description', 'ILIKE', '%' . $request->q . '%');
-        });
+        if ($request->filled('q')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'ILIKE', '%'.$request->q.'%')
+                    ->orWhere('description', 'ILIKE', '%'.$request->q.'%');
+            });
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('year')) {
+            $query->where('year', $request->year);
+        }
+
+        if ($request->filled('year_from')) {
+            $query->where('year', '>=', $request->year_from);
+        }
+
+        if ($request->filled('year_to')) {
+            $query->where('year', '<=', $request->year_to);
+        }
+
+        if ($request->filled('rating_min')) {
+            $query->where('rating', '>=', $request->rating_min);
+        }
+
+        if ($request->filled('genre')) {
+            $query->whereHas('genres', function ($q) use ($request) {
+                $q->where('slug', $request->genre);
+            });
+        }
+
+        if ($request->filled('tag')) {
+            $query->whereHas('tags', function ($q) use ($request) {
+                $q->where('slug', $request->tag);
+            });
+        }
+
+        $sortBy = $request->get('sort', 'popularity');
+        $sortOrder = $request->get('order', 'desc');
+
+        switch ($sortBy) {
+            case 'rating':
+                $query->orderByRaw('rating DESC NULLS LAST');
+                break;
+            case 'popularity':
+                $query->orderByRaw('popularity DESC NULLS LAST');
+                break;
+            case 'year':
+                $query->orderByRaw("year $sortOrder NULLS LAST");
+                break;
+            case 'title':
+                $query->orderByRaw("REGEXP_REPLACE(LOWER(title), '[^a-z0-9]', '', 'g') ASC");
+                break;
+            default:
+                $query->orderByRaw('popularity DESC NULLS LAST');
+        }
+
+        $anime = $query->with('tags')->paginate(20);
+
+        return AnimeResource::collection($anime);
     }
-
-    if ($request->filled('type')) {
-        $query->where('type', $request->type);
-    }
-
-    if ($request->filled('status')) {
-        $query->where('status', $request->status);
-    }
-
-    if ($request->filled('year')) {
-        $query->where('year', $request->year);
-    }
-
-    if ($request->filled('year_from')) {
-        $query->where('year', '>=', $request->year_from);
-    }
-
-    if ($request->filled('year_to')) {
-        $query->where('year', '<=', $request->year_to);
-    }
-
-    if ($request->filled('rating_min')) {
-        $query->where('rating', '>=', $request->rating_min);
-    }
-
-    if ($request->filled('genre')) {
-        $query->whereHas('genres', function ($q) use ($request) {
-            $q->where('slug', $request->genre);
-        });
-    }
-
-    if ($request->filled('tag')) {
-        $query->whereHas('tags', function ($q) use ($request) {
-            $q->where('slug', $request->tag);
-        });
-    }
-
-    $sortBy = $request->get('sort', 'popularity');
-    $sortOrder = $request->get('order', 'desc');
-    
-    switch ($sortBy) {
-        case 'rating':
-            $query->orderByRaw('rating DESC NULLS LAST');
-            break;
-        case 'popularity':
-            $query->orderByRaw('popularity DESC NULLS LAST');
-            break;
-        case 'year':
-            $query->orderByRaw("year $sortOrder NULLS LAST");
-            break;
-        case 'title':
-            $query->orderByRaw("REGEXP_REPLACE(LOWER(title), '[^a-z0-9]', '', 'g') ASC");
-            break;
-        default:
-            $query->orderByRaw('popularity DESC NULLS LAST');
-    }
-
-    $anime = $query->paginate(20);
-
-    return AnimeResource::collection($anime);
-}
-
 }

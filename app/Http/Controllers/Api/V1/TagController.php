@@ -13,14 +13,30 @@ class TagController extends Controller
     {
         $query = Tag::query();
 
-        if ($request->has('search')) {
-            $query->where('name', 'ILIKE', '%' . $request->search . '%');
+        if ($request->filled('search')) {
+            $query->where('name', 'ILIKE', '%'.$request->search.'%')
+                ->orWhere('slug', 'ILIKE', '%'.$request->search.'%');
         }
 
-        $perPage = min($request->get('per_page', 50), 100);
+        $tags = $query->orderBy('name', 'asc')->get();
 
-        return TagResource::collection(
-            $query->orderBy('name')->paginate($perPage)
-        );
+        return response()->json([
+            'success' => true,
+            'data' => $tags->map(function ($tag) {
+                return [
+                    'id' => $tag->id,
+                    'name' => $tag->name,
+                    'slug' => $tag->slug,
+                ];
+            }),
+            'total' => $tags->count(),
+        ]);
+    }
+
+    public function show($id)
+    {
+        $tag = Tag::findOrFail($id);
+
+        return new TagResource($tag);
     }
 }

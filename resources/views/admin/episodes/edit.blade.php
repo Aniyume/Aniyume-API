@@ -1,9 +1,8 @@
 @extends('layouts.admin')
 
-@section('title', 'Редактирование ' . $tag->name . ' - АниЮм Админ')
+@section('title', 'Edit Episode - AniYume Admin')
 
 @section('content')
-
 <style>
     .page-header {
         margin-bottom: 32px;
@@ -31,13 +30,23 @@
         border-radius: 16px;
         padding: 32px;
         backdrop-filter: blur(10px);
-        max-width: 600px;
+        max-width: 800px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
     }
 
     .form-group {
         display: flex;
         flex-direction: column;
-        margin-bottom: 24px;
+        margin-bottom: 20px;
+    }
+
+    .form-group.full {
+        grid-column: 1 / -1;
     }
 
     .form-label {
@@ -55,7 +64,9 @@
         margin-left: 4px;
     }
 
-    .form-input {
+    .form-input,
+    .form-select,
+    .form-textarea {
         background: linear-gradient(135deg, rgba(0, 255, 200, 0.08), rgba(0, 200, 255, 0.05));
         border: 1px solid rgba(0, 255, 200, 0.2);
         color: #e0e0e0;
@@ -66,32 +77,31 @@
         font-size: 14px;
     }
 
-    .form-input::placeholder {
+    .form-textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .form-input::placeholder,
+    .form-textarea::placeholder {
         color: rgba(224, 224, 224, 0.4);
     }
 
-    .form-input:focus {
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
         outline: none;
         background: linear-gradient(135deg, rgba(0, 255, 200, 0.12), rgba(0, 200, 255, 0.08));
         border-color: #00ffc8;
         box-shadow: 0 0 20px rgba(0, 255, 200, 0.3), inset 0 0 10px rgba(0, 255, 200, 0.08);
     }
 
-    .form-hint {
-        color: rgba(176, 224, 255, 0.6);
-        font-size: 13px;
-        margin-top: 8px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
+    .form-select option {
+        background: #0a0a1a;
+        color: #e0e0e0;
     }
 
-    .form-hint-icon {
-        color: #00ffc8;
-        font-size: 14px;
-    }
-
-    .stats-box {
+    .info-box {
         background: linear-gradient(135deg, rgba(0, 255, 200, 0.12), rgba(0, 200, 255, 0.08));
         border: 1px solid rgba(0, 255, 200, 0.25);
         border-radius: 10px;
@@ -100,32 +110,21 @@
         font-size: 13px;
         margin-bottom: 24px;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 10px;
     }
 
-    .stats-box-icon {
+    .info-box-icon {
         color: #00ffc8;
         font-size: 18px;
         flex-shrink: 0;
+        margin-top: 2px;
     }
 
-    .stats-box-content {
-        flex: 1;
-    }
-
-    .stats-box-label {
-        color: rgba(176, 224, 255, 0.7);
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 4px;
-    }
-
-    .stats-box-value {
+    .info-box-title {
         color: #00ffc8;
         font-weight: 700;
-        font-size: 16px;
+        margin-bottom: 4px;
     }
 
     .error-alert {
@@ -230,27 +229,6 @@
         transform: translateY(0);
     }
 
-    .info-banner {
-        background: linear-gradient(135deg, rgba(0, 200, 255, 0.15), rgba(0, 255, 200, 0.08));
-        border: 1px solid rgba(0, 255, 200, 0.25);
-        border-radius: 10px;
-        padding: 12px 14px;
-        color: #b0e0ff;
-        font-size: 12px;
-        margin-bottom: 24px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .info-banner-icon {
-        color: #00ffc8;
-        font-size: 14px;
-    }
-
     @media (max-width: 768px) {
         .form-container {
             padding: 20px;
@@ -270,22 +248,19 @@
         .page-title {
             font-size: 24px;
         }
-
-        .stats-box {
-            flex-direction: column;
-            align-items: flex-start;
-        }
     }
 </style>
 
 <div class="page-header">
-    <h1 class="page-title">✏️ Редактирование тега</h1>
-    <p class="subtitle">{{ $tag->name }}</p>
+    <h1 class="page-title">✏️ Edit Episode</h1>
+    <p class="subtitle">
+        {{ optional($episode->anime)->title ? 'Anime: ' . $episode->anime->title : 'Anime is missing' }}
+    </p>
 </div>
 
 @if($errors->any())
     <div class="error-alert">
-        <h3>⚠️ Ошибки валидации</h3>
+        <h3>⚠️ Validation Errors</h3>
         <ul>
             @foreach($errors->all() as $error)
                 <li>{{ $error }}</li>
@@ -295,44 +270,89 @@
 @endif
 
 <div class="form-container">
-    <div class="info-banner">
-        <span class="info-banner-icon">ℹ️</span>
-        Слаг будет обновлен автоматически при сохранении
-    </div>
-
-    <div class="stats-box">
-        <div class="stats-box-icon">🏷️</div>
-        <div class="stats-box-content">
-            <div class="stats-box-label">Используется в аниме</div>
-            <div class="stats-box-value">{{ number_format($tag->anime_count) }}</div>
+    <div class="info-box">
+        <div class="info-box-icon">ℹ️</div>
+        <div>
+            <div class="info-box-title">Episode #{{ $episode->episode_number }}</div>
+            You can update title, duration, status and player URL for this episode.
         </div>
     </div>
 
-    <form action="{{ route('admin.tags.update', $tag->id) }}" method="POST">
+    <form action="{{ route('admin.episodes.update', $episode->id) }}" method="POST">
         @csrf
         @method('PUT')
 
-        <div class="form-group">
-            <label class="form-label">
-                Название тега <span class="required">*</span>
-            </label>
-            <input type="text" name="name" value="{{ old('name', $tag->name) }}" required
-                   class="form-input">
-            <div class="form-hint">
-                <span class="form-hint-icon">💡</span>
-                Это название будет использоваться во всех {{ number_format($tag->anime_count) }} аниме с этим тегом
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="form-label">
+                    Episode Number <span class="required">*</span>
+                </label>
+                <input type="number"
+                       name="episode_number"
+                       value="{{ old('episode_number', $episode->episode_number) }}"
+                       min="1"
+                       required
+                       class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Duration (minutes)</label>
+                <input type="number"
+                       name="duration"
+                       value="{{ old('duration', $episode->duration) }}"
+                       min="0"
+                       class="form-input"
+                       placeholder="e.g., 24">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    Status <span class="required">*</span>
+                </label>
+                <select name="status" required class="form-select">
+                    @php
+                        $status = old('status', $episode->status);
+                    @endphp
+                    <option value="published" {{ $status === 'published' ? 'selected' : '' }}>✅ Published</option>
+                    <option value="draft" {{ $status === 'draft' ? 'selected' : '' }}>📝 Draft</option>
+                    <option value="archived" {{ $status === 'archived' ? 'selected' : '' }}>📦 Archived</option>
+                </select>
+            </div>
+
+            <div class="form-group full">
+                <label class="form-label">Title</label>
+                <input type="text"
+                       name="title"
+                       value="{{ old('title', $episode->title) }}"
+                       class="form-input"
+                       placeholder="Episode title (optional)">
+            </div>
+
+            <div class="form-group full">
+                <label class="form-label">Player URL</label>
+                <input type="url"
+                       name="player_url"
+                       value="{{ old('player_url', $episode->player_url) }}"
+                       class="form-input"
+                       placeholder="https://...">
+            </div>
+
+            <div class="form-group full">
+                <label class="form-label">Description</label>
+                <textarea name="description"
+                          class="form-textarea"
+                          placeholder="Short description (optional)">{{ old('description', $episode->description ?? '') }}</textarea>
             </div>
         </div>
 
         <div class="form-actions">
-            <a href="{{ route('admin.tags.index') }}" class="btn btn-secondary">
-                ← Отменить
+            <a href="{{ route('admin.episodes.index') }}" class="btn btn-secondary">
+                ← Cancel
             </a>
             <button type="submit" class="btn btn-primary">
-                ✓ Сохранить изменения
+                ✓ Save Changes
             </button>
         </div>
     </form>
 </div>
-
 @endsection

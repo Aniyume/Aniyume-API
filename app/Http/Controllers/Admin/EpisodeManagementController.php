@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Anime;
-use App\Models\Episode;
-use App\Models\AuditLog;
-use App\Models\ImportLog;
 use App\Jobs\ImportEpisodesJob;
+use App\Models\Anime;
+use App\Models\AuditLog;
+use App\Models\Episode;
+use App\Models\ImportLog;
 use Illuminate\Http\Request;
 
 class EpisodeManagementController extends Controller
@@ -22,7 +22,7 @@ class EpisodeManagementController extends Controller
 
         if ($request->filled('search')) {
             $query->whereHas('anime', function ($q) use ($request) {
-                $q->where('title', 'ILIKE', '%' . $request->search . '%');
+                $q->where('title', 'ILIKE', '%'.$request->search.'%');
             });
         }
 
@@ -65,7 +65,7 @@ class EpisodeManagementController extends Controller
         ]);
 
         return redirect()->route('admin.episodes.index', ['anime_id' => $animeId])
-            ->with('success', 'Episodes import started for ' . $anime->title);
+            ->with('success', 'Episodes import started for '.$anime->title);
     }
 
     public function importAll(Request $request)
@@ -117,5 +117,28 @@ class EpisodeManagementController extends Controller
 
         return redirect()->route('admin.episodes.index', ['anime_id' => $animeId])
             ->with('success', 'Episode deleted successfully');
+    }
+
+    public function edit(Episode $episode)
+    {
+        return view('admin.episodes.edit', compact('episode'));
+    }
+
+    public function update(Request $request, Episode $episode)
+    {
+        $data = $request->validate([
+            'episode_number' => ['required', 'integer', 'min:1'],
+            'title' => ['nullable', 'string', 'max:255'],
+            'duration' => ['nullable', 'integer', 'min:0'],
+            'status' => ['required', 'in:published,draft,archived'],
+            'player_url' => ['nullable', 'url', 'max:2048'],
+            'description' => ['nullable', 'string'],
+        ]);
+
+        $episode->update($data);
+
+        return redirect()
+            ->route('admin.episodes.index')
+            ->with('success', 'Episode updated successfully');
     }
 }
