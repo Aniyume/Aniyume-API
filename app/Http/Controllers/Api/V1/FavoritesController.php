@@ -2,102 +2,68 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreFavoriteRequest;
-use App\Http\Resources\Api\V1\FavoriteResource;
 use App\Models\Favorite;
-use App\Models\Anime;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class FavoritesController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
-        $favorites = Favorite::with('anime')
-            ->where('user_id', $request->user()->id)
-            ->orderBy('created_at', 'desc')
+        $favorites = Favorite::where('user_id', auth()->id())
+            ->with('anime')
+            ->orderByDesc('created_at')
             ->paginate(20);
 
-        return FavoriteResource::collection($favorites);
+        return response()->json($favorites);
     }
 
-    public function store(StoreFavoriteRequest $request)
+    public function store(Request $request): JsonResponse
     {
-        $exists = Favorite::where('user_id', $request->user()->id)
-            ->where('anime_id', $request->validated('anime_id'))
-            ->exists();
+        $validated = $request->validate([
+            'anime_id' => 'required|integer|exists:anime,id',
+        ]);
 
-        if ($exists) {
-            return response()->json([
-                'message' => 'Anime already in favorites'
-            ], 409);
-        }
+        $favorite = Favorite::firstOrCreate(
+            [
+                'user_id' => auth()->id(),
+                'anime_id' => $validated['anime_id'],
+            ]
+        );
 
-        DB::beginTransaction();
-        try {
-            $favorite = Favorite::create([
-                'user_id' => $request->user()->id,
-                'anime_id' => $request->validated('anime_id'),
-            ]);
-
-            $anime = Anime::find($request->validated('anime_id'));
-            $anime->increment('favorites');
-
-            DB::commit();
-
-            $favorite->load('anime');
-            return new FavoriteResource($favorite);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'message' => 'Failed to add to favorites',
-            ], 500);
-        }
+        return response()->json($favorite->load('anime'), 201);
     }
 
-    public function destroy(Request $request, $animeId)
+    public function show($id): JsonResponse
     {
-        $favorite = Favorite::where('user_id', $request->user()->id)
-            ->where('anime_id', $animeId)
-            ->first();
+        $favorite = Favorite::where('user_id', auth()->id())
+            ->where('id', $id)
+            ->with('anime')
+            ->firstOrFail();
 
-        if (!$favorite) {
-            return response()->json([
-                'message' => 'Favorite not found'
-            ], 404);
-        }
-
-        DB::beginTransaction();
-        try {
-            $favorite->delete();
-
-            $anime = Anime::find($animeId);
-            $anime->decrement('favorites');
-
-            DB::commit();
-
-            return response()->json([
-                'message' => 'Removed from favorites successfully'
-            ], 200);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'message' => 'Failed to remove from favorites',
-            ], 500);
-        }
+        return response()->json($favorite);
     }
 
-    public function check(Request $request, $animeId)
+    public function destroy($id): JsonResponse
     {
-        $exists = Favorite::where('user_id', $request->user()->id)
-            ->where('anime_id', $animeId)
+        $favorite = Favorite::where('user_id', auth()->id())
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $favorite->delete();
+
+        return response()->json(['message' => 'Removed from favorites']);
+    }
+
+    public function checkFavorite($anime_id): JsonResponse
+    {
+        $isFavorite = Favorite::where('user_id', auth()->id())
+            ->where('anime_id', $anime_id)
             ->exists();
 
         return response()->json([
-            'is_favorite' => $exists
+            'anime_id' => $anime_id,
+            'is_favorite' => $isFavorite,
         ]);
     }
 }
