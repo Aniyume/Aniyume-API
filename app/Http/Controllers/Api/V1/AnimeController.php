@@ -192,4 +192,96 @@ class AnimeController extends Controller
 
         return AnimeResource::collection($anime);
     }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $user = $request->user();
+        $status = $request->input('status');
+
+        // Валидация статуса
+        $validStatuses = ['watching', 'planned', 'completed', 'on_hold', 'dropped'];
+        if ($status && ! in_array($status, $validStatuses)) {
+            return response()->json([
+                'error' => 'Invalid status',
+            ], 422);
+        }
+
+        try {
+            if ($status === null) {
+                // Удалить запись если статус null
+                \DB::table('anime_user')
+                    ->where('user_id', $user->id)
+                    ->where('anime_id', $id)
+                    ->delete();
+            } else {
+                // Обновить или создать запись
+                \DB::table('anime_user')
+                    ->updateOrInsert(
+                        ['user_id' => $user->id, 'anime_id' => $id],
+                        ['status' => $status, 'updated_at' => now()]
+                    );
+            }
+
+            return response()->json([
+                'success' => true,
+                'status' => $status,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to update status',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Получить статистику сообщества для аниме
+     */
+    public function getCommunityStats($id)
+    {
+        try {
+            $stats = \DB::table('anime_user')
+                ->where('anime_id', $id)
+                ->select('status', \DB::raw('count(*) as count'))
+                ->groupBy('status')
+                ->pluck('count', 'status');
+
+            return response()->json([
+                'watching' => (int) ($stats['watching'] ?? 0),
+                'planned' => (int) ($stats['planned'] ?? 0),
+                'completed' => (int) ($stats['completed'] ?? 0),
+                'on_hold' => (int) ($stats['on_hold'] ?? 0),
+                'dropped' => (int) ($stats['dropped'] ?? 0),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to fetch community stats',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Получить статус пользователя для аниме
+     */
+    public function getUserStatus(Request $request, $id)
+    {
+        $user = $request->user();
+
+        try {
+            $userAnime = \DB::table('anime_user')
+                ->where('user_id', $user->id)
+                ->where('anime_id', $id)
+                ->first();
+
+            return response()->json([
+                'status' => $userAnime?->status,
+                'found' => $userAnime !== null,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to fetch user status',
+            ], 500);
+        }
+    }
 }

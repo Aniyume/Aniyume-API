@@ -10,14 +10,11 @@ class EnsureUserIsAdmin
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $user = auth()->user();
-        
-        if (!$user) {
-            abort(404);
-        }
-        
-        if (!$user->hasRole('admin')) {
-            abort(404);
+        if (! $request->user() || ! $request->user()->hasRole('admin')) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Access denied. Admins only.'], 403);
+            }
+            abort(403);
         }
 
         return $next($request);
