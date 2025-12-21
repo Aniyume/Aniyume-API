@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\ImportEpisodesJob;
+use App\Jobs\EpisodesImportJob;
 use App\Models\Anime;
 use App\Models\AuditLog;
 use App\Models\Episode;
@@ -60,7 +60,7 @@ class EpisodeManagementController extends Controller
             'status' => 'running',
         ]);
 
-        ImportEpisodesJob::dispatch($anime->id, false, $importLog->id);
+        EpisodesImportJob::dispatch($anime->id, false);
 
         AuditLog::create([
             'user_id' => auth()->id(),
@@ -92,7 +92,7 @@ class EpisodeManagementController extends Controller
         AuditLog::create([
             'user_id' => auth()->id(),
             'action' => 'import_all_episodes',
-            'description' => 'Started mass episodes import (initial) for all anime',
+            'description' => 'Started mass episodes import (initial, only new episodes) for all anime',
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
@@ -152,20 +152,18 @@ class EpisodeManagementController extends Controller
             'anime_id' => ['required', 'exists:anime,id'],
         ]);
 
-        $onlyNew = true;
-
         $importLog = ImportLog::create([
             'import_type' => 'episodes_bulk_new',
             'started_at' => now(),
             'status' => 'running',
         ]);
 
-        ImportEpisodesJob::dispatch((int) $data['anime_id'], ! $onlyNew, $importLog->id);
+        EpisodesImportJob::dispatch((int) $data['anime_id'], false);
 
         AuditLog::create([
             'user_id' => auth()->id(),
             'action' => 'bulk_import_episodes',
-            'description' => "Started bulk import for anime ID {$data['anime_id']} (mode: new)",
+            'description' => "Started bulk import for anime ID {$data['anime_id']} (only new episodes)",
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
