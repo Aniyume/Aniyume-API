@@ -15,15 +15,15 @@ class EpisodeImportService
 
     protected string $anilibriaUrl = 'https://api.anilibria.tv/v3/title';
 
-    protected int $processed = 0;
+    public int $processed = 0;
 
-    protected int $created = 0;
+    public int $created = 0;
 
-    protected int $updated = 0;
+    public int $updated = 0;
 
-    protected int $skipped = 0;
+    public int $skipped = 0;
 
-    protected int $errors = 0;
+    public int $errors = 0;
 
     protected float $startTime;
 
@@ -208,24 +208,28 @@ class EpisodeImportService
     {
         foreach ($episodes as $data) {
             try {
+                $episodeData = array_merge(['anime_id' => $anime->id], $data);
+                unset($episodeData['translation_name']);
+
                 $existing = Episode::where('anime_id', $anime->id)
                     ->where('episode_number', $data['episode_number'])
-                    ->where('translation_name', $data['translation_name'])
+                    ->where('translator', $data['translation_name'] ?? 'Unknown')
                     ->first();
 
                 if ($existing) {
                     if ($update) {
-                        $existing->update($data);
+                        $existing->update($episodeData);
                         $this->updated++;
                     } else {
                         $this->skipped++;
                     }
                 } else {
-                    Episode::create(array_merge(['anime_id' => $anime->id], $data));
+                    Episode::create($episodeData);
                     $this->created++;
                 }
             } catch (\Throwable $e) {
                 $this->errors++;
+                Log::error('Episode store error', ['error' => $e->getMessage(), 'data' => $data]);
             }
         }
     }

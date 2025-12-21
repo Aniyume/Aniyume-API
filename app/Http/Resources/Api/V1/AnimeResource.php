@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,16 +21,35 @@ class AnimeResource extends JsonResource
             'status' => $this->status,
             'type' => $this->type,
             'number_of_episodes' => $this->number_of_episodes,
-            'aired_from' => $this->aired_from?->format('Y-m-d'),
-            'aired_to' => $this->aired_to?->format('Y-m-d'),
+            'aired_from' => $this->formatDate($this->aired_from),
+            'aired_to' => $this->formatDate($this->aired_to),
             'nsfw_flag' => $this->nsfw_flag,
             'popularity' => $this->popularity,
             'favorites' => $this->favorites,
             'external_id' => $this->external_id,
             'external_source' => $this->external_source,
             'tags' => TagResource::collection($this->whenLoaded('tags')),
+            'studio' => $this->whenLoaded('studio', fn () => $this->studio),
+            'genres' => GenreResource::collection($this->whenLoaded('genres')),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];
+    }
+
+    private function formatDate($date): ?string
+    {
+        if (! $date) {
+            return null;
+        }
+
+        if ($date instanceof Carbon) {
+            return $date->format('Y-m-d');
+        }
+
+        try {
+            return Carbon::parse($date)->format('Y-m-d');
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 }

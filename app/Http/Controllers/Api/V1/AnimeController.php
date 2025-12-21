@@ -13,65 +13,42 @@ class AnimeController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Anime::query();
-
-        if ($request->filled('type')) {
-            $query->where('type', $request->type);
-        }
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->filled('year')) {
-            $query->where('release_year', $request->year);
-        }
-
-        if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('title', 'ILIKE', "%{$request->search}%")
-                    ->orWhere('title_en', 'ILIKE', "%{$request->search}%");
+        $query = Anime::query()
+            ->with(['tags', 'studio', 'genres'])
+            ->when($request->filled('type'), fn ($q) => $q->where('type', $request->type))
+            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
+            ->when($request->filled('year'), fn ($q) => $q->where('release_year', $request->year))
+            ->when($request->filled('search'), function ($q) use ($request) {
+                $q->where(function ($subQ) use ($request) {
+                    $subQ->where('title', 'ILIKE', "%{$request->search}%")
+                        ->orWhere('title_en', 'ILIKE', "%{$request->search}%");
+                });
             });
-        }
 
         if ($request->has('sort')) {
-            switch ($request->sort) {
-                case 'rating':
-                    $query->orderByRaw('rating DESC NULLS LAST');
-                    break;
-                case 'popularity':
-                    $query->orderByRaw('popularity DESC NULLS LAST');
-                    break;
-                case 'newest':
-                    $query->orderByRaw('aired_from DESC NULLS LAST');
-                    break;
-                case 'title':
-                    $query->orderBy('title', 'asc');
-                    break;
-                default:
-                    $query->orderBy('id', 'asc');
-            }
+            $sortMap = [
+                'rating' => ['rating', 'DESC'],
+                'popularity' => ['popularity', 'DESC'],
+                'newest' => ['aired_from', 'DESC'],
+                'title' => ['title', 'ASC'],
+            ];
+
+            $sort = $sortMap[$request->sort] ?? ['id', 'ASC'];
+            $query->orderByRaw("{$sort[0]} {$sort[1]} NULLS LAST");
         } else {
-            $query->orderBy('id', 'asc');
+            $query->orderBy('id', 'ASC');
         }
 
-        $anime = $query->with('tags')->paginate(20);
+        $anime = $query->paginate(20);
 
         return AnimeResource::collection($anime);
     }
 
-    public function show($id)
+    public function show(Anime $anime)
     {
-        try {
-            $anime = Anime::with('tags')->findOrFail($id);
+        $anime->load(['tags', 'studio', 'genres', 'episodes']);
 
-            return new AnimeResource($anime);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Anime not found',
-                'message' => $e->getMessage(),
-            ], 404);
-        }
+        return new AnimeResource($anime);
     }
 
     public function episodes(Anime $anime)
@@ -95,33 +72,10 @@ class AnimeController extends Controller
 
     public function search(Request $request)
     {
-        $query = Anime::query();
-
-        if ($request->filled('q')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('title', 'ILIKE', '%'.$request->q.'%')
-                    ->orWhere('description', 'ILIKE', '%'.$request->q.'%');
-            });
-        }
-
-        if ($request->filled('type')) {
-            $query->where('type', $request->type);
-        }
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->filled('year')) {
-            $query->where('release_year', $request->year);
-        }
-
-        $anime = $query->with('tags')->paginate(20);
-
-        return AnimeResource::collection($anime);
+        return $this->index($request);
     }
 
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(Request $request, Anime $anime)
     {
         $user = $request->user();
         $status = $request->input('status');
@@ -133,10 +87,10 @@ class AnimeController extends Controller
 
         try {
             if ($status === null) {
-                $user->users()->detach($id);
+                $user->animes()->detach($anime->id);
             } else {
-                $user->users()->syncWithoutDetaching([
-                    $id => ['status' => $status, 'updated_at' => now()],
+                $user->animes()->syncWithoutDetaching([
+                    $anime->id => ['status' => $status, 'updated_at' => now()],
                 ]);
             }
 
@@ -146,19 +100,17 @@ class AnimeController extends Controller
         }
     }
 
-    public function getCommunityStats($id)
+    public function getCommunityStats(Anime $anime)
     {
-        $anime = Anime::findOrFail($id);
-
         return response()->json($anime->getCommunityStats());
     }
 
-    public function getUserStatus(Request $request, $id)
+    public function getUserStatus(Request $request, Anime $anime)
     {
         $user = $request->user();
         $pivot = \DB::table('anime_user')
             ->where('user_id', $user->id)
-            ->where('anime_id', $id)
+            ->where('anime_id', $anime->id)
             ->first();
 
         return response()->json([

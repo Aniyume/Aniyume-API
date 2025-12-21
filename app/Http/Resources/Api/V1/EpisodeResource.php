@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,8 +21,8 @@ class EpisodeResource extends JsonResource
             'external_id' => $this->external_id,
             'external_source' => $this->external_source,
             'external_episode_id' => $this->external_episode_id,
-            'aired_at' => $this->aired_at?->toISOString(),
-            'release_date' => $this->release_date?->format('Y-m-d'),
+            'aired_at' => $this->formatDateTime($this->aired_at),
+            'release_date' => $this->formatDate($this->release_date),
             'duration' => $this->duration,
             'thumbnail_url' => $this->thumbnail_url,
             'poster_url' => $this->poster_url,
@@ -34,20 +35,23 @@ class EpisodeResource extends JsonResource
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];
-
     }
 
-    public function getTranslatorsByAnime(Anime $anime)
+    private function formatDateTime($dateTime): ?string
     {
-        $translators = Episode::where('anime_id', $anime->id)
-            ->whereNotNull('translator')
-            ->select('translator', 'translation_type')
-            ->groupBy('translator', 'translation_type')
-            ->orderBy('translator')
-            ->get();
+        if (! $dateTime) {
+            return null;
+        }
 
-        return response()->json([
-            'data' => $translators,
-        ]);
+        return $dateTime instanceof Carbon ? $dateTime->toISOString() : Carbon::parse($dateTime)->toISOString();
+    }
+
+    private function formatDate($date): ?string
+    {
+        if (! $date) {
+            return null;
+        }
+
+        return $date instanceof Carbon ? $date->format('Y-m-d') : Carbon::parse($date)->format('Y-m-d');
     }
 }
