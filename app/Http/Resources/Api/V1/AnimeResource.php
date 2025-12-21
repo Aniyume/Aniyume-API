@@ -29,8 +29,6 @@ class AnimeResource extends JsonResource
             'external_id' => $this->external_id,
             'external_source' => $this->external_source,
             'tags' => TagResource::collection($this->whenLoaded('tags')),
-            'studio' => $this->whenLoaded('studio', fn () => $this->studio),
-            'genres' => GenreResource::collection($this->whenLoaded('genres')),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

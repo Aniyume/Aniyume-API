@@ -14,7 +14,7 @@ class AnimeController extends Controller
     public function index(Request $request)
     {
         $query = Anime::query()
-            ->with(['tags', 'studio', 'genres'])
+            ->with(['tags'])
             ->when($request->filled('type'), fn ($q) => $q->where('type', $request->type))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
             ->when($request->filled('year'), fn ($q) => $q->where('release_year', $request->year))
