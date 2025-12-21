@@ -12,32 +12,33 @@ use Illuminate\Support\Facades\DB;
 class UserAnimeListController extends Controller
 {
     public function updateStatus(Anime $anime, UpdateAnimeStatusRequest $request): JsonResponse
-    {
-        $user = Auth::user();
-        $validated = $request->validated();
+{
+    $user = Auth::user();
+    $validated = $request->validated();
 
-        $existingEntry = DB::table('anime_user')
-            ->where('user_id', $user->id)
-            ->where('anime_id', $anime->id)
-            ->first();
+    if ($validated['status'] === 'not_watching') {
+        $user->animes()->detach($anime->id);
 
-        $data = [
+        return response()->json([
+            'message' => 'Status removed successfully',
+            'status' => 'not_watching',
+        ]);
+    }
+
+    $user->animes()->syncWithoutDetaching([
+        $anime->id => [
             'status' => $validated['status'],
+            'episodes_watched' => 0,
             'updated_at' => now(),
-        ];
+        ],
+    ]);
 
-        if ($validated['status'] === 'not_watching') {
-            if ($existingEntry) {
-                DB::table('anime_user')
-                    ->where('user_id', $user->id)
-                    ->where('anime_id', $anime->id)
-                    ->delete();
+    return response()->json([
+        'message' => 'Status updated successfully',
+        'status' => $validated['status'],
+    ]);
+}
 
-                return response()->json([
-                    'message' => 'Status removed successfully',
-                    'status' => 'not_watching',
-                ]);
-            }
         } else {
             if ($existingEntry) {
                 DB::table('anime_user')

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Controllers\Controller;
 use App\Models\Episode;
 use App\Models\WatchHistory;
 use Illuminate\Http\JsonResponse;
