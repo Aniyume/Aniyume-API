@@ -35,32 +35,57 @@ class EpisodeImportService
     public function importForSingleAnime(Anime $anime, bool $update = false): void
     {
         try {
+            Log::info('Attempting episode import', [
+                'anime_id' => $anime->id,
+                'title' => $anime->title,
+                'shikimori_id' => $anime->shikimori_id,
+            ]);
+
             $episodes = [];
 
+            // Try Kodik by Shikimori ID first
             if ($anime->shikimori_id) {
+                Log::info('Fetching from Kodik by Shikimori ID', ['shikimori_id' => $anime->shikimori_id]);
                 $episodes = $this->fetchFromKodikByShikimori($anime);
+                Log::info('Kodik by Shikimori result', ['episodes_count' => count($episodes)]);
             }
 
+            // Try Kodik by title if no results
             if (empty($episodes)) {
+                Log::info('Fetching from Kodik by title', ['title' => $anime->title]);
                 $episodes = $this->fetchFromKodik($anime);
+                Log::info('Kodik by title result', ['episodes_count' => count($episodes)]);
             }
 
+            // Try AniLibria as fallback
             if (empty($episodes)) {
+                Log::info('Fetching from AniLibria', ['title' => $anime->title]);
                 $episodes = $this->fetchFromAniLibria($anime);
+                Log::info('AniLibria result', ['episodes_count' => count($episodes)]);
             }
 
             if (empty($episodes)) {
+                Log::warning('No episodes found for anime', [
+                    'anime_id' => $anime->id,
+                    'title' => $anime->title,
+                ]);
                 $this->skipped++;
             } else {
+                Log::info('Storing episodes', [
+                    'anime_id' => $anime->id,
+                    'episodes_count' => count($episodes),
+                ]);
                 $this->storeEpisodes($anime, $episodes, $update);
             }
 
             $this->processed++;
+
         } catch (\Throwable $e) {
             $this->errors++;
             Log::error('Episode import error', [
                 'anime_id' => $anime->id,
                 'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
         }
     }
@@ -87,6 +112,9 @@ class EpisodeImportService
                 echo "\rProcessing {$processedLocal}/{$total} [{$anime->id}] {$anime->title}";
 
                 $this->importForSingleAnime($anime, $update);
+
+                // Small delay to avoid rate limiting
+                usleep(500000); // 0.5 second
             }
         });
 
@@ -97,38 +125,116 @@ class EpisodeImportService
     protected function fetchFromKodikByShikimori(Anime $anime): array
     {
         if (! $this->kodikToken || ! $anime->shikimori_id) {
-            return [];
-        }
-
-        $response = Http::timeout(30)
-            ->retry(3, 500)
-            ->withHeaders([
-                'User-Agent' => 'AniYumeBot/1.0',
-                'Accept' => 'application/json',
-            ])
-            ->get($this->kodikUrl, [
-                'token' => $this->kodikToken,
-                'shikimori_id' => $anime->shikimori_id,
-                'with_episodes' => 'true',
-                'limit' => 1,
+            Log::info('Skipping Kodik by Shikimori', [
+                'has_token' => ! empty($this->kodikToken),
+                'has_shikimori_id' => ! empty($anime->shikimori_id),
             ]);
 
-        if (! $response->ok()) {
             return [];
         }
 
-        $results = $response->json('results') ?? [];
-        if (! count($results)) {
+        try {
+            $response = Http::timeout(30)
+                ->retry(3, 1000)
+                ->withHeaders([
+                    'User-Agent' => 'AniYumeBot/1.0',
+                    'Accept' => 'application/json',
+                ])
+                ->get($this->kodikUrl, [
+                    'token' => $this->kodikToken,
+                    'shikimori_id' => $anime->shikimori_id,
+                    'with_episodes' => 'true',
+                    'limit' => 1,
+                ]);
+
+            if (! $response->ok()) {
+                Log::warning('Kodik API request failed', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+
+                return [];
+            }
+
+            $results = $response->json('results') ?? [];
+
+            if (empty($results)) {
+                return [];
+            }
+
+            return $this->parseKodikEpisodes($results[0]);
+
+        } catch (\Exception $e) {
+            Log::error('Kodik fetch error', [
+                'anime_id' => $anime->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [];
+        }
+    }
+
+    protected function fetchFromKodik(Anime $anime): array
+    {
+        if (! $this->kodikToken) {
             return [];
         }
 
-        $episodes = [];
-        $result = $results[0];
+        $title = $this->normalizeTitle($anime->title);
+
+        try {
+            $response = Http::timeout(30)
+                ->retry(3, 1000)
+                ->withHeaders([
+                    'User-Agent' => 'AniYumeBot/1.0',
+                    'Accept' => 'application/json',
+                ])
+                ->get($this->kodikUrl, [
+                    'token' => $this->kodikToken,
+                    'title' => $title,
+                    'types' => 'anime,anime-serial',
+                    'with_episodes' => 'true',
+                    'limit' => 10,
+                ]);
+
+            if (! $response->ok()) {
+                return [];
+            }
+
+            $results = $response->json('results') ?? [];
+
+            if (empty($results)) {
+                return [];
+            }
+
+            // Take the first result with most episodes
+            usort($results, function ($a, $b) {
+                $countA = isset($a['episodes']) ? count($a['episodes'], COUNT_RECURSIVE) : 0;
+                $countB = isset($b['episodes']) ? count($b['episodes'], COUNT_RECURSIVE) : 0;
+
+                return $countB <=> $countA;
+            });
+
+            return $this->parseKodikEpisodes($results[0]);
+
+        } catch (\Exception $e) {
+            Log::error('Kodik title fetch error', [
+                'anime_id' => $anime->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [];
+        }
+    }
+
+    protected function parseKodikEpisodes(array $result): array
+    {
         if (! isset($result['episodes']) || ! is_array($result['episodes'])) {
             return [];
         }
 
-        $poster = $result['poster'] ?? null;
+        $episodes = [];
+        $poster = $result['screenshots'][0] ?? null;
 
         foreach ($result['episodes'] as $episodeNumber => $episodeItems) {
             if (! is_array($episodeItems)) {
@@ -145,92 +251,18 @@ class EpisodeImportService
                     'external_id' => $result['id'] ?? null,
                     'external_source' => 'kodik',
                     'external_episode_id' => $variant['id'] ?? null,
-                    'aired_at' => $variant['created_at'] ?? null,
-                    'release_date' => $variant['aired_at'] ?? null,
-                    'duration' => $variant['duration'] ?? null,
+                    'aired_at' => null,
+                    'release_date' => null,
+                    'duration' => null,
                     'thumbnail_url' => $variant['screenshot'] ?? null,
                     'poster_url' => $poster,
-                    'translator' => $variant['translation'] ?? null,
-                    'translation_type' => $variant['translation_type'] ?? null,
-                    'quality' => $variant['quality'] ?? null,
+                    'translator' => $result['translation']['title'] ?? null,
+                    'translation_type' => $result['translation']['type'] ?? null,
+                    'quality' => $result['quality'] ?? null,
                     'source' => 'kodik',
                     'priority' => 10,
                 ];
-                break;
-            }
-        }
-
-        return $episodes;
-    }
-
-    protected function fetchFromKodik(Anime $anime): array
-    {
-        if (! $this->kodikToken) {
-            return [];
-        }
-
-        $title = $this->normalizeTitle($anime->title);
-
-        $response = Http::timeout(30)
-            ->retry(3, 500)
-            ->withHeaders([
-                'User-Agent' => 'AniYumeBot/1.0',
-                'Accept' => 'application/json',
-            ])
-            ->get($this->kodikUrl, [
-                'token' => $this->kodikToken,
-                'title' => $title,
-                'types' => 'anime,anime-serial',
-                'with_episodes' => 'true',
-                'limit' => 10,
-            ]);
-
-        if (! $response->ok()) {
-            return [];
-        }
-
-        $results = $response->json('results') ?? [];
-        if (! count($results)) {
-            return [];
-        }
-
-        $episodes = [];
-
-        foreach ($results as $result) {
-            if (! isset($result['episodes']) || ! is_array($result['episodes'])) {
-                continue;
-            }
-
-            $poster = $result['poster'] ?? null;
-
-            foreach ($result['episodes'] as $episodeNumber => $episodeItems) {
-                if (! is_array($episodeItems)) {
-                    continue;
-                }
-
-                foreach ($episodeItems as $variant) {
-                    $episodes[] = [
-                        'episode_number' => (int) $episodeNumber,
-                        'season_number' => $variant['season'] ?? null,
-                        'title' => $variant['title'] ?? "Серия {$episodeNumber}",
-                        'player_url' => $variant['link'] ?? null,
-                        'player_iframe' => $variant['iframe_src'] ?? null,
-                        'external_id' => $result['id'] ?? null,
-                        'external_source' => 'kodik',
-                        'external_episode_id' => $variant['id'] ?? null,
-                        'aired_at' => $variant['created_at'] ?? null,
-                        'release_date' => $variant['aired_at'] ?? null,
-                        'duration' => $variant['duration'] ?? null,
-                        'thumbnail_url' => $variant['screenshot'] ?? null,
-                        'poster_url' => $poster,
-                        'translator' => $variant['translation'] ?? null,
-                        'translation_type' => $variant['translation_type'] ?? null,
-                        'quality' => $variant['quality'] ?? null,
-                        'source' => 'kodik',
-                        'priority' => 10,
-                    ];
-                    break;
-                }
+                break; // Only take first translation per episode
             }
         }
 
@@ -241,61 +273,72 @@ class EpisodeImportService
     {
         $title = $this->normalizeTitle($anime->title);
 
-        $response = Http::timeout(20)
-            ->retry(3, 500)
-            ->withHeaders([
-                'User-Agent' => 'AniYumeBot/1.0',
-                'Accept' => 'application/json',
-            ])
-            ->get($this->anilibriaUrl, [
-                'search' => $title,
-                'playlist_type' => 'object',
-                'filter' => 'id,code,names,player,posters',
+        try {
+            $response = Http::timeout(20)
+                ->retry(3, 1000)
+                ->withHeaders([
+                    'User-Agent' => 'AniYumeBot/1.0',
+                    'Accept' => 'application/json',
+                ])
+                ->get($this->anilibriaUrl, [
+                    'search' => $title,
+                    'playlist_type' => 'object',
+                    'filter' => 'id,code,names,player,posters',
+                ]);
+
+            if (! $response->ok()) {
+                return [];
+            }
+
+            $data = $response->json();
+
+            if (! is_array($data) || ! isset($data['player']['playlist'])) {
+                return [];
+            }
+
+            $playlist = $data['player']['playlist'];
+            $poster = $data['posters']['original']['url'] ?? null;
+
+            $episodes = [];
+
+            foreach ($playlist as $key => $item) {
+                $num = $item['episode'] ?? (int) $key;
+
+                $hls = $item['hls'] ?? null;
+                $hlsPlaylist = is_array($hls) ? ($hls['fhd'] ?? $hls['hd'] ?? $hls['sd'] ?? null) : null;
+
+                $episodes[] = [
+                    'episode_number' => (int) $num,
+                    'season_number' => null,
+                    'title' => $item['name'] ?? "Серия {$num}",
+                    'player_url' => $hlsPlaylist,
+                    'player_iframe' => null,
+                    'external_id' => $data['id'] ?? null,
+                    'external_source' => 'anilibria',
+                    'external_episode_id' => ($data['id'] ?? 'anilibria').':'.$num,
+                    'aired_at' => null,
+                    'release_date' => null,
+                    'duration' => null,
+                    'thumbnail_url' => $item['preview'] ?? null,
+                    'poster_url' => $poster,
+                    'translator' => 'AniLibria',
+                    'translation_type' => 'voice',
+                    'quality' => 'hls',
+                    'source' => 'anilibria',
+                    'priority' => 5,
+                ];
+            }
+
+            return $episodes;
+
+        } catch (\Exception $e) {
+            Log::error('AniLibria fetch error', [
+                'anime_id' => $anime->id,
+                'error' => $e->getMessage(),
             ]);
 
-        if (! $response->ok()) {
             return [];
         }
-
-        $data = $response->json();
-        if (! is_array($data) || ! isset($data['player']['playlist'])) {
-            return [];
-        }
-
-        $playlist = $data['player']['playlist'];
-        $poster = $data['posters']['original']['url'] ?? null;
-
-        $episodes = [];
-
-        foreach ($playlist as $key => $item) {
-            $num = $item['episode'] ?? (int) $key;
-
-            $hls = $item['hls'] ?? null;
-            $hlsPlaylist = is_array($hls) ? ($hls['fhd'] ?? $hls['hd'] ?? $hls['sd'] ?? null) : null;
-
-            $episodes[] = [
-                'episode_number' => (int) $num,
-                'season_number' => $item['season'] ?? null,
-                'title' => $item['name'] ?? "Серия {$num}",
-                'player_url' => $hlsPlaylist,
-                'player_iframe' => null,
-                'external_id' => $data['id'] ?? null,
-                'external_source' => 'anilibria',
-                'external_episode_id' => ($data['id'] ?? 'anilibria').':'.$num,
-                'aired_at' => null,
-                'release_date' => null,
-                'duration' => $item['length'] ?? null,
-                'thumbnail_url' => $item['preview'] ?? null,
-                'poster_url' => $poster,
-                'translator' => 'AniLibria',
-                'translation_type' => 'voice',
-                'quality' => 'hls',
-                'source' => 'anilibria',
-                'priority' => 5,
-            ];
-        }
-
-        return $episodes;
     }
 
     protected function storeEpisodes(Anime $anime, array $episodes, bool $update): void
@@ -325,6 +368,7 @@ class EpisodeImportService
                 $this->errors++;
                 Log::error('Failed to store episode', [
                     'anime_id' => $anime->id,
+                    'episode_number' => $data['episode_number'],
                     'message' => $e->getMessage(),
                 ]);
             }

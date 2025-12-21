@@ -10,8 +10,11 @@ class Anime extends Model
 {
     protected $fillable = [
         'external_id',
+        'shikimori_id',
         'title',
         'title_en',
+        'title_english',
+        'title_japanese',
         'description',
         'poster_url',
         'cover_url',
@@ -20,18 +23,27 @@ class Anime extends Model
         'episodes_count',
         'duration',
         'release_year',
+        'year',
         'rating',
+        'popularity',
         'views_count',
         'favorites_count',
+        'aired_from',
+        'aired_to',
     ];
 
     protected $casts = [
         'episodes_count' => 'integer',
         'duration' => 'integer',
         'release_year' => 'integer',
+        'year' => 'integer',
         'rating' => 'decimal:2',
+        'popularity' => 'integer',
         'views_count' => 'integer',
         'favorites_count' => 'integer',
+        'aired_from' => 'datetime',
+        'aired_to' => 'datetime',
+        'shikimori_id' => 'integer',
     ];
 
     public function tags(): BelongsToMany
