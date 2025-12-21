@@ -77,8 +77,6 @@ class EpisodeManagementController extends Controller
 
     public function importAll(Request $request)
     {
-        $isInitialImport = true;
-
         $importLog = ImportLog::create([
             'import_type' => 'episodes_initial',
             'started_at' => now(),
@@ -88,7 +86,7 @@ class EpisodeManagementController extends Controller
         $anime = Anime::all();
 
         foreach ($anime as $animeItem) {
-            ImportEpisodesJob::dispatch($animeItem->id, $isInitialImport, $importLog->id);
+            EpisodesImportJob::dispatch($animeItem->id, false);
         }
 
         AuditLog::create([
