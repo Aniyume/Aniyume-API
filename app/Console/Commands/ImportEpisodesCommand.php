@@ -32,7 +32,7 @@ class ImportEpisodesCommand extends Command
         $this->info('Starting episodes import...');
 
         if ($animeId = $this->option('anime')) {
-            $this->importForSingleAnime($animeId, $kodikService);
+            $this->importForSingleAnime((int) $animeId, $kodikService);
         } else {
             $this->importForMultipleAnime($kodikService);
         }
