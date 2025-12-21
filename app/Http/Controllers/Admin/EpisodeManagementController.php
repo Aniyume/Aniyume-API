@@ -77,19 +77,16 @@ class EpisodeManagementController extends Controller
 
     public function importAll(Request $request)
     {
-        $validated = $request->validate([
-            'type' => 'required|in:initial,update',
-        ]);
-
-        $isInitialImport = $validated['type'] === 'initial';
+        $isInitialImport = true;
 
         $importLog = ImportLog::create([
-            'import_type' => $isInitialImport ? 'episodes_initial' : 'episodes_update',
+            'import_type' => 'episodes_initial',
             'started_at' => now(),
             'status' => 'running',
         ]);
 
         $anime = Anime::all();
+
         foreach ($anime as $animeItem) {
             ImportEpisodesJob::dispatch($animeItem->id, $isInitialImport, $importLog->id);
         }
@@ -97,14 +94,14 @@ class EpisodeManagementController extends Controller
         AuditLog::create([
             'user_id' => auth()->id(),
             'action' => 'import_all_episodes',
-            'description' => "Started mass episodes import ({$validated['type']}) for all anime",
+            'description' => 'Started mass episodes import (initial) for all anime',
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
 
         return redirect()
             ->route('admin.episodes.index')
-            ->with('success', 'Mass episodes import started. Check queue worker progress.');
+            ->with('success', 'Mass episodes import (only new episodes) started. Check queue worker progress.');
     }
 
     public function destroy(Request $request, string $id)

@@ -520,10 +520,20 @@
         <h1>📺 Управление эпизодами</h1>
         <p class="page-subtitle">Управление эпизодами аниме</p>
     </div>
-    <button onclick="openBulkImportModal()" class="btn btn-primary">
-        📥 Массовый импорт
-    </button>
+    <div style="display: flex; gap: 10px;">
+        <button onclick="openBulkImportModal()" class="btn btn-primary">
+            📥 Массовый импорт
+        </button>
+        <form action="{{ route('admin.episodes.import-all') }}" method="POST"
+              onsubmit="return confirm('Импортировать эпизоды для ВСЕХ аниме?\n\nБудут добавлены только новые эпизоды, существующие не изменятся.');">
+            @csrf
+            <button type="submit" class="btn btn-primary">
+                🌍 Импорт для всех аниме
+            </button>
+        </form>
+    </div>
 </div>
+
 
 @if($anime)
     <div class="anime-info-card">
