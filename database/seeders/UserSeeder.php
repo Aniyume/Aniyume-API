@@ -11,8 +11,15 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $adminRole = Role::where('name', 'admin')->first();
-        $devRole = Role::where('name', 'developer')->first() ?? Role::create(['name' => 'developer', 'display_name' => 'Developer']);
+        $adminRole = Role::firstOrCreate(
+            ['name' => 'admin'],
+            ['display_name' => 'Administrator']
+        );
+
+        $devRole = Role::firstOrCreate(
+            ['name' => 'developer'],
+            ['display_name' => 'Developer']
+        );
 
         $admin = User::updateOrCreate(
             ['email' => 'vladjjjsss7@gmail.com'],
@@ -22,6 +29,7 @@ class UserSeeder extends Seeder
                 'is_active' => true,
             ]
         );
+
         $admin->roles()->sync([$adminRole->id]);
 
         $developer = User::updateOrCreate(
@@ -32,6 +40,7 @@ class UserSeeder extends Seeder
                 'is_active' => true,
             ]
         );
+
         $developer->roles()->sync([$devRole->id]);
     }
 }
