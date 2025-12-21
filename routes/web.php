@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CommentModerationController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\EpisodeManagementController;
 use App\Http\Controllers\Admin\ImportManagementController;
 use App\Http\Controllers\Admin\TagManagementController;
 use Illuminate\Support\Facades\Route;
@@ -18,12 +19,10 @@ Route::get('/login', function () {
 })->name('login');
 
 Route::prefix('admin')->name('admin.')->group(function () {
-
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AuthController::class, 'login'])->name('login.post');
 
     Route::middleware(['auth'])->group(function () {
-
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -31,10 +30,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('tags', TagManagementController::class)->except(['show']);
 
         Route::prefix('episodes')->name('episodes.')->group(function () {
-            Route::get('/', [App\Http\Controllers\Admin\EpisodeManagementController::class, 'index'])->name('index');
-            Route::post('/import-all', [App\Http\Controllers\Admin\EpisodeManagementController::class, 'importAll'])->name('import-all');
-            Route::post('/{anime}/import', [App\Http\Controllers\Admin\EpisodeManagementController::class, 'importForAnime'])->name('import-for-anime');
-            Route::delete('/{id}', [App\Http\Controllers\Admin\EpisodeManagementController::class, 'destroy'])->name('destroy');
+            Route::get('/', [EpisodeManagementController::class, 'index'])->name('index');
+            Route::get('/{episode}/edit', [EpisodeManagementController::class, 'edit'])->name('edit');
+            Route::put('/{episode}', [EpisodeManagementController::class, 'update'])->name('update');
+            Route::post('/import-all', [EpisodeManagementController::class, 'importAll'])->name('import-all');
+            Route::post('/{anime}/import', [EpisodeManagementController::class, 'importForAnime'])->name('import-for-anime');
+            Route::delete('/{id}', [EpisodeManagementController::class, 'destroy'])->name('destroy');
         });
 
         Route::prefix('comments')->name('comments.')->group(function () {
