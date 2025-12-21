@@ -9,12 +9,10 @@ class Kernel extends ConsoleKernel
 {
     protected $commands = [
         \App\Console\Commands\CheckAuditLogs::class,
+        \App\Console\Commands\ImportEpisodesCommand::class,
     ];
 
-    protected function schedule(Schedule $schedule)
-    {
-        //
-    }
+    protected function schedule(Schedule $schedule) {}
 
     protected function commands()
     {
