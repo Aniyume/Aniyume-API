@@ -155,13 +155,12 @@ class EpisodeManagementController extends Controller
     {
         $data = $request->validate([
             'anime_id' => ['required', 'exists:anime,id'],
-            'mode' => ['nullable', 'in:all,new'],
         ]);
 
-        $onlyNew = $data['mode'] === 'new';
+        $onlyNew = true;
 
         $importLog = ImportLog::create([
-            'import_type' => $onlyNew ? 'episodes_bulk_new' : 'episodes_bulk_all',
+            'import_type' => 'episodes_bulk_new',
             'started_at' => now(),
             'status' => 'running',
         ]);
@@ -171,7 +170,7 @@ class EpisodeManagementController extends Controller
         AuditLog::create([
             'user_id' => auth()->id(),
             'action' => 'bulk_import_episodes',
-            'description' => "Started bulk import for anime ID {$data['anime_id']} (mode: ".($onlyNew ? 'new' : 'all').')',
+            'description' => "Started bulk import for anime ID {$data['anime_id']} (mode: new)",
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
