@@ -32,6 +32,39 @@ class EpisodeImportService
         $this->kodikToken = config('services.kodik.token');
     }
 
+    public function importForSingleAnime(Anime $anime, bool $update = false): void
+    {
+        try {
+            $episodes = [];
+
+            if ($anime->shikimori_id) {
+                $episodes = $this->fetchFromKodikByShikimori($anime);
+            }
+
+            if (empty($episodes)) {
+                $episodes = $this->fetchFromKodik($anime);
+            }
+
+            if (empty($episodes)) {
+                $episodes = $this->fetchFromAniLibria($anime);
+            }
+
+            if (empty($episodes)) {
+                $this->skipped++;
+            } else {
+                $this->storeEpisodes($anime, $episodes, $update);
+            }
+
+            $this->processed++;
+        } catch (\Throwable $e) {
+            $this->errors++;
+            Log::error('Episode import error', [
+                'anime_id' => $anime->id,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
     public function import(bool $update = false, ?int $limit = null): void
     {
         $this->startTime = microtime(true);
@@ -53,32 +86,81 @@ class EpisodeImportService
                 $processedLocal++;
                 echo "\rProcessing {$processedLocal}/{$total} [{$anime->id}] {$anime->title}";
 
-                try {
-                    $episodes = $this->fetchFromKodik($anime);
-
-                    if (empty($episodes)) {
-                        $episodes = $this->fetchFromAniLibria($anime);
-                    }
-
-                    if (empty($episodes)) {
-                        $this->skipped++;
-                    } else {
-                        $this->storeEpisodes($anime, $episodes, $update);
-                    }
-
-                    $this->processed++;
-                } catch (\Throwable $e) {
-                    $this->errors++;
-                    Log::error('Episode import error', [
-                        'anime_id' => $anime->id,
-                        'message' => $e->getMessage(),
-                    ]);
-                }
+                $this->importForSingleAnime($anime, $update);
             }
         });
 
         echo "\n\n";
         $this->printStats();
+    }
+
+    protected function fetchFromKodikByShikimori(Anime $anime): array
+    {
+        if (! $this->kodikToken || ! $anime->shikimori_id) {
+            return [];
+        }
+
+        $response = Http::timeout(30)
+            ->retry(3, 500)
+            ->withHeaders([
+                'User-Agent' => 'AniYumeBot/1.0',
+                'Accept' => 'application/json',
+            ])
+            ->get($this->kodikUrl, [
+                'token' => $this->kodikToken,
+                'shikimori_id' => $anime->shikimori_id,
+                'with_episodes' => 'true',
+                'limit' => 1,
+            ]);
+
+        if (! $response->ok()) {
+            return [];
+        }
+
+        $results = $response->json('results') ?? [];
+        if (! count($results)) {
+            return [];
+        }
+
+        $episodes = [];
+        $result = $results[0];
+        if (! isset($result['episodes']) || ! is_array($result['episodes'])) {
+            return [];
+        }
+
+        $poster = $result['poster'] ?? null;
+
+        foreach ($result['episodes'] as $episodeNumber => $episodeItems) {
+            if (! is_array($episodeItems)) {
+                continue;
+            }
+
+            foreach ($episodeItems as $variant) {
+                $episodes[] = [
+                    'episode_number' => (int) $episodeNumber,
+                    'season_number' => $variant['season'] ?? null,
+                    'title' => $variant['title'] ?? "Серия {$episodeNumber}",
+                    'player_url' => $variant['link'] ?? null,
+                    'player_iframe' => $variant['iframe_src'] ?? null,
+                    'external_id' => $result['id'] ?? null,
+                    'external_source' => 'kodik',
+                    'external_episode_id' => $variant['id'] ?? null,
+                    'aired_at' => $variant['created_at'] ?? null,
+                    'release_date' => $variant['aired_at'] ?? null,
+                    'duration' => $variant['duration'] ?? null,
+                    'thumbnail_url' => $variant['screenshot'] ?? null,
+                    'poster_url' => $poster,
+                    'translator' => $variant['translation'] ?? null,
+                    'translation_type' => $variant['translation_type'] ?? null,
+                    'quality' => $variant['quality'] ?? null,
+                    'source' => 'kodik',
+                    'priority' => 10,
+                ];
+                break;
+            }
+        }
+
+        return $episodes;
     }
 
     protected function fetchFromKodik(Anime $anime): array
@@ -271,30 +353,5 @@ class EpisodeImportService
         echo '| Errors          | '.str_pad($this->errors, 14)."|\n";
         echo '| Duration        | '.str_pad($duration.' s', 14)."|\n";
         echo "+-----------------+----------------+\n";
-    }
-
-    public function importForSingleAnime(Anime $anime, bool $update = false): void
-    {
-        try {
-            $episodes = $this->fetchFromKodik($anime);
-
-            if (empty($episodes)) {
-                $episodes = $this->fetchFromAniLibria($anime);
-            }
-
-            if (empty($episodes)) {
-                $this->skipped++;
-            } else {
-                $this->storeEpisodes($anime, $episodes, $update);
-            }
-
-            $this->processed++;
-        } catch (\Throwable $e) {
-            $this->errors++;
-            Log::error('Episode import error', [
-                'anime_id' => $anime->id,
-                'message' => $e->getMessage(),
-            ]);
-        }
     }
 }
