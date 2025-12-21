@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Anime;
-use App\Models\Tag;
 use App\Models\ImportLog;
+use App\Models\Tag;
 use App\Models\User;
-use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
@@ -15,6 +14,7 @@ class DashboardController extends Controller
     {
         $stats = [
             'total_anime' => Anime::count(),
+            'total_episodes' => Episode::count(),
             'total_tags' => Tag::count(),
             'total_users' => User::count(),
             'recent_imports' => ImportLog::latest()->take(5)->get(),
