@@ -34,14 +34,20 @@ class EpisodeManagementController extends Controller
             $query->where('quality', $request->quality);
         }
 
-        $episodes = $query->orderBy('anime_id')->orderBy('season_number')->orderBy('episode_number')->paginate(50);
+        $episodes = $query
+            ->orderBy('anime_id')
+            ->orderBy('season_number')
+            ->orderBy('episode_number')
+            ->paginate(50);
 
         $anime = null;
         if ($request->filled('anime_id')) {
             $anime = Anime::find($request->anime_id);
         }
 
-        return view('admin.episodes.index', compact('episodes', 'anime'));
+        $allAnimes = Anime::orderBy('title')->get();
+
+        return view('admin.episodes.index', compact('episodes', 'anime', 'allAnimes'));
     }
 
     public function importForAnime(Request $request, string $animeId)
@@ -64,7 +70,8 @@ class EpisodeManagementController extends Controller
             'user_agent' => $request->userAgent(),
         ]);
 
-        return redirect()->route('admin.episodes.index', ['anime_id' => $animeId])
+        return redirect()
+            ->route('admin.episodes.index', ['anime_id' => $animeId])
             ->with('success', 'Episodes import started for '.$anime->title);
     }
 
@@ -95,7 +102,8 @@ class EpisodeManagementController extends Controller
             'user_agent' => $request->userAgent(),
         ]);
 
-        return redirect()->route('admin.episodes.index')
+        return redirect()
+            ->route('admin.episodes.index')
             ->with('success', 'Mass episodes import started. Check queue worker progress.');
     }
 
@@ -115,7 +123,8 @@ class EpisodeManagementController extends Controller
             'user_agent' => $request->userAgent(),
         ]);
 
-        return redirect()->route('admin.episodes.index', ['anime_id' => $animeId])
+        return redirect()
+            ->route('admin.episodes.index', ['anime_id' => $animeId])
             ->with('success', 'Episode deleted successfully');
     }
 
@@ -140,5 +149,35 @@ class EpisodeManagementController extends Controller
         return redirect()
             ->route('admin.episodes.index')
             ->with('success', 'Episode updated successfully');
+    }
+
+    public function bulkImport(Request $request)
+    {
+        $data = $request->validate([
+            'anime_id' => ['required', 'exists:anime,id'],
+            'mode' => ['nullable', 'in:all,new'],
+        ]);
+
+        $onlyNew = $data['mode'] === 'new';
+
+        $importLog = ImportLog::create([
+            'import_type' => $onlyNew ? 'episodes_bulk_new' : 'episodes_bulk_all',
+            'started_at' => now(),
+            'status' => 'running',
+        ]);
+
+        ImportEpisodesJob::dispatch((int) $data['anime_id'], ! $onlyNew, $importLog->id);
+
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'bulk_import_episodes',
+            'description' => "Started bulk import for anime ID {$data['anime_id']} (mode: ".($onlyNew ? 'new' : 'all').')',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
+        return redirect()
+            ->route('admin.episodes.index', ['anime_id' => $data['anime_id']])
+            ->with('success', 'Bulk episodes import started');
     }
 }
