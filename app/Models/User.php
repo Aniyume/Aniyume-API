@@ -11,7 +11,15 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $fillable = ['name', 'email', 'password', 'avatar', 'custom_status'];
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'avatar_url',
+        'bio',
+        'status_text',
+        'is_online',
+    ];
 
     protected $hidden = [
         'password',
@@ -20,8 +28,8 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'last_login_at' => 'datetime',
-        'is_active' => 'boolean',
+        'password' => 'hashed',
+        'is_online' => 'boolean',
     ];
 
     public function roles()
@@ -29,19 +37,9 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class, 'role_user');
     }
 
-    public function hasRole(string $role): bool
+    public function comments()
     {
-        return $this->roles()->where('name', $role)->exists();
-    }
-
-    public function watchHistory()
-    {
-        return $this->hasMany(WatchHistory::class);
-    }
-
-    public function favorites()
-    {
-        return $this->hasMany(Favorite::class);
+        return $this->hasMany(Comment::class);
     }
 
     public function ratings()
@@ -49,13 +47,44 @@ class User extends Authenticatable
         return $this->hasMany(Rating::class);
     }
 
-    public function comments()
+    public function favorites()
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(Favorite::class);
     }
 
-    public function animeStatuses()
+    public function watchHistory()
     {
-        return $this->hasMany(AnimeStatus::class);
+        return $this->hasMany(WatchHistory::class);
+    }
+
+    public function animeList()
+    {
+        return $this->belongsToMany(Anime::class, 'anime_user')
+            ->withPivot(['status', 'episodes_watched', 'last_watched_at'])
+            ->withTimestamps();
+    }
+
+    public function friends()
+    {
+        return $this->belongsToMany(User::class, 'friendships', 'user_id', 'friend_id')
+            ->wherePivot('status', 'accepted')
+            ->withTimestamps();
+    }
+
+    public function friendRequests()
+    {
+        return $this->belongsToMany(User::class, 'friendships', 'friend_id', 'user_id')
+            ->wherePivot('status', 'pending')
+            ->withTimestamps();
+    }
+
+    public function videos()
+    {
+        return $this->hasMany(UserVideo::class);
+    }
+
+    public function collections()
+    {
+        return $this->hasMany(UserCollection::class);
     }
 }

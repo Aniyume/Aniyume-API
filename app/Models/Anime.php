@@ -2,77 +2,84 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Anime extends Model
 {
-    use HasFactory;
-
-    protected $table = 'anime';
-
     protected $fillable = [
+        'external_id',
         'title',
-        'slug',
+        'title_en',
         'description',
         'poster_url',
-        'rating',
-        'year',
-        'status',
+        'cover_url',
         'type',
-        'number_of_episodes',
-        'external_id',
-        'external_source',
-        'aired_from',
-        'aired_to',
-        'nsfw_flag',
-        'popularity',
-        'favorites',
+        'status',
+        'episodes_count',
+        'duration',
+        'release_year',
+        'rating',
+        'views_count',
+        'favorites_count',
     ];
 
     protected $casts = [
-        'aired_from' => 'date',
-        'aired_to' => 'date',
-        'nsfw_flag' => 'boolean',
+        'episodes_count' => 'integer',
+        'duration' => 'integer',
+        'release_year' => 'integer',
+        'rating' => 'decimal:2',
+        'views_count' => 'integer',
+        'favorites_count' => 'integer',
     ];
 
-    public function genres()
-    {
-        return $this->belongsToMany(Genre::class, 'anime_genre');
-    }
-
-    public function studios()
-    {
-        return $this->belongsToMany(Studio::class, 'anime_studio');
-    }
-
-    public function tags()
+    public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class, 'anime_tag');
     }
 
-    public function episodes()
+    public function episodes(): HasMany
     {
         return $this->hasMany(Episode::class);
     }
-    public function watchHistory()
-{
-    return $this->hasMany(WatchHistory::class);
-}
 
-public function favorites()
-{
-    return $this->hasMany(Favorite::class);
-}
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
 
-public function ratings()
-{
-    return $this->hasMany(Rating::class);
-}
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(Rating::class);
+    }
 
-public function comments()
-{
-    return $this->hasMany(Comment::class);
-}
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(Favorite::class);
+    }
 
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'anime_user')
+            ->withPivot(['status', 'episodes_watched', 'last_watched_at'])
+            ->withTimestamps();
+    }
+
+    public function getCommunityStats()
+    {
+        $stats = $this->users()
+            ->selectRaw('status, COUNT(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status');
+
+        return [
+            'watching' => $stats->get('watching', 0),
+            'planned' => $stats->get('planned', 0),
+            'completed' => $stats->get('completed', 0),
+            'on_hold' => $stats->get('on_hold', 0),
+            'dropped' => $stats->get('dropped', 0),
+            'total' => $stats->sum(),
+        ];
+    }
 }
