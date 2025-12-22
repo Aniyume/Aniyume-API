@@ -24,7 +24,8 @@ class AnimeController extends Controller
                         ->orWhere('title_en', 'ILIKE', "%{$request->search}%");
                 });
             });
-if ($request->has('sort')) {
+
+        if ($request->has('sort')) {
             $sortMap = [
                 'rating' => ['rating', 'DESC'],
                 'popularity' => ['popularity', 'DESC'],
@@ -45,7 +46,7 @@ if ($request->has('sort')) {
 
     public function show(Anime $anime)
     {
-        $anime->load(['tags', 'studio', 'genres', 'episodes']);
+        $anime->load(['tags', 'episodes']);
 
         return new AnimeResource($anime);
     }
@@ -80,10 +81,11 @@ if ($request->has('sort')) {
         $status = $request->input('status');
         $validStatuses = ['watching', 'planned', 'completed', 'on_hold', 'dropped'];
 
-        if ($status && ! in_array($status, $validStatuses)) {
+        if ($status && !in_array($status, $validStatuses)) {
             return response()->json(['error' => 'Invalid status'], 422);
         }
-try {
+
+        try {
             if ($status === null) {
                 $user->animes()->detach($anime->id);
             } else {
