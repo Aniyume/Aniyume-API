@@ -44,12 +44,17 @@ class AnimeController extends Controller
         return AnimeResource::collection($anime);
     }
 
-    public function show(Anime $anime)
-    {
-        $anime->load(['tags', 'episodes']);
+ public function show(Anime $anime)
+{
+    $anime->load(['tags', 'episodes']);
 
-        return new AnimeResource($anime);
-    }
+    dd([
+        'anime_data' => $anime,
+        'resource' => new AnimeResource($anime),
+        'resolved' => (new AnimeResource($anime))->resolve(),
+    ]);
+}
+
 
     public function episodes(Anime $anime)
     {
