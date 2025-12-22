@@ -38,6 +38,16 @@ class FavoritesController extends Controller
         ]);
     }
 
+    public function checkFavorite($animeId): JsonResponse
+    {
+        $user = Auth::user();
+        $isFavorite = Favorite::where('user_id', $user->id)
+            ->where('anime_id', $animeId)
+            ->exists();
+
+        return response()->json(['is_favorite' => $isFavorite]);
+    }
+
     public function getFavorites(): JsonResponse
     {
         $user = Auth::user();

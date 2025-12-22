@@ -24,8 +24,7 @@ class AnimeController extends Controller
                         ->orWhere('title_en', 'ILIKE', "%{$request->search}%");
                 });
             });
-
-        if ($request->has('sort')) {
+if ($request->has('sort')) {
             $sortMap = [
                 'rating' => ['rating', 'DESC'],
                 'popularity' => ['popularity', 'DESC'],
@@ -84,8 +83,7 @@ class AnimeController extends Controller
         if ($status && ! in_array($status, $validStatuses)) {
             return response()->json(['error' => 'Invalid status'], 422);
         }
-
-        try {
+try {
             if ($status === null) {
                 $user->animes()->detach($anime->id);
             } else {

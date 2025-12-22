@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -11,7 +12,7 @@ class UserStatisticsController extends Controller
 {
     public function getStatistics($userId = null): JsonResponse
     {
-        $user = $userId ? \App\Models\User::findOrFail($userId) : Auth::user();
+        $user = $userId ? User::findOrFail($userId) : Auth::user();
 
         $statistics = [
             'status_counts' => $this->getStatusCounts($user->id),

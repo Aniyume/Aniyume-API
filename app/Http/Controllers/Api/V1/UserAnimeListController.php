@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateAnimeStatusRequest;
 use App\Models\Anime;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class UserAnimeListController extends Controller
 {
@@ -16,7 +17,10 @@ class UserAnimeListController extends Controller
         $validated = $request->validated();
 
         if ($validated['status'] === 'not_watching') {
-            $user->animes()->detach($anime->id);
+            DB::table('anime_user')
+                ->where('user_id', $user->id)
+                ->where('anime_id', $anime->id)
+                ->delete();
 
             return response()->json([
                 'message' => 'Status removed successfully',
@@ -24,13 +28,14 @@ class UserAnimeListController extends Controller
             ]);
         }
 
-        $user->animes()->syncWithoutDetaching([
-            $anime->id => [
+        DB::table('anime_user')->updateOrInsert(
+            ['user_id' => $user->id, 'anime_id' => $anime->id],
+            [
                 'status' => $validated['status'],
                 'episodes_watched' => 0,
                 'updated_at' => now(),
-            ],
-        ]);
+            ]
+        );
 
         return response()->json([
             'message' => 'Status updated successfully',
@@ -42,14 +47,15 @@ class UserAnimeListController extends Controller
     {
         $user = Auth::user();
 
-        $status = $user->animes()
+        $status = DB::table('anime_user')
+            ->where('user_id', $user->id)
             ->where('anime_id', $anime->id)
             ->first();
 
         return response()->json([
-            'status' => $status ? $status->pivot->status : 'not_watching',
-            'episodes_watched' => $status ? $status->pivot->episodes_watched : 0,
-            'last_watched_at' => $status ? $status->pivot->last_watched_at : null,
+            'status' => $status ? $status->status : 'not_watching',
+            'episodes_watched' => $status ? $status->episodes_watched : 0,
+            'last_watched_at' => $status ? $status->last_watched_at : null,
         ]);
     }
 
@@ -57,11 +63,13 @@ class UserAnimeListController extends Controller
     {
         $user = Auth::user();
 
-        $user->animes()
+        DB::table('anime_user')
+            ->where('user_id', $user->id)
             ->where('anime_id', $anime->id)
-            ->updateExistingPivot($anime->id, [
+            ->update([
                 'episodes_watched' => $episodesWatched,
                 'last_watched_at' => now(),
+                'updated_at' => now(),
             ]);
 
         return response()->json([
