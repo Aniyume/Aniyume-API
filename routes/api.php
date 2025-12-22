@@ -17,7 +17,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/episodes/translators', [EpisodeController::class, 'getAllTranslators']);
         Route::get('/episodes', [EpisodeController::class, 'index']);
         Route::get('/tags', [TagController::class, 'index']);
-        Route::get('/anime/{id}', [AnimeController::class, 'show']);
+      Route::get('/anime/{anime}', [AnimeController::class, 'show']);
+
         Route::get('/anime/{anime}/episodes', [EpisodeController::class, 'getByAnime']);
         Route::get('/anime/{anime}/community-stats', [AnimeController::class, 'getCommunityStats']);
         Route::get('/episodes/{episode}', [EpisodeController::class, 'show'])
