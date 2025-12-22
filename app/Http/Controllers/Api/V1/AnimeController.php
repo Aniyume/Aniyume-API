@@ -12,37 +12,37 @@ use Illuminate\Http\Request;
 class AnimeController extends Controller
 {
     public function index(Request $request)
-    {
-        $query = Anime::query()
-            ->with(['tags'])
-            ->when($request->filled('type'), fn ($q) => $q->where('type', $request->type))
-            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
-            ->when($request->filled('year'), fn ($q) => $q->where('release_year', $request->year))
-            ->when($request->filled('search'), function ($q) use ($request) {
-                $q->where(function ($subQ) use ($request) {
-                    $subQ->where('title', 'ILIKE', "%{$request->search}%")
-                        ->orWhere('title_en', 'ILIKE', "%{$request->search}%");
-                });
+{
+    $query = Anime::query()
+        ->with(['tags'])
+        ->when($request->filled('type'), fn ($q) => $q->where('type', $request->type))
+        ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
+        ->when($request->filled('year'), fn ($q) => $q->where('year', $request->year))
+        ->when($request->filled('search'), function ($q) use ($request) {
+            $q->where(function ($subQ) use ($request) {
+                $subQ->where('title', 'ILIKE', "%{$request->search}%")
+                    ->orWhere('slug', 'ILIKE', "%{$request->search}%");
             });
+        });
 
-        if ($request->has('sort')) {
-            $sortMap = [
-                'rating' => ['rating', 'DESC'],
-                'popularity' => ['popularity', 'DESC'],
-                'newest' => ['aired_from', 'DESC'],
-                'title' => ['title', 'ASC'],
-            ];
+    if ($request->has('sort')) {
+        $sortMap = [
+            'rating' => ['rating', 'DESC'],
+            'popularity' => ['popularity', 'DESC'],
+            'newest' => ['aired_from', 'DESC'],
+            'title' => ['title', 'ASC'],
+        ];
 
-            $sort = $sortMap[$request->sort] ?? ['id', 'ASC'];
-            $query->orderByRaw("{$sort[0]} {$sort[1]} NULLS LAST");
-        } else {
-            $query->orderBy('id', 'ASC');
-        }
-
-        $anime = $query->paginate(20);
-
-        return AnimeResource::collection($anime);
+        $sort = $sortMap[$request->sort] ?? ['id', 'ASC'];
+        $query->orderByRaw("{$sort[0]} {$sort[1]} NULLS LAST");
+    } else {
+        $query->orderBy('id', 'ASC');
     }
+
+    $anime = $query->paginate(20);
+
+    return AnimeResource::collection($anime);
+}
 
 public function show(Anime $anime)
 {
