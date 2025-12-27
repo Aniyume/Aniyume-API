@@ -3,74 +3,71 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use Carbon\Carbon;
+use App\Http\Requests\UpdateUserProfileRequest;
+use App\Services\UserProfileService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class UserProfileController extends Controller
 {
-    public function getFullProfile(Request $request)
+    public function __construct(private UserProfileService $profileService) {}
+
+    public function getFullProfile(Request $request): JsonResponse
     {
         $user = $request->user();
+        $profile = $this->profileService->getFullProfile($user);
+        return response()->json($profile);
+    }
 
-        $statsRaw = DB::table('anime_user')
-            ->where('user_id', $user->id)
-            ->select('status', DB::raw('count(*) as count'))
-            ->groupBy('status')
-            ->pluck('count', 'status');
+    public function show(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'avatar' => $user->avatar,
+            'bio' => $user->bio,
+            'custom_status' => $user->custom_status,
+            'created_at' => $user->created_at,
+            'updated_at' => $user->updated_at,
+        ]);
+    }
 
-        $stats = [
-            'watching' => $statsRaw['watching'] ?? 0,
-            'planned' => $statsRaw['planned'] ?? 0,
-            'completed' => $statsRaw['completed'] ?? 0,
-            'on_hold' => $statsRaw['on_hold'] ?? 0,
-            'dropped' => $statsRaw['dropped'] ?? 0,
-        ];
-
-        $totalEpisodes = DB::table('watch_history')->where('user_id', $user->id)->count();
-        $totalMinutes = $totalEpisodes * 24;
-        $days = floor($totalMinutes / 1440);
-        $hours = floor(($totalMinutes % 1440) / 60);
-
-        $dynamics = [];
-        for ($i = 9; $i >= 0; $i--) {
-            $date = Carbon::now()->subDays($i)->format('Y-m-d');
-            $count = DB::table('watch_history')
-                ->where('user_id', $user->id)
-                ->whereDate('watched_at', $date)
-                ->count();
-
-            $dynamics[] = [
-                'date' => Carbon::parse($date)->format('d.m'),
-                'count' => $count,
-            ];
-        }
-
-        $recent = DB::table('watch_history')
-            ->join('anime', 'watch_history.anime_id', '=', 'anime.id')
-            ->where('watch_history.user_id', $user->id)
-            ->select('watch_history.*', 'anime.title', 'anime.poster_url')
-            ->orderBy('watch_history.watched_at', 'desc')
-            ->take(5)
-            ->get();
+    public function update(UpdateUserProfileRequest $request): JsonResponse
+    {
+        $user = $request->user();
+        $updated = $this->profileService->updateProfile($user, $request->validated());
 
         return response()->json([
+            'message' => 'Profile updated successfully',
             'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'avatar' => $user->avatar,
-                'custom_status' => $user->custom_status,
-                'comments_count' => DB::table('comments')->where('user_id', $user->id)->count(),
-                'friends_count' => 0,
+                'id' => $updated->id,
+                'name' => $updated->name,
+                'email' => $updated->email,
+                'avatar' => $updated->avatar,
+                'bio' => $updated->bio,
+                'custom_status' => $updated->custom_status,
             ],
-            'stats' => $stats,
-            'total_episodes' => $totalEpisodes,
-            'total_time' => [
-                'days' => $days,
-                'hours' => $hours,
-            ],
-            'dynamics' => $dynamics,
-            'recent' => $recent,
+        ], 200);
+    }
+
+    public function uploadAvatar(Request $request): JsonResponse
+    {
+        $request->validate([
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
+
+        if ($request->hasFile('avatar')) {
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $user = $this->profileService->updateAvatar($request->user(), $path);
+
+            return response()->json([
+                'message' => 'Avatar uploaded successfully',
+                'avatar' => $user->avatar,
+            ], 200);
+        }
+
+        return response()->json(['message' => 'No file provided'], 400);
     }
 }

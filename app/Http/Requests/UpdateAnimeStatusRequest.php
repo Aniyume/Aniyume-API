@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UpdateAnimeStatusRequest extends FormRequest
 {
@@ -15,18 +14,7 @@ class UpdateAnimeStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => [
-                'required',
-                'string',
-                Rule::in([
-                    'not_watching',
-                    'watching',
-                    'planned',
-                    'completed',
-                    'on_hold',
-                    'dropped',
-                ]),
-            ],
+            'status' => 'required|in:watching,planned,completed,on_hold,dropped,not_watching',
         ];
     }
 
