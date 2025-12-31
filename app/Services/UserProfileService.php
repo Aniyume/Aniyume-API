@@ -130,9 +130,9 @@ class UserProfileService
         return $user->fresh();
     }
 
-    public function updateAvatar(User $user, string $avatarPath): User
-    {
-        $user->update(['avatar' => $avatarPath]);
-        return $user->fresh();
-    }
+public function updateAvatar(User $user, string $avatarPath): User
+{
+    $user->update(['avatar' => $avatarPath]);
+    return $user->fresh();
+}
 }

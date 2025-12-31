@@ -58,16 +58,16 @@ class UserProfileController extends Controller
             'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
-        if ($request->hasFile('avatar')) {
-            $path = $request->file('avatar')->store('avatars', 'public');
-            $user = $this->profileService->updateAvatar($request->user(), $path);
+       if ($request->hasFile('avatar')) {
+    $path = $request->file('avatar')->store('avatars', 'public');
 
-            return response()->json([
-                'message' => 'Avatar uploaded successfully',
-                'avatar' => $user->avatar,
-            ], 200);
-        }
+    $user = $this->profileService->updateAvatar($request->user(), $path);
 
+    return response()->json([
+        'message' => 'Avatar uploaded successfully',
+        'avatar' => $user->avatar,
+    ], 200);
+}
         return response()->json(['message' => 'No file provided'], 400);
     }
 }
