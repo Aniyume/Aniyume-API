@@ -14,8 +14,9 @@ class UpdateWatchHistoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'progress' => 'nullable|integer|min:0',
-            'completed' => 'nullable|boolean',
+            'episode_id' => 'required|exists:episodes,id',
+            'progress' => 'required|integer|min:0',
+            'completed' => 'sometimes|boolean',
         ];
     }
 }

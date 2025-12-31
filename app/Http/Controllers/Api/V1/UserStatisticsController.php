@@ -3,18 +3,37 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\V1\UserEpisodesStatisticsResource;
 use App\Services\UserStatisticsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class UserStatisticsController extends Controller
 {
-    public function __construct(private UserStatisticsService $statisticsService) {}
+    protected UserStatisticsService $statisticsService;
 
-    public function getStatistics(Request $request, ?int $userId = null): JsonResponse
+    public function __construct(UserStatisticsService $statisticsService)
     {
-        $userId = $userId ?? $request->user()->id;
-        $statistics = $this->statisticsService->getStatistics($userId);
-        return response()->json($statistics);
+        $this->statisticsService = $statisticsService;
+    }
+
+    public function getStatistics(Request $request, $userId = null): JsonResponse
+    {
+        $targetUserId = $userId ?? $request->user()?->id;
+
+        if (!$targetUserId) {
+            return response()->json(['message' => 'User ID not provided'], 400);
+        }
+
+        $stats = $this->statisticsService->getStatistics((int) $targetUserId);
+
+        return response()->json($stats);
+    }
+
+    public function getEpisodesSummary(Request $request): UserEpisodesStatisticsResource
+    {
+        $summary = $this->statisticsService->getWatchEpisodesSummary($request->user()->id);
+
+        return new UserEpisodesStatisticsResource($summary);
     }
 }

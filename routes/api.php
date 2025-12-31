@@ -43,6 +43,7 @@ Route::prefix('v1')->group(function () {
 
         // Statistics
         Route::get('/statistics/me', [UserStatisticsController::class, 'getStatistics']);
+        Route::get('/statistics/me/episodes-summary', [UserStatisticsController::class, 'getEpisodesSummary']);
 
         // Anime list
         Route::post('/anime/{anime}/status', [UserAnimeListController::class, 'updateStatus']);
@@ -50,7 +51,7 @@ Route::prefix('v1')->group(function () {
         Route::patch('/anime/{anime}/episodes-watched/{episodesWatched}', [UserAnimeListController::class, 'updateEpisodesWatched']);
         Route::get('/my-anime-list/{status?}', [UserAnimeListController::class, 'getList']);
 
-        // Favorites (через модель Favorite)
+        // Favorites
         Route::get('/favorites', [FavoritesController::class, 'index']);
         Route::post('/favorites', [FavoritesController::class, 'store']);
         Route::delete('/favorites/{animeId}', [FavoritesController::class, 'destroy']);
