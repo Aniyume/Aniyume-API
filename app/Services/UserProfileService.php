@@ -114,8 +114,8 @@ class UserProfileService
                 'anime.id as anime_id',
                 'anime.title',
                 'anime.poster_url',
-                'watch_history.watched_at',
-                'watch_history.progress',
+                DB::raw('1 as episodes_watched'),
+                'watch_history.watched_at as last_watched_at',
             ])
             ->orderBy('watch_history.watched_at', 'desc')
             ->limit($limit)
@@ -125,7 +125,7 @@ class UserProfileService
 
     public function updateProfile(User $user, array $data): User
     {
-        $user->update(array_filter($data, fn($value) => $value !== null));
+        $user->update(array_filter($data, fn ($value) => $value !== null));
         return $user->fresh();
     }
 
