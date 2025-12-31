@@ -105,23 +105,25 @@ class UserProfileService
         return $result;
     }
 
-    private function getRecentlyWatched(int $userId, int $limit): array
-    {
-        return DB::table('watch_history')
-            ->join('anime', 'watch_history.anime_id', '=', 'anime.id')
-            ->where('watch_history.user_id', $userId)
-            ->select([
-                'anime.id as anime_id',
-                'anime.title',
-                'anime.poster_url',
-                DB::raw('1 as episodes_watched'),
-                'watch_history.watched_at as last_watched_at',
-            ])
-            ->orderBy('watch_history.watched_at', 'desc')
-            ->limit($limit)
-            ->get()
-            ->toArray();
-    }
+   private function getRecentlyWatched(int $userId, int $limit): array
+{
+    return DB::table('watch_history')
+        ->join('anime', 'watch_history.anime_id', '=', 'anime.id')
+        ->leftJoin('episodes', 'watch_history.episode_id', '=', 'episodes.id')
+        ->where('watch_history.user_id', $userId)
+        ->select([
+            'anime.id as anime_id',
+            'anime.title',
+            'anime.poster_url',
+            'episodes.episode_number',
+            'watch_history.watched_at as last_watched_at',
+        ])
+        ->orderBy('watch_history.watched_at', 'desc')
+        ->limit($limit)
+        ->get()
+        ->toArray();
+}
+
 
     public function updateProfile(User $user, array $data): User
     {
