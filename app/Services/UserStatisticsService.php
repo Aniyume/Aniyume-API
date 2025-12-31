@@ -2,143 +2,103 @@
 
 namespace App\Services;
 
+use App\Models\User;
+use App\Models\WatchHistory;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
-class UserStatisticsService
+class UserProfileService
 {
-    public function getStatistics(int $userId): array
+    public function getFullProfile(User $user): array
     {
         return [
-            'status_counts' => $this->getStatusCounts($userId),
-            'episodes_watched' => $this->getTotalEpisodesWatched($userId),
-            'total_watch_time' => $this->getTotalWatchTime($userId),
-            'recent_ratings' => $this->getRecentRatings($userId, 3),
-            'watch_dynamics' => $this->getWatchDynamics($userId, 10),
-            'recently_watched' => $this->getRecentlyWatched($userId, 5),
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'avatar' => $user->avatar,
+                'bio' => $user->bio,
+                'custom_status' => $user->custom_status,
+                'created_at' => $user->created_at,
+            ],
+            'stats' => $this->getAnimeStats($user->id),
+            'watch_time' => $this->getWatchTime($user->id),
+            'watch_dynamics' => $this->getWatchDynamics($user->id, 10),
+            'recently_watched' => $this->getRecentlyWatched($user->id, 5),
+            'counts' => [
+                'anime_watching' => $this->countByStatus($user->id, 'watching'),
+                'anime_planned' => $this->countByStatus($user->id, 'planned'),
+                'anime_completed' => $this->countByStatus($user->id, 'completed'),
+                'anime_on_hold' => $this->countByStatus($user->id, 'on_hold'),
+                'anime_dropped' => $this->countByStatus($user->id, 'dropped'),
+                'favorites' => $user->favorites()->count(),
+                'ratings' => $user->ratings()->count(),
+                'watch_history' => $user->watchHistory()->count(),
+            ],
         ];
     }
 
-    public function getWatchEpisodesSummary(int $userId, int $days = 10): array
+    private function getAnimeStats(int $userId): array
     {
-        $startDate = Carbon::now()->subDays($days - 1)->startOfDay();
-
-        $dynamics = DB::table('watch_history')
-            ->where('user_id', $userId)
-            ->where('watched_at', '>=', $startDate)
-            ->select(
-                DB::raw('DATE(watched_at) as date'),
-                DB::raw('COUNT(*) as count')
-            )
-            ->groupBy(DB::raw('DATE(watched_at)'))
-            ->get()
-            ->keyBy('date');
-
-        $episodesPerDay = [];
-        $totalInPeriod = 0;
-
-        for ($i = $days - 1; $i >= 0; $i--) {
-            $date = Carbon::now()->subDays($i)->format('Y-m-d');
-            $count = isset($dynamics[$date]) ? (int) $dynamics[$date]->count : 0;
-
-            $episodesPerDay[] = [
-                'date' => $date,
-                'episodes_count' => $count,
-            ];
-
-            $totalInPeriod += $count;
-        }
-
-        $todayDate = Carbon::now()->format('Y-m-d');
-        $totalToday = isset($dynamics[$todayDate]) ? (int) $dynamics[$todayDate]->count : 0;
-
-        return [
-            'total_episodes_today' => $totalToday,
-            'episodes_per_day_last_10_days' => $episodesPerDay,
-            'average_episodes_last_10_days' => round($totalInPeriod / $days, 2),
-        ];
-    }
-
-    private function getStatusCounts(int $userId): array
-    {
-        $counts = DB::table('anime_user')
+        $stats = DB::table('anime_user')
             ->where('user_id', $userId)
             ->select('status', DB::raw('COUNT(*) as count'))
             ->groupBy('status')
-            ->pluck('count', 'status')
-            ->toArray();
+            ->pluck('count', 'status');
 
         return [
-            'watching' => $counts['watching'] ?? 0,
-            'planned' => $counts['planned'] ?? 0,
-            'completed' => $counts['completed'] ?? 0,
-            'on_hold' => $counts['on_hold'] ?? 0,
-            'dropped' => $counts['dropped'] ?? 0,
+            'watching' => $stats->get('watching', 0),
+            'planned' => $stats->get('planned', 0),
+            'completed' => $stats->get('completed', 0),
+            'on_hold' => $stats->get('on_hold', 0),
+            'dropped' => $stats->get('dropped', 0),
         ];
     }
 
-    private function getTotalEpisodesWatched(int $userId): int
+    private function countByStatus(int $userId, string $status): int
     {
-        $total = DB::table('anime_user')
+        return DB::table('anime_user')
             ->where('user_id', $userId)
-            ->sum('episodes_watched');
-
-        return (int) ($total ?? 0);
+            ->where('status', $status)
+            ->count();
     }
 
-    private function getTotalWatchTime(int $userId): int
+    private function getWatchTime(int $userId): array
     {
-        $total = DB::table('watch_history')
-            ->where('user_id', $userId)
-            ->sum('progress');
+        $totalSeconds = WatchHistory::where('user_id', $userId)
+            ->sum('progress') ?? 0;
 
-        return (int) ($total ?? 0);
-    }
+        $days = floor($totalSeconds / 86400);
+        $hours = floor(($totalSeconds % 86400) / 3600);
+        $minutes = floor(($totalSeconds % 3600) / 60);
 
-    private function getRecentRatings(int $userId, int $limit): array
-    {
-        $ratings = DB::table('ratings')
-            ->join('anime', 'ratings.anime_id', '=', 'anime.id')
-            ->where('ratings.user_id', $userId)
-            ->orderBy('ratings.created_at', 'desc')
-            ->limit($limit)
-            ->select([
-                'anime.id as anime_id',
-                'anime.title',
-                'anime.poster_url',
-                'ratings.rating',
-                'ratings.created_at',
-            ])
-            ->get();
-
-        return $ratings ? $ratings->toArray() : [];
+        return [
+            'total_seconds' => $totalSeconds,
+            'days' => $days,
+            'hours' => $hours,
+            'minutes' => $minutes,
+        ];
     }
 
     private function getWatchDynamics(int $userId, int $days): array
     {
         $dynamics = DB::table('watch_history')
             ->where('user_id', $userId)
-            ->where('watched_at', '>=', Carbon::now()->subDays($days))
+            ->where('watched_at', '>=', now()->subDays($days))
             ->select(
                 DB::raw('DATE(watched_at) as date'),
-                DB::raw('COUNT(*) as count')
+                DB::raw('COUNT(*) as episodes_count')
             )
-            ->groupBy(DB::raw('DATE(watched_at)'))
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
             ->get()
             ->keyBy('date');
 
         $result = [];
         for ($i = $days - 1; $i >= 0; $i--) {
-            $date = Carbon::now()->subDays($i)->format('Y-m-d');
-            $count = 0;
-
-            if (isset($dynamics[$date])) {
-                $count = $dynamics[$date]->count;
-            }
-
+            $date = now()->subDays($i)->format('Y-m-d');
             $result[] = [
                 'date' => $date,
-                'count' => $count,
+                'episodes_count' => $dynamics->get($date)?->episodes_count ?? 0,
             ];
         }
 
@@ -147,19 +107,31 @@ class UserStatisticsService
 
     private function getRecentlyWatched(int $userId, int $limit): array
     {
-        $watched = DB::table('watch_history')
+        return DB::table('watch_history')
             ->join('anime', 'watch_history.anime_id', '=', 'anime.id')
             ->where('watch_history.user_id', $userId)
             ->select([
                 'anime.id as anime_id',
                 'anime.title',
                 'anime.poster_url',
-                'watch_history.watched_at',
+                DB::raw('1 as episodes_watched'),
+                'watch_history.watched_at as last_watched_at',
             ])
             ->orderBy('watch_history.watched_at', 'desc')
             ->limit($limit)
-            ->get();
+            ->get()
+            ->toArray();
+    }
 
-        return $watched ? $watched->toArray() : [];
+    public function updateProfile(User $user, array $data): User
+    {
+        $user->update(array_filter($data, fn ($value) => $value !== null));
+        return $user->fresh();
+    }
+
+    public function updateAvatar(User $user, string $avatarPath): User
+    {
+        $user->update(['avatar' => $avatarPath]);
+        return $user->fresh();
     }
 }
