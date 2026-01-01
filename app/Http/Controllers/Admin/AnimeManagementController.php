@@ -3,71 +3,58 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Anime;
+use App\Models\Tag;
 use App\Models\AuditLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
-class UserManagementController extends Controller
+class AnimeManagementController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::query();
+        $query = Anime::with('tags');
 
         if ($request->filled('search')) {
-            $query->where('name', 'ILIKE', '%' . $request->search . '%')
-                  ->orWhere('email', 'ILIKE', '%' . $request->search . '%');
+            $query->where('title', 'ILIKE', '%' . $request->search . '%');
         }
 
-        $users = $query->latest()->paginate(20);
-        return view('admin.users.index', compact('users'));
+        $anime = $query->latest()->paginate(20);
+        return view('admin.anime.index', compact('anime'));
     }
 
-    public function show(User $user)
+    public function store(Request $request)
     {
-        return view('admin.users.show', compact('user'));
-    }
-
-    public function ban(Request $request, User $user)
-    {
-        $request->validate(['reason' => 'required|string|max:255']);
-
-        $user->update([
-            'is_banned' => true,
-            'ban_reason' => $request->reason
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'status' => 'required|in:planned,ongoing,finished,paused',
+            'type' => 'required|in:tv,movie,ova,ona,special,music',
         ]);
+
+        $anime = Anime::create($validated);
 
         AuditLog::create([
             'user_id' => auth()->id(),
-            'action' => 'ban_user',
-            'description' => "Banned user {$user->email}: {$request->reason}",
+            'action' => 'create_anime',
+            'description' => "Created anime: {$anime->title}",
             'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
         ]);
 
-        return back()->with('success', 'Пользователь заблокирован');
+        return redirect()->route('admin.anime.index')->with('success', 'Anime created');
     }
 
-    public function unban(Request $request, User $user)
+    public function destroy($id)
     {
-        $user->update([
-            'is_banned' => false,
-            'ban_reason' => null
-        ]);
+        $anime = Anime::findOrFail($id);
+        $anime->delete();
 
         AuditLog::create([
             'user_id' => auth()->id(),
-            'action' => 'unban_user',
-            'description' => "Unbanned user {$user->email}",
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
+            'action' => 'delete_anime',
+            'description' => "Deleted anime ID: {$id}",
+            'ip_address' => request()->ip(),
         ]);
 
-        return back()->with('success', 'Пользователь разблокирован');
-    }
-
-    public function destroy(User $user)
-    {
-        $user->delete();
-        return redirect()->route('admin.users.index')->with('success', 'Пользователь удален');
+        return redirect()->back()->with('success', 'Anime deleted');
     }
 }
