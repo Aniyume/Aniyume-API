@@ -13,6 +13,17 @@ use Illuminate\Support\Facades\DB;
 
 class CommentsController extends Controller
 {
+    public function index(Anime $anime)
+    {
+        $comments = $anime->comments()
+            ->with('user')
+            ->where('is_approved', true)
+            ->orderBy('created_at', 'desc')
+            ->paginate(50);
+
+        return CommentResource::collection($comments);
+    }
+
     public function store(StoreCommentRequest $request)
     {
         DB::beginTransaction();
