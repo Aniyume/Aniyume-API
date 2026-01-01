@@ -7,6 +7,7 @@ use App\Models\Anime;
 use App\Models\ImportLog;
 use App\Models\Tag;
 use App\Models\User;
+use App\Models\Episode;
 
 class DashboardController extends Controller
 {
@@ -18,12 +19,8 @@ class DashboardController extends Controller
             'total_tags' => Tag::count(),
             'total_users' => User::count(),
             'recent_imports' => ImportLog::latest()->take(5)->get(),
-            'anime_by_status' => Anime::selectRaw('status, COUNT(*) as count')
-                ->groupBy('status')
-                ->pluck('count', 'status'),
-            'anime_by_type' => Anime::selectRaw('type, COUNT(*) as count')
-                ->groupBy('type')
-                ->pluck('count', 'type'),
+            'anime_by_status' => Anime::selectRaw('status, COUNT(*) as count')->groupBy('status')->pluck('count', 'status'),
+            'anime_by_type' => Anime::selectRaw('type, COUNT(*) as count')->groupBy('type')->pluck('count', 'type'),
             'latest_anime' => Anime::with('tags')->latest()->take(10)->get(),
         ];
 

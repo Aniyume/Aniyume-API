@@ -3,194 +3,71 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Anime;
-use App\Models\Tag;
+use App\Models\User;
 use App\Models\AuditLog;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use App\Models\Episode;
 
-class AnimeManagementController extends Controller
+class UserManagementController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Anime::with('tags');
+        $query = User::query();
 
         if ($request->filled('search')) {
-            $query->where('title', 'ILIKE', '%' . $request->search . '%');
+            $query->where('name', 'ILIKE', '%' . $request->search . '%')
+                  ->orWhere('email', 'ILIKE', '%' . $request->search . '%');
         }
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->filled('type')) {
-            $query->where('type', $request->type);
-        }
-
-        $sortBy = $request->get('sort', 'created_at');
-        $sortOrder = $request->get('order', 'desc');
-        
-        $allowedSorts = ['id', 'title', 'created_at', 'year', 'rating'];
-        if (in_array($sortBy, $allowedSorts)) {
-            $query->orderBy($sortBy, $sortOrder);
-        } else {
-            $query->latest();
-        }
-
-        $anime = $query->paginate(20);
-
-        return view('admin.anime.index', compact('anime'));
+        $users = $query->latest()->paginate(20);
+        return view('admin.users.index', compact('users'));
     }
 
-    public function create()
+    public function show(User $user)
     {
-        $tags = Tag::orderBy('name')->get();
-        return view('admin.anime.create', compact('tags'));
+        return view('admin.users.show', compact('user'));
     }
 
-    public function store(Request $request)
+    public function ban(Request $request, User $user)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'poster_url' => 'nullable|url|max:1024',
-            'rating' => 'nullable|numeric|min:0|max:10',
-            'year' => 'nullable|integer|min:1900|max:2100',
-            'status' => 'required|in:planned,ongoing,finished,paused',
-            'type' => 'required|in:tv,movie,ova,ona,special,music',
-            'number_of_episodes' => 'nullable|integer|min:0',
-            'aired_from' => 'nullable|date',
-            'aired_to' => 'nullable|date',
-            'nsfw_flag' => 'boolean',
-            'tags' => 'array',
-            'tags.*' => 'exists:tags,id',
+        $request->validate(['reason' => 'required|string|max:255']);
+
+        $user->update([
+            'is_banned' => true,
+            'ban_reason' => $request->reason
         ]);
-
-        $validated['slug'] = $this->generateUniqueSlug($validated['title']);
-        $validated['external_source'] = 'manual';
-        $validated['nsfw_flag'] = $request->has('nsfw_flag');
-
-        $anime = Anime::create($validated);
-
-        if (isset($validated['tags'])) {
-            $anime->tags()->sync($validated['tags']);
-        }
 
         AuditLog::create([
             'user_id' => auth()->id(),
-            'action' => 'create_anime',
-            'description' => "Created anime: {$anime->title}",
+            'action' => 'ban_user',
+            'description' => "Banned user {$user->email}: {$request->reason}",
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
 
-        return redirect()->route('admin.anime.index')
-            ->with('success', 'Anime created successfully');
+        return back()->with('success', 'Пользователь заблокирован');
     }
 
-    public function show(string $id)
+    public function unban(Request $request, User $user)
     {
-        $anime = Anime::with('tags')->findOrFail($id);
-        $episodes = Episode::where('anime_id', $id)
-            ->orderBy('season_number')
-            ->orderBy('episode_number')
-            ->get();
-        
-        return view('admin.anime.show', compact('anime', 'episodes'));
-    }
-
-    public function edit(string $id)
-    {
-        $anime = Anime::with('tags')->findOrFail($id);
-        $tags = Tag::orderBy('name')->get();
-        return view('admin.anime.edit', compact('anime', 'tags'));
-    }
-
-    public function update(Request $request, string $id)
-    {
-        $anime = Anime::findOrFail($id);
-
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'poster_url' => 'nullable|url|max:1024',
-            'rating' => 'nullable|numeric|min:0|max:10',
-            'year' => 'nullable|integer|min:1900|max:2100',
-            'status' => 'required|in:planned,ongoing,finished,paused',
-            'type' => 'required|in:tv,movie,ova,ona,special,music',
-            'number_of_episodes' => 'nullable|integer|min:0',
-            'aired_from' => 'nullable|date',
-            'aired_to' => 'nullable|date',
-            'nsfw_flag' => 'boolean',
-            'tags' => 'array',
-            'tags.*' => 'exists:tags,id',
+        $user->update([
+            'is_banned' => false,
+            'ban_reason' => null
         ]);
-
-        if ($validated['title'] !== $anime->title) {
-            $validated['slug'] = $this->generateUniqueSlug($validated['title'], $anime->id);
-        }
-
-        $validated['nsfw_flag'] = $request->has('nsfw_flag');
-
-        $anime->update($validated);
-
-        if (isset($validated['tags'])) {
-            $anime->tags()->sync($validated['tags']);
-        }
 
         AuditLog::create([
             'user_id' => auth()->id(),
-            'action' => 'update_anime',
-            'description' => "Updated anime: {$anime->title}",
+            'action' => 'unban_user',
+            'description' => "Unbanned user {$user->email}",
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
 
-        return redirect()->route('admin.anime.index')
-            ->with('success', 'Anime updated successfully');
+        return back()->with('success', 'Пользователь разблокирован');
     }
 
-    public function destroy(Request $request, string $id)
+    public function destroy(User $user)
     {
-        $anime = Anime::findOrFail($id);
-        $title = $anime->title;
-
-        $anime->delete();
-
-        AuditLog::create([
-            'user_id' => auth()->id(),
-            'action' => 'delete_anime',
-            'description' => "Deleted anime: {$title}",
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
-
-        return redirect()->route('admin.anime.index')
-            ->with('success', 'Anime deleted successfully');
-    }
-
-    protected function generateUniqueSlug(string $title, ?int $excludeId = null): string
-    {
-        $baseSlug = Str::slug($title);
-        $slug = $baseSlug;
-        $counter = 2;
-
-        while (true) {
-            $query = Anime::where('slug', $slug);
-            
-            if ($excludeId) {
-                $query->where('id', '!=', $excludeId);
-            }
-
-            if (!$query->exists()) {
-                break;
-            }
-
-            $slug = $baseSlug . '-' . $counter;
-            $counter++;
-        }
-
-        return $slug;
+        $user->delete();
+        return redirect()->route('admin.users.index')->with('success', 'Пользователь удален');
     }
 }

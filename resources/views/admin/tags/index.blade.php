@@ -1,351 +1,55 @@
 @extends('layouts.admin')
-
-@section('title', 'Управление тегами - АниЮм Админ')
-
+@section('title', 'Управление тегами - AniYume Админ')
 @section('content')
-
 <style>
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 32px;
-        gap: 20px;
-        flex-wrap: wrap;
-    }
-
-    .page-title {
-        background: linear-gradient(135deg, #00ffc8, #00c8ff);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        font-weight: 800;
-        font-size: 28px;
-        margin: 0;
-    }
-
-    .btn {
-        padding: 12px 20px;
-        border-radius: 10px;
-        border: none;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 14px;
-        text-decoration: none;
-        white-space: nowrap;
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #00ffc8, #00c8ff);
-        color: #0a0a1a;
-    }
-
-    .btn-primary:hover {
-        box-shadow: 0 12px 30px rgba(0, 255, 200, 0.3);
-        transform: translateY(-2px);
-    }
-
-    .btn-primary:active {
-        transform: translateY(0);
-    }
-
-    .search-card {
-        background: linear-gradient(135deg, rgba(0, 255, 200, 0.08), rgba(0, 200, 255, 0.05));
-        border: 1.5px solid rgba(0, 255, 200, 0.2);
-        border-radius: 16px;
-        padding: 24px;
-        backdrop-filter: blur(10px);
-        margin-bottom: 24px;
-    }
-
-    .search-form {
-        display: flex;
-        gap: 12px;
-        align-items: flex-end;
-    }
-
-    .search-input-group {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .search-label {
-        color: #b0e0ff;
-        font-weight: 600;
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 8px;
-    }
-
-    .search-input {
-        background: linear-gradient(135deg, rgba(0, 255, 200, 0.08), rgba(0, 200, 255, 0.05));
-        border: 1px solid rgba(0, 255, 200, 0.2);
-        color: #e0e0e0;
-        border-radius: 10px;
-        padding: 12px 14px;
-        transition: all 0.3s ease;
-        font-family: 'Onest', sans-serif;
-        font-size: 14px;
-    }
-
-    .search-input::placeholder {
-        color: rgba(224, 224, 224, 0.4);
-    }
-
-    .search-input:focus {
-        outline: none;
-        background: linear-gradient(135deg, rgba(0, 255, 200, 0.12), rgba(0, 200, 255, 0.08));
-        border-color: #00ffc8;
-        box-shadow: 0 0 20px rgba(0, 255, 200, 0.3);
-    }
-
-    .btn-search {
-        background: linear-gradient(135deg, #00ffc8, #00c8ff);
-        color: #0a0a1a;
-        padding: 12px 24px;
-    }
-
-    .btn-search:hover {
-        box-shadow: 0 12px 30px rgba(0, 255, 200, 0.3);
-        transform: translateY(-2px);
-    }
-
-    .table-container {
-        background: linear-gradient(135deg, rgba(0, 255, 200, 0.08), rgba(0, 200, 255, 0.05));
-        border: 1.5px solid rgba(0, 255, 200, 0.2);
-        border-radius: 16px;
-        overflow: hidden;
-        backdrop-filter: blur(10px);
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    thead {
-        background: linear-gradient(90deg, #0f1419, #1a2535);
-    }
-
-    th {
-        color: #00ffc8;
-        padding: 16px;
-        text-align: left;
-        font-weight: 700;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        border-bottom: 1.5px solid rgba(0, 255, 200, 0.25);
-    }
-
-    th:last-child {
-        text-align: right;
-    }
-
-    td {
-        padding: 14px 16px;
-        border-bottom: 1px solid rgba(0, 255, 200, 0.1);
-        color: #d0e8ff;
-        font-size: 14px;
-    }
-
-    tbody tr {
-        transition: all 0.3s ease;
-    }
-
-    tbody tr:hover {
-        background: rgba(0, 255, 200, 0.08);
-    }
-
-    tbody tr:last-child td {
-        border-bottom: none;
-    }
-
-    .tag-name {
-        color: #00ffc8;
-        font-weight: 700;
-        font-size: 15px;
-    }
-
-    .tag-slug {
-        color: #b0e0ff;
-        font-family: 'Space Mono', monospace;
-        font-size: 12px;
-    }
-
-    .count-badge {
-        display: inline-block;
-        background: linear-gradient(135deg, rgba(0, 255, 200, 0.15), rgba(0, 200, 255, 0.1));
-        color: #00ffc8;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 700;
-        border: 1px solid rgba(0, 255, 200, 0.25);
-    }
-
-    .actions-cell {
-        text-align: right;
-    }
-
-    .action-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        color: #00ffc8;
-        text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        margin-left: 16px;
-        font-size: 13px;
-    }
-
-    .action-link:first-child {
-        margin-left: 0;
-    }
-
-    .action-link:hover {
-        color: #00ffc8;
-        text-decoration: underline;
-    }
-
-    .action-delete {
-        color: #ff9fa0;
-    }
-
-    .action-delete:hover {
-        color: #ff6464;
-    }
-
-    .empty-state {
-        padding: 60px 20px;
-        text-align: center;
-        color: #b0e0ff;
-    }
-
-    .empty-emoji {
-        font-size: 48px;
-        margin-bottom: 12px;
-        display: block;
-    }
-
-    .empty-text {
-        font-size: 16px;
-        margin-bottom: 20px;
-    }
-
-    .pagination-container {
-        display: flex;
-        justify-content: center;
-        margin-top: 32px;
-        padding: 24px;
-        background: linear-gradient(135deg, rgba(0, 255, 200, 0.08), rgba(0, 200, 255, 0.05));
-        border: 1px solid rgba(0, 255, 200, 0.2);
-        border-top: none;
-        border-radius: 0 0 16px 16px;
-    }
-
-    .pagination {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .pagination a,
-    .pagination span {
-        padding: 10px 12px;
-        border-radius: 8px;
-        border: 1px solid rgba(0, 255, 200, 0.2);
-        color: #b0e0ff;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        font-size: 13px;
-        font-weight: 600;
-    }
-
-    .pagination a:hover {
-        border-color: rgba(0, 255, 200, 0.4);
-        background: rgba(0, 255, 200, 0.1);
-        color: #00ffc8;
-    }
-
-    .pagination .active span {
-        background: linear-gradient(135deg, #00ffc8, #00c8ff);
-        color: #0a0a1a;
-        border-color: rgba(0, 255, 200, 0.4);
-        font-weight: 700;
-    }
-
-    .pagination .disabled span {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; gap: 1.5rem; flex-wrap: wrap; }
+    .page-title { color: #1a1d1f; font-weight: 800; font-size: 1.75rem; margin: 0; }
+    .btn { padding: 0.75rem 1.25rem; border-radius: 0.75rem; border: none; font-weight: 700; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; text-decoration: none; white-space: nowrap; }
+    .btn-primary { background: #00f2ea; color: #ffffff; box-shadow: 0 4px 14px rgba(0, 242, 234, 0.3); }
+    .btn-primary:hover { background: #00d1ca; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 242, 234, 0.4); }
+    .search-card { background: #ffffff; border: 1px solid #f0f2f5; border-radius: 1.25rem; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 12px rgba(0,0,0,0.02); }
+    .search-form { display: flex; gap: 0.75rem; align-items: flex-end; }
+    .search-input-group { flex: 1; display: flex; flex-direction: column; }
+    .search-label { color: #6f767e; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+    .search-input { background: #f4f4f4; border: 2px solid transparent; color: #1a1d1f; border-radius: 0.75rem; padding: 0.75rem 1rem; transition: all 0.2s ease; font-size: 0.9rem; font-weight: 600; }
+    .search-input::placeholder { color: #6f767e; opacity: 0.6; }
+    .search-input:focus { outline: none; border-color: #00f2ea; background: #ffffff; }
+    .table-container { background: #ffffff; border: 1px solid #f0f2f5; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.02); }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: #fcfdfe; }
+    th { color: #6f767e; padding: 1.25rem 1.5rem; text-align: left; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #f0f2f5; }
+    th:last-child { text-align: right; }
+    tbody tr { border-bottom: 1px solid #f0f2f5; transition: all 0.2s ease; }
+    tbody tr:hover { background: #fcfdfe; }
+    td { padding: 1.25rem 1.5rem; color: #1a1d1f; font-size: 0.9rem; font-weight: 500; }
+    .tag-name { color: #1a1d1f; font-weight: 700; font-size: 0.95rem; }
+    .tag-slug { color: #6f767e; font-family: monospace; font-size: 0.8rem; }
+    .count-badge { display: inline-block; background: #f0fdfa; color: #0d9488; padding: 0.375rem 0.75rem; border-radius: 0.5rem; font-size: 0.8rem; font-weight: 700; }
+    .actions-cell { text-align: right; display: flex; gap: 0.5rem; justify-content: flex-end; align-items: center; }
+    .action-link { color: #00f2ea; text-decoration: none; font-weight: 600; transition: all 0.2s ease; font-size: 0.85rem; padding: 0.5rem 0.875rem; border-radius: 0.5rem; display: inline-flex; align-items: center; gap: 0.375rem; }
+    .action-link:hover { background: #f0fdfa; color: #00d1ca; }
+    .action-delete { color: #dc2626; background: none; border: none; cursor: pointer; padding: 0.5rem 0.875rem; font-weight: 600; font-size: 0.85rem; border-radius: 0.5rem; display: inline-flex; align-items: center; gap: 0.375rem; transition: all 0.2s ease; }
+    .action-delete:hover { background: #fef2f2; }
+    .empty-state { padding: 4rem 1.25rem; text-align: center; color: #6f767e; }
+    .empty-emoji { font-size: 3rem; margin-bottom: 0.75rem; display: block; }
+    .empty-text { font-size: 1rem; margin-bottom: 1.25rem; }
+    .pagination-container { margin-top: 2.5rem; display: flex; justify-content: center; }
     @media (max-width: 768px) {
-        .page-header {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .btn-primary {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .search-form {
-            flex-direction: column;
-        }
-
-        .search-input-group {
-            width: 100%;
-        }
-
-        .btn-search {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .table-container {
-            overflow-x: auto;
-        }
-
-        table {
-            min-width: 600px;
-        }
-
-        th, td {
-            padding: 12px;
-            font-size: 12px;
-        }
-
-        .actions-cell {
-            white-space: nowrap;
-        }
-
-        .action-link {
-            margin-left: 8px;
-            font-size: 12px;
-        }
-
-        .page-title {
-            font-size: 24px;
-        }
+        .page-header { flex-direction: column; align-items: flex-start; }
+        .btn-primary { width: 100%; justify-content: center; }
+        .search-form { flex-direction: column; }
+        .search-input-group { width: 100%; }
+        .table-container { overflow-x: auto; }
+        table { min-width: 600px; }
+        th, td { padding: 0.875rem; font-size: 0.8rem; }
+        .actions-cell { white-space: nowrap; }
+        .page-title { font-size: 1.5rem; }
     }
 </style>
 
 <div class="page-header">
-    <h1 class="page-title">🏷️ Управление тегами</h1>
-    <a href="{{ route('admin.tags.create') }}" class="btn btn-primary">
-        ➕ Добавить тег
-    </a>
+    <h1 class="page-title">Управление тегами</h1>
+    <a href="{{ route('admin.tags.create') }}" class="btn btn-primary">Добавить тег</a>
 </div>
 
 <div class="search-card">
@@ -355,9 +59,7 @@
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Введите название тега..."
                    class="search-input">
         </div>
-        <button type="submit" class="btn btn-search">
-            🔍 Поиск
-        </button>
+        <button type="submit" class="btn btn-primary">Найти</button>
     </form>
 </div>
 
@@ -374,27 +76,19 @@
         <tbody>
             @forelse($tags as $tag)
                 <tr>
+                    <td><span class="tag-name">{{ $tag->name }}</span></td>
+                    <td><span class="tag-slug">{{ $tag->slug }}</span></td>
+                    <td><span class="count-badge">{{ number_format($tag->anime_count) }}</span></td>
                     <td>
-                        <span class="tag-name">{{ $tag->name }}</span>
-                    </td>
-                    <td>
-                        <span class="tag-slug">{{ $tag->slug }}</span>
-                    </td>
-                    <td>
-                        <span class="count-badge">{{ number_format($tag->anime_count) }}</span>
-                    </td>
-                    <td class="actions-cell">
-                        <a href="{{ route('admin.tags.edit', $tag->id) }}" class="action-link">
-                            ✏️ Редактировать
-                        </a>
-                        <form action="{{ route('admin.tags.destroy', $tag->id) }}" method="POST" class="inline"
-                              onsubmit="return confirm('Вы уверены? Тег будет удален из всех аниме.')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="action-link action-delete" style="background: none; border: none; cursor: pointer; padding: 0;">
-                                🗑️ Удалить
-                            </button>
-                        </form>
+                        <div class="actions-cell">
+                            <a href="{{ route('admin.tags.edit', $tag->id) }}" class="action-link">Изменить</a>
+                            <form action="{{ route('admin.tags.destroy', $tag->id) }}" method="POST" style="display: inline;"
+                                  onsubmit="return confirm('Вы уверены? Тег будет удален из всех аниме.')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="action-delete">Удалить</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
             @empty
@@ -403,9 +97,7 @@
                         <div class="empty-state">
                             <span class="empty-emoji">🏷️</span>
                             <div class="empty-text">Теги не найдены</div>
-                            <a href="{{ route('admin.tags.create') }}" class="btn btn-primary">
-                                ➕ Добавить первый тег
-                            </a>
+                            <a href="{{ route('admin.tags.create') }}" class="btn btn-primary">Добавить первый тег</a>
                         </div>
                     </td>
                 </tr>
@@ -419,5 +111,4 @@
         {{ $tags->links() }}
     </div>
 @endif
-
 @endsection

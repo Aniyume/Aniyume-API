@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('avatar')->nullable();
-            $table->string('custom_status')->nullable();
+            $table->boolean('is_banned')->default(false);
+            $table->string('ban_reason')->nullable();
         });
     }
 

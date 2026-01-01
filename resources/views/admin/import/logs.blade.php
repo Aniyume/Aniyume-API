@@ -1,147 +1,189 @@
 @extends('layouts.admin')
-
-@section('title', 'Import Logs - AniYume Admin')
-
+@section('title', 'Логи импорта - AniYume Админ')
 @section('content')
-<div class="mb-8 flex justify-between items-center">
-    <div>
-        <h1 class="text-4xl font-bold bg-gradient-to-r from-cyan-500 via-teal-500 to-blue-500 bg-clip-text text-transparent">📊 Import Logs</h1>
-        <p class="text-gray-500 mt-2">Detailed history of all import operations</p>
+<style>
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; gap: 1.5rem; flex-wrap: wrap; }
+    .page-title-block h1 { color: #1a1d1f; font-weight: 800; font-size: 1.75rem; margin: 0; }
+    .page-subtitle { color: #6f767e; font-size: 0.9rem; margin-top: 0.5rem; }
+    .btn-back { background: #00f2ea; color: #ffffff; padding: 0.75rem 1.5rem; border-radius: 0.75rem; border: none; font-weight: 700; cursor: pointer; transition: all 0.2s ease; font-size: 0.9rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 14px rgba(0, 242, 234, 0.3); }
+    .btn-back:hover { background: #00d1ca; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 242, 234, 0.4); }
+    .table-container { background: #ffffff; border: 1px solid #f0f2f5; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.02); margin-bottom: 2rem; }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: #fcfdfe; }
+    th { color: #6f767e; padding: 1.25rem 1.5rem; text-align: left; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #f0f2f5; }
+    th.text-center { text-align: center; }
+    tbody tr { border-bottom: 1px solid #f0f2f5; transition: all 0.2s ease; }
+    tbody tr:hover { background: #fcfdfe; }
+    td { padding: 1.25rem 1.5rem; color: #1a1d1f; font-size: 0.9rem; font-weight: 500; }
+    td.text-center { text-align: center; }
+    .log-id { color: #00f2ea; font-weight: 700; }
+    .type-badge { background: #f0fdfa; color: #0d9488; padding: 0.375rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; display: inline-block; }
+    .status-badge { padding: 0.375rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; display: inline-block; }
+    .status-completed { background: #f0fdf4; color: #16a34a; }
+    .status-failed { background: #fef2f2; color: #dc2626; }
+    .status-running { background: #fffbeb; color: #d97706; }
+    .count-cell { font-weight: 700; font-size: 1.125rem; }
+    .count-cell.green { color: #16a34a; }
+    .count-cell.blue { color: #00f2ea; }
+    .count-cell.orange { color: #d97706; }
+    .date-cell { font-size: 0.85rem; }
+    .date-main { font-weight: 700; color: #1a1d1f; }
+    .date-sub { color: #6f767e; }
+    .duration-cell { font-size: 0.85rem; font-weight: 700; }
+    .duration-main { color: #0d9488; }
+    .duration-sub { color: #6f767e; font-weight: 500; }
+    .duration-running { color: #d97706; }
+    .error-row { background: #fef2f2; border-left: 4px solid #dc2626; }
+    .error-content { display: flex; gap: 0.75rem; padding: 1rem 1.5rem; }
+    .error-title { color: #dc2626; font-weight: 700; margin-bottom: 0.5rem; }
+    .error-box { background: #ffffff; padding: 1rem; border-radius: 0.5rem; border: 1px solid #fecaca; overflow-x: auto; flex: 1; }
+    .error-box pre { color: #dc2626; font-size: 0.75rem; margin: 0; font-family: monospace; }
+    .empty-state { padding: 4rem 1.25rem; text-align: center; }
+    .empty-emoji { font-size: 3.75rem; margin-bottom: 1rem; display: block; }
+    .empty-title { color: #1a1d1f; font-size: 1.125rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .empty-text { color: #6f767e; margin-bottom: 1.5rem; }
+    .btn-primary { background: #00f2ea; color: #ffffff; padding: 0.75rem 1.5rem; border-radius: 0.75rem; border: none; font-weight: 700; cursor: pointer; transition: all 0.2s ease; font-size: 0.9rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 14px rgba(0, 242, 234, 0.3); }
+    .btn-primary:hover { background: #00d1ca; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 242, 234, 0.4); }
+    .pagination-container { margin-top: 0; display: flex; justify-content: center; background: #fcfdfe; padding: 1.5rem; border-top: 1px solid #f0f2f5; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+    .stat-card { background: #ffffff; border: 1px solid #f0f2f5; border-radius: 1.25rem; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.02); }
+    .stat-card.cyan { border-left: 4px solid #00f2ea; }
+    .stat-card.green { border-left: 4px solid #16a34a; }
+    .stat-card.red { border-left: 4px solid #dc2626; }
+    .stat-card.yellow { border-left: 4px solid #d97706; }
+    .stat-label { color: #6f767e; font-size: 0.75rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .stat-value { color: #1a1d1f; font-size: 2rem; font-weight: 800; }
+    .stat-value.cyan { color: #00f2ea; }
+    .stat-value.green { color: #16a34a; }
+    .stat-value.red { color: #dc2626; }
+    .stat-value.yellow { color: #d97706; }
+    @media (max-width: 1024px) {
+        th, td { padding: 0.875rem; font-size: 0.8rem; }
+        .count-cell { font-size: 1rem; }
+    }
+    @media (max-width: 768px) {
+        .page-header { flex-direction: column; align-items: flex-start; }
+        .btn-back { width: 100%; justify-content: center; }
+        .table-container { overflow-x: auto; }
+        table { min-width: 1000px; }
+        .stats-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+<div class="page-header">
+    <div class="page-title-block">
+        <h1>Логи импорта</h1>
+        <p class="page-subtitle">Детальная история всех операций импорта</p>
     </div>
-    <a href="{{ route('admin.import.index') }}" class="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white px-6 py-3 rounded-lg font-bold transition shadow-lg">
-        ⬅️ Back to Import
-    </a>
+    <a href="{{ route('admin.import.index') }}" class="btn-back">← Назад к импорту</a>
 </div>
 
-<div class="bg-white rounded-xl shadow-lg overflow-hidden border-t-4 border-cyan-500">
+<div class="table-container">
     @if($logs->count() > 0)
-    <div class="overflow-x-auto">
-        <table class="w-full divide-y divide-gray-200">
-            <thead class="bg-gradient-to-r from-cyan-500 to-teal-500 text-white">
-                <tr>
-                    <th class="px-6 py-4 text-left font-bold">#</th>
-                    <th class="px-6 py-4 text-left font-bold">📊 Type</th>
-                    <th class="px-6 py-4 text-left font-bold">📊 Status</th>
-                    <th class="px-6 py-4 text-center font-bold">🌀</th>
-                    <th class="px-6 py-4 text-center font-bold">✅ Created</th>
-                    <th class="px-6 py-4 text-center font-bold">🔄 Updated</th>
-                    <th class="px-6 py-4 text-center font-bold">⏭️ Skipped</th>
-                    <th class="px-6 py-4 text-left font-bold">📅 Started</th>
-                    <th class="px-6 py-4 text-left font-bold">⏱️ Duration</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-                @foreach($logs as $index => $log)
-                @php
-                    $statusBg = match($log->status) {
-                        'completed' => 'from-green-100 to-emerald-100 text-green-800 border-green-300',
-                        'failed' => 'from-red-100 to-rose-100 text-red-800 border-red-300',
-                        'running' => 'from-yellow-100 to-amber-100 text-yellow-800 border-yellow-300',
-                        default => 'from-gray-100 to-slate-100 text-gray-800 border-gray-300'
-                    };
-                    $statusEmoji = match($log->status) {
-                        'completed' => '✅',
-                        'failed' => '❌',
-                        'running' => '⏳',
-                        default => 'ℹ️'
-                    };
-                @endphp
-                <tr class="hover:bg-cyan-50 transition">
-                    <td class="px-6 py-4 font-bold text-cyan-600">#{{ $log->id }}</td>
-                    <td class="px-6 py-4">
-                        <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-bold capitalize">
-                            {{ $log->import_type === 'initial' ? '🆕 New' : '🔄 Update' }} 
-                        </span>
-                    </td>
-                    <td class="px-6 py-4">
-                        <span class="px-3 py-1 bg-gradient-to-r {{ $statusBg }} rounded-full text-xs font-bold border-l-4">
-                            {{ $statusEmoji }} {{ ucfirst($log->status) }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 text-center font-bold text-lg text-gray-700">
-                        {{ number_format($log->total_processed) }}
-                    </td>
-                    <td class="px-6 py-4 text-center font-bold text-lg text-green-600">
-                        {{ number_format($log->total_created) }}
-                    </td>
-                    <td class="px-6 py-4 text-center font-bold text-lg text-blue-600">
-                        {{ number_format($log->total_updated) }}
-                    </td>
-                    <td class="px-6 py-4 text-center font-bold text-lg text-orange-600">
-                        {{ number_format($log->total_skipped) }}
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-700">
-                        <div class="font-bold">{{ $log->started_at->format('M d') }}</div>
-                        <div class="text-gray-500">{{ $log->started_at->format('H:i:s') }}</div>
-                    </td>
-                    <td class="px-6 py-4 text-sm font-bold">
-                        @if($log->finished_at)
-                            <div class="text-teal-600">{{ $log->started_at->diffInMinutes($log->finished_at) }}m {{ $log->started_at->diff($log->finished_at)->format('%s') }}s</div>
-                            <div class="text-gray-500 text-xs">{{ $log->finished_at->diffForHumans() }}</div>
-                        @else
-                            <div class="text-yellow-600 animate-pulse">📋 In progress...</div>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Тип</th>
+                <th>Статус</th>
+                <th class="text-center">Обработано</th>
+                <th class="text-center">Создано</th>
+                <th class="text-center">Обновлено</th>
+                <th class="text-center">Пропущено</th>
+                <th>Начато</th>
+                <th>Длительность</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($logs as $log)
+            <tr>
+                <td><span class="log-id">#{{ $log->id }}</span></td>
+                <td>
+                    <span class="type-badge">
+                        {{ $log->import_type === 'initial' ? 'Новый' : 'Обновление' }}
+                    </span>
+                </td>
+                <td>
+                    <span class="status-badge status-{{ $log->status }}">
+                        @if($log->status === 'completed') Завершено
+                        @elseif($log->status === 'failed') Ошибка
+                        @elseif($log->status === 'running') Выполняется
+                        @else {{ ucfirst($log->status) }}
                         @endif
-                    </td>
-                </tr>
-                @if($log->errors)
-                <tr class="bg-red-50 border-l-4 border-red-500">
-                    <td colspan="9" class="px-6 py-4">
-                        <div class="flex gap-3">
-                            <span class="text-2xl">⚠️</span>
-                            <div class="flex-1">
-                                <div class="font-bold text-red-800 mb-2">Import Errors</div>
-                                <div class="bg-white p-4 rounded border-2 border-red-300 overflow-x-auto">
-                                    <pre class="text-red-700 text-xs font-mono">{{ $log->errors }}</pre>
-                                </div>
+                    </span>
+                </td>
+                <td class="text-center count-cell">{{ number_format($log->total_processed) }}</td>
+                <td class="text-center count-cell green">{{ number_format($log->total_created) }}</td>
+                <td class="text-center count-cell blue">{{ number_format($log->total_updated) }}</td>
+                <td class="text-center count-cell orange">{{ number_format($log->total_skipped) }}</td>
+                <td class="date-cell">
+                    <div class="date-main">{{ $log->started_at->format('d.m.Y') }}</div>
+                    <div class="date-sub">{{ $log->started_at->format('H:i:s') }}</div>
+                </td>
+                <td class="duration-cell">
+                    @if($log->finished_at)
+                        <div class="duration-main">{{ $log->started_at->diffInMinutes($log->finished_at) }}м {{ $log->started_at->diff($log->finished_at)->format('%s') }}с</div>
+                        <div class="duration-sub">{{ $log->finished_at->diffForHumans() }}</div>
+                    @else
+                        <div class="duration-running">В процессе...</div>
+                    @endif
+                </td>
+            </tr>
+            @if($log->errors)
+            <tr class="error-row">
+                <td colspan="9">
+                    <div class="error-content">
+                        <div style="flex: 1;">
+                            <div class="error-title">Ошибки импорта</div>
+                            <div class="error-box">
+                                <pre>{{ $log->errors }}</pre>
                             </div>
                         </div>
-                    </td>
-                </tr>
-                @endif
-                @endforeach
-            </tbody>
-        </table>
-    </div>
+                    </div>
+                </td>
+            </tr>
+            @endif
+            @endforeach
+        </tbody>
+    </table>
 
-    <div class="px-6 py-4 bg-gradient-to-r from-cyan-50 to-teal-50 border-t-2 border-cyan-200">
+    <div class="pagination-container">
         {{ $logs->links('pagination::tailwind') }}
     </div>
     @else
-    <div class="p-12 text-center">
-        <span class="text-6xl mb-4">📊</span>
-        <p class="text-gray-600 text-lg mb-4">No import logs found</p>
-        <p class="text-gray-500 text-sm mb-6">Import history will appear here after you run your first import</p>
-        <a href="{{ route('admin.import.index') }}" class="inline-block bg-gradient-to-r from-cyan-500 to-teal-500 text-white px-6 py-3 rounded-lg font-bold hover:shadow-lg transition">
-            🚀 Start First Import
-        </a>
+    <div class="empty-state">
+        <span class="empty-emoji">📊</span>
+        <div class="empty-title">Логи импорта не найдены</div>
+        <p class="empty-text">История импорта появится здесь после первого запуска импорта</p>
+        <a href="{{ route('admin.import.index') }}" class="btn-primary">Начать первый импорт</a>
     </div>
     @endif
 </div>
 
-<div class="mt-8 grid grid-cols-1 md:grid-cols-4 gap-6">
-    <div class="bg-gradient-to-br from-cyan-50 to-teal-50 rounded-xl shadow-lg border-l-4 border-cyan-500 p-6">
-        <div class="text-gray-600 text-sm font-bold mb-2">📥 Total Imports</div>
-        <div class="text-3xl font-bold text-cyan-600">{{ $logs->total() }}</div>
+<div class="stats-grid">
+    <div class="stat-card cyan">
+        <div class="stat-label">Всего импортов</div>
+        <div class="stat-value cyan">{{ $logs->total() }}</div>
     </div>
 
-    <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-lg border-l-4 border-green-500 p-6">
-        <div class="text-gray-600 text-sm font-bold mb-2">✅ Successful</div>
-        <div class="text-3xl font-bold text-green-600">{{ $logs->where('status', 'completed')->count() }}</div>
+    <div class="stat-card green">
+        <div class="stat-label">Успешных</div>
+        <div class="stat-value green">{{ $logs->where('status', 'completed')->count() }}</div>
     </div>
 
-    <div class="bg-gradient-to-br from-red-50 to-rose-50 rounded-xl shadow-lg border-l-4 border-red-500 p-6">
-        <div class="text-gray-600 text-sm font-bold mb-2">❌ Failed</div>
-        <div class="text-3xl font-bold text-red-600">{{ $logs->where('status', 'failed')->count() }}</div>
+    <div class="stat-card red">
+        <div class="stat-label">С ошибками</div>
+        <div class="stat-value red">{{ $logs->where('status', 'failed')->count() }}</div>
     </div>
 
-    <div class="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl shadow-lg border-l-4 border-yellow-500 p-6">
-        <div class="text-gray-600 text-sm font-bold mb-2">🔄 Success Rate</div>
+    <div class="stat-card yellow">
+        <div class="stat-label">Процент успеха</div>
         @php
             $completed = $logs->where('status', 'completed')->count();
             $total = $logs->count();
             $rate = $total > 0 ? round(($completed / $total) * 100) : 0;
         @endphp
-        <div class="text-3xl font-bold text-yellow-600">{{ $rate }}%</div>
+        <div class="stat-value yellow">{{ $rate }}%</div>
     </div>
 </div>
 @endsection

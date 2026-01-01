@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EpisodeManagementController;
 use App\Http\Controllers\Admin\ImportManagementController;
 use App\Http\Controllers\Admin\TagManagementController;
+use App\Http\Controllers\Admin\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -26,6 +27,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+        Route::resource('users', UserManagementController::class);
+        Route::post('users/{user}/ban', [UserManagementController::class, 'ban'])->name('users.ban');
+        Route::post('users/{user}/unban', [UserManagementController::class, 'unban'])->name('users.unban');
+
         Route::resource('anime', AnimeManagementController::class);
         Route::resource('tags', TagManagementController::class)->except(['show']);
 
@@ -35,6 +40,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::put('/{episode}', [EpisodeManagementController::class, 'update'])->name('update');
             Route::post('/import-all', [EpisodeManagementController::class, 'importAll'])->name('import-all');
             Route::post('/{anime}/import', [EpisodeManagementController::class, 'importForAnime'])->name('import-for-anime');
+            Route::post('/bulk-import', [EpisodeManagementController::class, 'bulkImport'])->name('bulk-import');
             Route::delete('/{id}', [EpisodeManagementController::class, 'destroy'])->name('destroy');
         });
 
