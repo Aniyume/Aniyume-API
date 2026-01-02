@@ -45,13 +45,14 @@ class CommentsController extends Controller
             return new CommentResource($comment->load('user'));
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Error'], 500);
         }
     }
 
     public function update(UpdateCommentRequest $request, $id)
     {
-        $comment = Comment::findOrFail($id);
+        $comment = Comment::find($id);
+        if (!$comment) return response()->json(['message' => 'Not found'], 404);
 
         if ($comment->user_id !== $request->user()->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
@@ -64,10 +65,7 @@ class CommentsController extends Controller
     public function destroy(Request $request, $id)
     {
         $comment = Comment::find($id);
-
-        if (!$comment) {
-            return response()->json(['message' => 'Comment not found'], 404);
-        }
+        if (!$comment) return response()->json(['message' => 'Not found'], 404);
 
         if ($comment->user_id !== $request->user()->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
@@ -87,7 +85,16 @@ class CommentsController extends Controller
             return response()->json(['message' => 'Deleted'], 200);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Server Error'], 500);
+            return response()->json(['message' => 'Error'], 500);
         }
+    }
+
+    public function userComments(Request $request)
+    {
+        $comments = Comment::with(['anime'])
+            ->where('user_id', $request->user()->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return CommentResource::collection($comments);
     }
 }
