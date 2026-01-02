@@ -16,6 +16,7 @@ class UserStatisticsService
             'recent_ratings' => $this->getRecentRatings($userId, 3),
             'watch_dynamics' => $this->getWatchDynamics($userId, 10),
             'recently_watched' => $this->getRecentlyWatched($userId, 5),
+             'comments_count' => $this->getTotalCommentsCount($userId),
         ];
     }
 
@@ -158,4 +159,8 @@ class UserStatisticsService
 
         return $watched ? $watched->toArray() : [];
     }
+    private function getTotalCommentsCount(int $userId): int
+{
+    return DB::table('comments')->where('user_id', $userId)->count();
+}
 }

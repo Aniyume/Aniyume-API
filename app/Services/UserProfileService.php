@@ -33,6 +33,7 @@ class UserProfileService
                 'favorites' => $user->favorites()->count(),
                 'ratings' => $user->ratings()->count(),
                 'watch_history' => $user->watchHistory()->count(),
+                 'comments' => DB::table('comments')->where('user_id', $user->id)->count(),
             ],
         ];
     }
