@@ -47,6 +47,8 @@ class AnimeManagementController extends Controller
             'tags.*' => 'exists:tags,id',
         ]);
 
+        $validated['slug'] = Str::slug($validated['title']);
+
         $anime = Anime::create($validated);
 
         if ($request->has('tags')) {
@@ -93,6 +95,8 @@ class AnimeManagementController extends Controller
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
         ]);
+
+        $validated['slug'] = Str::slug($validated['title']);
 
         $anime->update($validated);
 

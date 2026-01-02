@@ -14,6 +14,7 @@ class Anime extends Model
         'external_id',
         'shikimori_id',
         'title',
+        'slug',
         'title_en',
         'title_jp',
         'description',
