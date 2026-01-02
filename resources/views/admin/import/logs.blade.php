@@ -2,31 +2,74 @@
 @section('title', 'Архив логов - AniYume Админ')
 @section('content')
 <style>
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; }
-    .page-title { color: #FFF; font-weight: 900; font-size: 2.5rem; text-transform: uppercase; italic: italic; letter-spacing: -0.05em; }
-    .page-title span { color: #2EC4B6; }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
-    .btn-back { background: #161616; color: #2EC4B6; border: 1px solid rgba(46, 196, 182, 0.2); padding: 1rem 1.5rem; border-radius: 12px; font-weight: 900; text-transform: uppercase; text-decoration: none; font-size: 0.8rem; transition: 0.3s; }
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2.5rem;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        animation: fadeInUp 0.5s ease;
+    }
+
+    .page-title { color: #FFF; font-weight: 900; font-size: clamp(1.5rem, 5vw, 2.5rem); text-transform: uppercase; letter-spacing: -0.05em; }
+    .page-title span { color: #2EC4B6; font-style: italic; }
+
+    .btn-back {
+        background: #161616;
+        color: #2EC4B6;
+        border: 1px solid rgba(46, 196, 182, 0.2);
+        padding: 0.8rem 1.25rem;
+        border-radius: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
+        text-decoration: none;
+        font-size: 0.75rem;
+        transition: 0.3s;
+    }
     .btn-back:hover { background: #2EC4B6; color: #000; }
 
-    .table-container { background: #111111; border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; overflow: hidden; }
-    table { width: 100%; border-collapse: collapse; }
-    th { color: rgba(255,255,255,0.3); padding: 1.5rem; text-align: left; font-weight: 900; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    td { padding: 1.5rem; color: #FFF; font-size: 0.9rem; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.02); }
+    .table-container {
+        background: #111111;
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 20px;
+        overflow-x: auto;
+        animation: fadeInUp 0.5s ease 0.1s forwards;
+        opacity: 0;
+    }
 
-    .log-id { color: #2EC4B6; font-weight: 900; font-family: monospace; }
-    .type-badge { background: rgba(255,255,255,0.05); color: #FFF; padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; }
+    table { width: 100%; border-collapse: collapse; min-width: 900px; }
+    th { color: rgba(255,255,255,0.3); padding: 1.25rem 1.5rem; text-align: left; font-weight: 900; font-size: 0.65rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    td { padding: 1.25rem 1.5rem; color: #FFF; font-size: 0.85rem; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.02); }
 
-    .status-badge { padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 900; text-transform: uppercase; }
+    .status-badge { padding: 5px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; }
     .status-completed { background: rgba(73, 204, 144, 0.1); color: #49cc90; }
     .status-failed { background: rgba(255, 77, 77, 0.1); color: #ff4d4d; }
     .status-running { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
 
-    .count-text { font-weight: 900; font-size: 1rem; }
-    .text-dim { color: rgba(255,255,255,0.3); font-size: 0.75rem; }
+    .error-pre {
+        background: #000;
+        color: #ff4d4d;
+        padding: 1rem;
+        border-radius: 12px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem;
+        border: 1px solid rgba(255, 77, 77, 0.1);
+        margin-top: 0.5rem;
+        white-space: pre-wrap;
+        max-height: 200px;
+        overflow-y: auto;
+    }
 
-    .error-row { background: rgba(255, 77, 77, 0.03); }
-    .error-pre { background: #000; color: #ff4d4d; padding: 15px; border-radius: 10px; font-family: monospace; font-size: 0.75rem; border: 1px solid rgba(255, 77, 77, 0.1); }
+    .pagination-wrapper { margin-top: 2.5rem; display: flex; justify-content: center; }
+    nav[role="navigation"] { display: flex; gap: 0.5rem; }
+    nav[role="navigation"] a, nav[role="navigation"] span { background: #111 !important; border: 1px solid rgba(255,255,255,0.1) !important; color: #fff !important; padding: 0.75rem 1rem !important; border-radius: 10px !important; text-decoration: none !important; font-weight: 800 !important; font-size: 0.8rem !important; }
+    nav[role="navigation"] .active span { background: #2EC4B6 !important; color: #000 !important; }
 </style>
 
 <div class="page-header">
@@ -42,35 +85,35 @@
                 <th>Тип</th>
                 <th>Статус</th>
                 <th>Результат (C/U/S)</th>
-                <th>Начало / Длительность</th>
+                <th>Дата / Длительность</th>
             </tr>
         </thead>
         <tbody>
             @foreach($logs as $log)
             <tr>
-                <td><span class="log-id">#{{ $log->id }}</span></td>
-                <td><span class="type-badge">{{ $log->import_type }}</span></td>
+                <td style="color: #2EC4B6; font-family: monospace; font-weight: 900;">#{{ $log->id }}</td>
+                <td><span style="background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; text-transform: uppercase;">{{ $log->import_type }}</span></td>
                 <td><span class="status-badge status-{{ $log->status }}">{{ $log->status }}</span></td>
                 <td>
-                    <span class="count-text" style="color:#49cc90">{{ $log->total_created }}</span> /
-                    <span class="count-text" style="color:#2EC4B6">{{ $log->total_updated }}</span> /
-                    <span class="count-text" style="color:#ffc107">{{ $log->total_skipped }}</span>
+                    <span style="color:#49cc90">{{ $log->total_created }}</span> /
+                    <span style="color:#2EC4B6">{{ $log->total_updated }}</span> /
+                    <span style="color:#ffc107">{{ $log->total_skipped }}</span>
                 </td>
                 <td>
-                    <div style="font-weight: 900;">{{ $log->started_at->format('d.m.Y H:i') }}</div>
-                    <div class="text-dim">
+                    <div style="font-weight: 800;">{{ $log->started_at->format('d.m.Y H:i') }}</div>
+                    <div style="font-size: 0.7rem; opacity: 0.4;">
                         @if($log->finished_at)
                             {{ $log->started_at->diff($log->finished_at)->format('%iм %sс') }}
                         @else
-                            Running...
+                            В процессе...
                         @endif
                     </div>
                 </td>
             </tr>
             @if($log->errors)
-            <tr class="error-row">
-                <td colspan="5" style="padding: 10px 1.5rem 1.5rem;">
-                    <div style="font-weight: 900; color: #ff4d4d; font-size: 0.65rem; text-transform: uppercase; margin-bottom: 5px;">Traceback Error:</div>
+            <tr>
+                <td colspan="5" style="padding: 0 1.5rem 1.5rem;">
+                    <div style="font-weight: 900; color: #ff4d4d; font-size: 0.6rem; text-transform: uppercase; margin-bottom: 0.5rem;">Ошибка выполнения:</div>
                     <pre class="error-pre">{{ $log->errors }}</pre>
                 </td>
             </tr>
@@ -80,61 +123,9 @@
     </table>
 </div>
 
-<style>
-    nav[role="navigation"],
-    .pagination {
-        display: flex !important;
-        gap: 0.5rem !important;
-        justify-content: center !important;
-        align-items: center !important;
-        flex-wrap: wrap !important;
-        list-style: none !important;
-        padding: 0 !important;
-    }
-    nav[role="navigation"] svg {
-        width: 16px !important;
-        height: 16px !important;
-    }
-    nav[role="navigation"] *,
-    .pagination * {
-        background: #161616 !important;
-        color: #FFF !important;
-        padding: 10px 15px !important;
-        border-radius: 10px !important;
-        text-decoration: none !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        min-width: 40px !important;
-        text-align: center !important;
-        font-weight: 700 !important;
-        font-size: 0.9rem !important;
-        transition: all 0.3s !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        margin: 0 !important;
-    }
-    nav[role="navigation"] a:hover,
-    .pagination a:hover {
-        background: #2EC4B6 !important;
-        color: #000 !important;
-        transform: translateY(-2px) !important;
-    }
-    nav[role="navigation"] span[aria-current="page"],
-    .pagination .active span {
-        background: #2EC4B6 !important;
-        color: #000 !important;
-        border-color: #2EC4B6 !important;
-    }
-    nav[role="navigation"] span[aria-disabled="true"],
-    .pagination .disabled span {
-        color: rgba(255, 255, 255, 0.3) !important;
-        cursor: not-allowed !important;
-    }
-    nav[role="navigation"] p {
-        display: none !important;
-    }
-</style>
+<div class="pagination-wrapper">
+    {{ $logs->links() }}
+</div>
 
-<div style="margin-top: 2rem;">{{ $logs->links() }}</div>
 <script>lucide.createIcons();</script>
 @endsection

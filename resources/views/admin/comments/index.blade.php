@@ -2,38 +2,69 @@
 @section('title', 'Модерация комментариев - AniYume Админ')
 @section('content')
 <style>
-    .page-header { margin-bottom: 3rem; }
-    .page-title { color: #FFF; font-weight: 900; font-size: 2.5rem; text-transform: uppercase; font-style: italic; letter-spacing: -0.05em; }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .page-header { margin-bottom: 2.5rem; animation: fadeInUp 0.5s ease; }
+    .page-title { color: #FFF; font-weight: 900; font-size: clamp(1.5rem, 5vw, 2.5rem); text-transform: uppercase; font-style: italic; letter-spacing: -0.05em; }
     .page-title span { color: #2EC4B6; }
 
-    .filter-card { background: #111111; border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 2rem; margin-bottom: 2.5rem; }
-    .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; align-items: flex-end; }
-    .filter-label { color: rgba(255,255,255,0.4); font-weight: 900; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 0.75rem; display: block; }
-    .filter-input, .filter-select { background: #161616; border: 1px solid rgba(255,255,255,0.1); color: #FFF; border-radius: 12px; padding: 1rem; transition: 0.3s; font-size: 0.9rem; font-weight: 700; width: 100%; }
-    .filter-input:focus, .filter-select:focus { outline: none; border-color: #2EC4B6; }
+    .filter-card {
+        background: #111111;
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 2.5rem;
+        animation: fadeInUp 0.5s ease 0.1s forwards;
+        opacity: 0;
+    }
 
-    .btn-submit { background: #2EC4B6; color: #000; border: none; border-radius: 12px; padding: 1rem; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.3s; font-size: 0.8rem; }
-    .btn-secondary { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5); border: none; border-radius: 12px; padding: 1rem; font-weight: 900; text-transform: uppercase; text-decoration: none; text-align: center; font-size: 0.8rem; transition: 0.3s; }
-    .btn-secondary:hover { background: rgba(255,255,255,0.1); color: #FFF; }
+    .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; align-items: flex-end; }
+    .filter-label { color: rgba(255,255,255,0.4); font-weight: 900; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 0.6rem; display: block; }
+    .filter-input, .filter-select { background: #161616; border: 1px solid rgba(255,255,255,0.1); color: #FFF; border-radius: 12px; padding: 0.85rem; transition: 0.3s; font-size: 0.85rem; font-weight: 700; width: 100%; }
 
-    .table-container { background: #111111; border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; overflow: hidden; }
-    table { width: 100%; border-collapse: collapse; }
-    th { color: rgba(255,255,255,0.3); padding: 1.5rem; text-align: left; font-weight: 900; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    td { padding: 1.5rem; color: #FFF; font-size: 0.9rem; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.02); }
+    .btn-submit { background: #2EC4B6; color: #000; border: none; border-radius: 12px; padding: 0.85rem; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.3s; font-size: 0.75rem; }
+    .btn-secondary { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5); border: none; border-radius: 12px; padding: 0.85rem; font-weight: 900; text-transform: uppercase; text-decoration: none; text-align: center; font-size: 0.75rem; transition: 0.3s; }
 
-    .anime-link { color: #2EC4B6; text-decoration: none; font-weight: 800; italic: italic; text-transform: uppercase; font-size: 0.8rem; }
-    .comment-text { color: rgba(255,255,255,0.7); font-style: italic; font-weight: 500; }
+    .table-container {
+        background: #111111;
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 20px;
+        overflow-x: auto;
+        animation: fadeInUp 0.5s ease 0.2s forwards;
+        opacity: 0;
+    }
 
-    .badge { padding: 6px 12px; border-radius: 8px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; }
+    table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+    th { color: rgba(255,255,255,0.3); padding: 1.25rem 1.5rem; text-align: left; font-weight: 900; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    td { padding: 1.25rem 1.5rem; color: #FFF; font-size: 0.85rem; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.02); }
+
+    .anime-link { color: #2EC4B6; text-decoration: none; font-weight: 800; font-style: italic; text-transform: uppercase; font-size: 0.75rem; transition: 0.3s; }
+    .anime-link:hover { opacity: 0.7; }
+    .comment-text { color: rgba(255,255,255,0.7); font-style: italic; font-weight: 500; max-width: 300px; }
+
+    .badge { padding: 6px 12px; border-radius: 8px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; }
     .badge-approved { background: rgba(46, 196, 182, 0.1); color: #2EC4B6; }
     .badge-pending { background: rgba(255, 193, 7, 0.1); color: #FFC107; }
 
     .actions-cell { display: flex; gap: 0.5rem; justify-content: flex-end; }
-    .btn-action { padding: 8px 14px; border-radius: 10px; font-weight: 900; font-size: 0.7rem; text-transform: uppercase; border: none; cursor: pointer; transition: 0.3s; }
+    .btn-action { padding: 8px 14px; border-radius: 10px; font-weight: 900; font-size: 0.65rem; text-transform: uppercase; border: none; cursor: pointer; transition: 0.3s; }
     .btn-approve { background: #2EC4B6; color: #000; }
     .btn-reject { background: #FFC107; color: #000; }
     .btn-delete { background: rgba(255, 77, 77, 0.1); color: #FF4D4D; border: 1px solid rgba(255, 77, 77, 0.2); }
-    .btn-delete:hover { background: #FF4D4D; color: #FFF; }
+
+    @media (max-width: 768px) {
+        .filter-grid { grid-template-columns: 1fr; }
+        .actions-cell { flex-direction: column; }
+        .btn-action { width: 100%; text-align: center; }
+    }
+
+    .pagination-wrapper { margin-top: 2.5rem; display: flex; justify-content: center; }
+    nav[role="navigation"] { display: flex; gap: 0.5rem; }
+    nav[role="navigation"] a, nav[role="navigation"] span { background: #111 !important; border: 1px solid rgba(255,255,255,0.1) !important; color: #fff !important; padding: 0.75rem 1rem !important; border-radius: 10px !important; text-decoration: none !important; font-weight: 800 !important; font-size: 0.8rem !important; }
+    nav[role="navigation"] .active span { background: #2EC4B6 !important; color: #000 !important; }
 </style>
 
 <div class="page-header">
@@ -74,13 +105,13 @@
         <tbody>
             @forelse($comments as $comment)
                 <tr>
-                    <td style="font-weight: 900; text-transform: uppercase; italic: italic;">{{ $comment->user->name }}</td>
+                    <td style="font-weight: 900; text-transform: uppercase; font-style: italic;">{{ $comment->user->name }}</td>
                     <td>
                         <a href="{{ route('admin.anime.show', $comment->anime_id) }}" class="anime-link">
-                            {{ Str::limit($comment->anime->title, 20) }}
+                            {{ Str::limit($comment->anime->title, 25) }}
                         </a>
                     </td>
-                    <td class="comment-text">"{{ Str::limit($comment->comment, 60) }}"</td>
+                    <td class="comment-text"><div class="truncate">"{{ $comment->comment }}"</div></td>
                     <td>
                         <span class="badge {{ $comment->is_approved ? 'badge-approved' : 'badge-pending' }}">
                             {{ $comment->is_approved ? 'Approved' : 'Pending' }}
@@ -112,61 +143,8 @@
     </table>
 </div>
 
-<style>
-    nav[role="navigation"],
-    .pagination {
-        display: flex !important;
-        gap: 0.5rem !important;
-        justify-content: center !important;
-        align-items: center !important;
-        flex-wrap: wrap !important;
-        list-style: none !important;
-        padding: 0 !important;
-    }
-    nav[role="navigation"] svg {
-        width: 16px !important;
-        height: 16px !important;
-    }
-    nav[role="navigation"] *,
-    .pagination * {
-        background: #161616 !important;
-        color: #FFF !important;
-        padding: 10px 15px !important;
-        border-radius: 10px !important;
-        text-decoration: none !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        min-width: 40px !important;
-        text-align: center !important;
-        font-weight: 700 !important;
-        font-size: 0.9rem !important;
-        transition: all 0.3s !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        margin: 0 !important;
-    }
-    nav[role="navigation"] a:hover,
-    .pagination a:hover {
-        background: #2EC4B6 !important;
-        color: #000 !important;
-        transform: translateY(-2px) !important;
-    }
-    nav[role="navigation"] span[aria-current="page"],
-    .pagination .active span {
-        background: #2EC4B6 !important;
-        color: #000 !important;
-        border-color: #2EC4B6 !important;
-    }
-    nav[role="navigation"] span[aria-disabled="true"],
-    .pagination .disabled span {
-        color: rgba(255, 255, 255, 0.3) !important;
-        cursor: not-allowed !important;
-    }
-    nav[role="navigation"] p {
-        display: none !important;
-    }
-</style>
-
-<div style="margin-top: 2rem;">{{ $comments->links() }}</div>
+<div class="pagination-wrapper">
+    {{ $comments->links() }}
+</div>
 <script>lucide.createIcons();</script>
 @endsection
