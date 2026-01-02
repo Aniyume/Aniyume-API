@@ -51,14 +51,16 @@ class CommentsController extends Controller
 
     public function update(UpdateCommentRequest $request, $id)
     {
-        $comment = Comment::find($id);
-        if (!$comment) return response()->json(['message' => 'Not found'], 404);
+        $comment = Comment::findOrFail($id);
 
         if ($comment->user_id !== $request->user()->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $comment->update(['comment' => $request->validated('comment')]);
+        $comment->update([
+            'comment' => $request->validated('comment')
+        ]);
+
         return new CommentResource($comment->load('user'));
     }
 
