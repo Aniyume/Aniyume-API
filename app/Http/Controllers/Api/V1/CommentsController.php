@@ -93,13 +93,12 @@ class CommentsController extends Controller
         }
     }
 
-    public function userComments(Request $request)
-    {
-        $comments = Comment::with(['anime', 'user'])
-            ->where('user_id', $request->user()->id)
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
-
-        return CommentResource::collection($comments);
-    }
+   public function userComments(Request $request)
+{
+    $comments = Comment::with(['anime'])
+        ->where('user_id', $request->user()->id)
+        ->orderBy('created_at', 'desc')
+        ->get();
+    return CommentResource::collection($comments);
+}
 }
