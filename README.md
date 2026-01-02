@@ -1,59 +1,115 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+  <!-- КОМПОЗИЦИЯ: ТЯНКА — ЛОГОТИП — ТЯНКА -->
+  <table>
+    <tr>
+      <!-- Левый маскот -->
+      <td align="right" valign="bottom" width="25%">
+        <img src="https://github.com/user-attachments/assets/ac1a5892-f3cf-4d60-99c9-e5216260b69f" height="280" alt="Left Mascot" />
+      </td>
+      <!-- Логотип и описание по центру -->
+      <td align="center" valign="middle" width="50%">
+        <img src="https://github.com/user-attachments/assets/d7779d05-b096-4ffc-b7e5-830fdd0c62c6" width="100%" style="max-width: 450px;" alt="Aniyume Logo" />
+        <br />
+        <br />
+        <b>RESTful API для платформы AniYume.</b>
+        <br />
+        <sub>SOLID Architecture • Type Safety • API Documentation</sub>
+        <br />
+        <br />
+        <p>
+          <img src="https://img.shields.io/badge/Laravel_12-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" />
+          <img src="https://img.shields.io/badge/PHP_8.3-777BB4?style=for-the-badge&logo=php&logoColor=white" />
+          <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white" />
+        </p>
+      </td>
+      <!-- Правый маскот -->
+      <td align="left" valign="bottom" width="25%">
+        <img src="https://github.com/user-attachments/assets/d69861b3-a166-4b87-89fb-a5a9feeaa7c9" height="280" alt="Right Mascot" />
+      </td>
+    </tr>
+  </table>
 
-## About Laravel
+</div>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<br />
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## <img src="https://api.iconify.design/heroicons/server-stack-solid.svg?color=%2321D0B8" width="28" height="28" style="vertical-align: middle; margin-bottom: 4px;" alt="icon" /> Архитектура
 
-## Learning Laravel
+> **Примечание:** Backend реализован с соблюдением принципов SOLID, DRY и KISS.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Проект построен на чистой архитектуре с четким разделением слоев ответственности:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### <img src="https://api.iconify.design/heroicons/cube-solid.svg?color=%2321D0B8" width="24" height="24" style="vertical-align: middle; margin-bottom: 2px;" alt="icon" /> Структура слоев
 
-## Laravel Sponsors
+```text
+app/
+├── Http/
+│   ├── Controllers/  # Тонкий слой обработки HTTP-запросов
+│   ├── Requests/     # Валидация входящих данных (Form Requests)
+│   ├── Resources/    # Трансформация данных для API ответов (v1)
+│   └── Middleware/   # Промежуточная обработка (Auth, CORS)
+├── Models/           # Eloquent модели (Anime, Episode, User, etc.)
+├── Services/         # Бизнес-логика (Statistics, Profile Services)
+├── Policies/         # Правила доступа к комментариям и спискам
+└── Exceptions/       # Централизованная обработка ошибок
+<img src="https://api.iconify.design/heroicons/check-circle-solid.svg?color=%2321D0B8" width="24" height="24" style="vertical-align: middle; margin-bottom: 2px;" alt="icon" /> Принципы разработки
+Single Responsibility: Каждый контроллер и сервис отвечает за свою узкую задачу.
+Dependency Injection: Активное использование контейнера зависимостей Laravel.
+Strict Typing: Полная поддержка типизации PHP 8.3.
+Self-Documenting Code: Понятный нейминг и использование API Resources вместо сырых массивов.
+<img src="https://api.iconify.design/heroicons/sparkles-solid.svg?color=%2321D0B8" width="28" height="28" style="vertical-align: middle; margin-bottom: 4px;" alt="icon" /> Основные возможности
+<img src="https://api.iconify.design/heroicons/shield-check-solid.svg?color=%2321D0B8" width="24" height="24" style="vertical-align: middle; margin-bottom: 2px;" alt="icon" /> Аутентификация
+Laravel Sanctum: Безопасная авторизация через Bearer-токены.
+User Profiles: Управление профилем, смена био и загрузка аватаров.
+<img src="https://api.iconify.design/heroicons/play-solid.svg?color=%2321D0B8" width="24" height="24" style="vertical-align: middle; margin-bottom: 2px;" alt="icon" /> Контент и Плеер
+Anime Catalog: Гибкий поиск, фильтрация по жанрам, годам и типам.
+Episode Management: Поддержка сезонов, разных переводчиков и типов озвучки.
+Watch History: Сохранение прогресса просмотра каждой серии в секундах.
+<img src="https://api.iconify.design/heroicons/star-solid.svg?color=%2321D0B8" width="24" height="24" style="vertical-align: middle; margin-bottom: 2px;" alt="icon" /> Социальные функции
+User Lists: Личные списки (Смотрю, В планах, Завершено, Брошено).
+Ratings: Система оценок 1-5 с автоматическим пересчетом рейтинга аниме.
+Comments: Система обсуждений с привязкой к тайтлам.
+<img src="https://api.iconify.design/heroicons/code-bracket-solid.svg?color=%2321D0B8" width="28" height="28" style="vertical-align: middle; margin-bottom: 4px;" alt="icon" /> API Endpoints (v1)
+Публичные данные
+code
+Text
+GET    /api/v1/public/anime          # Список аниме с фильтрами
+GET    /api/v1/public/anime/{id}     # Детали тайтла
+GET    /api/v1/public/tags           # Все доступные жанры
+GET    /api/v1/public/episodes       # Поиск эпизодов и плеера
+Личный кабинет (Auth Required)
+code
+Text
+POST   /api/v1/auth/login            # Вход и получение токена
+GET    /api/v1/profile/me            # Данные моего профиля
+POST   /api/v1/watch-history         # Сохранить прогресс просмотра
+PUT    /api/v1/anime-list/status     # Изменить статус в моем списке
+Документация
+Полная интерактивная документация с примерами запросов доступна по адресу:
+Scribe UI: http://your-server-ip/docs
+<img src="https://api.iconify.design/heroicons/rocket-launch-solid.svg?color=%2321D0B8" width="28" height="28" style="vertical-align: middle; margin-bottom: 4px;" alt="icon" /> Быстрый старт
+Установка
+Шаг	Действие	Команда
+1	Клонирование	git clone https://github.com/TamerlanWebd/AniYume.git
+2	Зависимости	composer install
+3	Конфигурация	cp .env.example .env
+4	База данных	php artisan migrate --seed
+5	Документация	php artisan scribe:generate
+6	Запуск	php artisan serve
+<img src="https://api.iconify.design/heroicons/lifebuoy-solid.svg?color=%2321D0B8" width="28" height="28" style="vertical-align: middle; margin-bottom: 4px;" alt="icon" /> Deployment
+Production Checklist
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Настроить APP_ENV=production
 
-### Premium Partners
+Выполнить php artisan optimize
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Настроить CORS в config/cors.php для фронтенда
 
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Настроить Symbolic Link: php artisan storage:link
+<div align="center">
+<sub>Crafted with 💻 by TamerlanWebd</sub> <br />
+<sub>Backend Architecture • RESTful API • Laravel 12</sub>
+</div>
