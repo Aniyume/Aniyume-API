@@ -264,7 +264,7 @@ body {
         </nav>
 
         <div class="sidebar-footer">
-            <form action="{{ route('admin.logout') }}" method="POST">
+            <form action="{{ route('admin.logout.confirm') }}" method="POST">
                 @csrf
                 <button type="submit" class="sidebar-logout">
                     <i data-lucide="log-out"></i>
