@@ -14,7 +14,6 @@ return new class extends Migration
             $table->string('external_source')->default('anilist');
             $table->timestamps();
 
-            // Уникальный индекс, чтобы один и тот же ID не дублировался
             $table->unique(['external_id', 'external_source']);
         });
     }

@@ -144,4 +144,36 @@ class AnimeManagementController extends Controller
 
         return redirect()->route('admin.anime.index')->with('success', 'Anime deleted and blacklisted');
     }
+    public function bulkDestroy(Request $request)
+{
+    $ids = $request->input('ids', []);
+
+    if (empty($ids)) {
+        return redirect()->back()->with('error', 'Ничего не выбрано');
+    }
+
+    $animes = Anime::whereIn('id', $ids)->get();
+    $count = $animes->count();
+
+    foreach ($animes as $anime) {
+        if ($anime->external_id) {
+            \App\Models\BlacklistedAnime::firstOrCreate([
+                'external_id' => $anime->external_id,
+                'external_source' => $anime->external_source ?? 'anilist'
+            ]);
+        }
+        $anime->delete();
+    }
+
+    AuditLog::create([
+        'user_id' => auth()->id(),
+        'action' => 'bulk_delete_anime',
+        'description' => "Deleted {$count} anime records and added them to blacklist",
+        'ip_address' => $request->ip(),
+        'user_agent' => $request->userAgent(),
+        'created_at' => now(),
+    ]);
+
+    return redirect()->back()->with('success', "Успешно удалено {$count} записей");
+}
 }
