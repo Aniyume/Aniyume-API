@@ -31,7 +31,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('users/{user}/ban', [UserManagementController::class, 'ban'])->name('users.ban');
         Route::post('users/{user}/unban', [UserManagementController::class, 'unban'])->name('users.unban');
 
-        Route::post('anime/bulk-delete', [AnimeManagementController::class, 'bulkDestroy'])->name('anime.bulk-delete');
+        Route::post('anime/bulk-delete', [AnimeManagementController::class, 'bulkDestroy'])->name('bulk-delete');
         Route::resource('anime', AnimeManagementController::class);
 
         Route::resource('tags', TagManagementController::class)->except(['show']);
