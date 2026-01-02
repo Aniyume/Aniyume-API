@@ -11,7 +11,7 @@
     .filter-label { color: rgba(255,255,255,0.4); font-weight: 900; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 0.75rem; display: block; }
     .filter-input, .filter-select { background: #161616; border: 1px solid rgba(255,255,255,0.1); color: #FFF; border-radius: 12px; padding: 1rem; transition: 0.3s; font-size: 0.9rem; font-weight: 700; width: 100%; }
     .filter-input:focus, .filter-select:focus { outline: none; border-color: #2EC4B6; }
-    
+
     .btn-submit { background: #2EC4B6; color: #000; border: none; border-radius: 12px; padding: 1rem; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.3s; font-size: 0.8rem; }
     .btn-secondary { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5); border: none; border-radius: 12px; padding: 1rem; font-weight: 900; text-transform: uppercase; text-decoration: none; text-align: center; font-size: 0.8rem; transition: 0.3s; }
     .btn-secondary:hover { background: rgba(255,255,255,0.1); color: #FFF; }
@@ -23,7 +23,7 @@
 
     .anime-link { color: #2EC4B6; text-decoration: none; font-weight: 800; italic: italic; text-transform: uppercase; font-size: 0.8rem; }
     .comment-text { color: rgba(255,255,255,0.7); font-style: italic; font-weight: 500; }
-    
+
     .badge { padding: 6px 12px; border-radius: 8px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; }
     .badge-approved { background: rgba(46, 196, 182, 0.1); color: #2EC4B6; }
     .badge-pending { background: rgba(255, 193, 7, 0.1); color: #FFC107; }
@@ -111,6 +111,61 @@
         </tbody>
     </table>
 </div>
+
+<style>
+    nav[role="navigation"],
+    .pagination {
+        display: flex !important;
+        gap: 0.5rem !important;
+        justify-content: center !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        list-style: none !important;
+        padding: 0 !important;
+    }
+    nav[role="navigation"] svg {
+        width: 16px !important;
+        height: 16px !important;
+    }
+    nav[role="navigation"] *,
+    .pagination * {
+        background: #161616 !important;
+        color: #FFF !important;
+        padding: 10px 15px !important;
+        border-radius: 10px !important;
+        text-decoration: none !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        min-width: 40px !important;
+        text-align: center !important;
+        font-weight: 700 !important;
+        font-size: 0.9rem !important;
+        transition: all 0.3s !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+    }
+    nav[role="navigation"] a:hover,
+    .pagination a:hover {
+        background: #2EC4B6 !important;
+        color: #000 !important;
+        transform: translateY(-2px) !important;
+    }
+    nav[role="navigation"] span[aria-current="page"],
+    .pagination .active span {
+        background: #2EC4B6 !important;
+        color: #000 !important;
+        border-color: #2EC4B6 !important;
+    }
+    nav[role="navigation"] span[aria-disabled="true"],
+    .pagination .disabled span {
+        color: rgba(255, 255, 255, 0.3) !important;
+        cursor: not-allowed !important;
+    }
+    nav[role="navigation"] p {
+        display: none !important;
+    }
+</style>
 
 <div style="margin-top: 2rem;">{{ $comments->links() }}</div>
 <script>lucide.createIcons();</script>

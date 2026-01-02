@@ -16,7 +16,7 @@
 
     .log-id { color: #2EC4B6; font-weight: 900; font-family: monospace; }
     .type-badge { background: rgba(255,255,255,0.05); color: #FFF; padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; }
-    
+
     .status-badge { padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 900; text-transform: uppercase; }
     .status-completed { background: rgba(73, 204, 144, 0.1); color: #49cc90; }
     .status-failed { background: rgba(255, 77, 77, 0.1); color: #ff4d4d; }
@@ -79,6 +79,61 @@
         </tbody>
     </table>
 </div>
+
+<style>
+    nav[role="navigation"],
+    .pagination {
+        display: flex !important;
+        gap: 0.5rem !important;
+        justify-content: center !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        list-style: none !important;
+        padding: 0 !important;
+    }
+    nav[role="navigation"] svg {
+        width: 16px !important;
+        height: 16px !important;
+    }
+    nav[role="navigation"] *,
+    .pagination * {
+        background: #161616 !important;
+        color: #FFF !important;
+        padding: 10px 15px !important;
+        border-radius: 10px !important;
+        text-decoration: none !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        min-width: 40px !important;
+        text-align: center !important;
+        font-weight: 700 !important;
+        font-size: 0.9rem !important;
+        transition: all 0.3s !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+    }
+    nav[role="navigation"] a:hover,
+    .pagination a:hover {
+        background: #2EC4B6 !important;
+        color: #000 !important;
+        transform: translateY(-2px) !important;
+    }
+    nav[role="navigation"] span[aria-current="page"],
+    .pagination .active span {
+        background: #2EC4B6 !important;
+        color: #000 !important;
+        border-color: #2EC4B6 !important;
+    }
+    nav[role="navigation"] span[aria-disabled="true"],
+    .pagination .disabled span {
+        color: rgba(255, 255, 255, 0.3) !important;
+        cursor: not-allowed !important;
+    }
+    nav[role="navigation"] p {
+        display: none !important;
+    }
+</style>
 
 <div style="margin-top: 2rem;">{{ $logs->links() }}</div>
 <script>lucide.createIcons();</script>

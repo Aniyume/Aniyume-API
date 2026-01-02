@@ -17,9 +17,9 @@
     td { padding: 1.5rem; color: #FFF; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.02); }
 
     .user-cell { display: flex; align-items: center; gap: 1.25rem; }
-    .user-avatar { 
-        width: 44px; height: 44px; border-radius: 12px; background: #161616; 
-        display: flex; align-items: center; justify-content: center; 
+    .user-avatar {
+        width: 44px; height: 44px; border-radius: 12px; background: #161616;
+        display: flex; align-items: center; justify-content: center;
         color: #2EC4B6; font-weight: 900; font-size: 1.1rem; border: 1px solid rgba(255,255,255,0.05);
     }
     .user-name { font-weight: 900; color: #FFF; text-transform: uppercase; italic: italic; font-size: 0.95rem; }
@@ -30,10 +30,10 @@
     .status-banned { background: rgba(255, 77, 77, 0.1); color: #FF4D4D; border: 1px solid rgba(255, 77, 77, 0.2); }
 
     .actions-cell { display: flex; gap: 0.5rem; justify-content: flex-end; }
-    .action-btn { 
-        background: #161616; color: rgba(255,255,255,0.3); width: 40px; height: 40px; 
-        border-radius: 10px; display: flex; align-items: center; justify-content: center; 
-        transition: 0.3s; border: 1px solid rgba(255,255,255,0.05); 
+    .action-btn {
+        background: #161616; color: rgba(255,255,255,0.3); width: 40px; height: 40px;
+        border-radius: 10px; display: flex; align-items: center; justify-content: center;
+        transition: 0.3s; border: 1px solid rgba(255,255,255,0.05);
     }
     .action-btn:hover { background: #2EC4B6; color: #000; border-color: #2EC4B6; }
     .action-delete:hover { background: #FF4D4D; color: #FFF; border-color: #FF4D4D; }
@@ -93,9 +93,62 @@
     </table>
 </div>
 
-<div style="margin-top: 2rem;">
-    {{ $users->links() }}
-</div>
+<style>
+    nav[role="navigation"],
+    .pagination {
+        display: flex !important;
+        gap: 0.5rem !important;
+        justify-content: center !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        list-style: none !important;
+        padding: 0 !important;
+    }
+    nav[role="navigation"] svg {
+        width: 16px !important;
+        height: 16px !important;
+    }
+    nav[role="navigation"] *,
+    .pagination * {
+        background: #161616 !important;
+        color: #FFF !important;
+        padding: 10px 15px !important;
+        border-radius: 10px !important;
+        text-decoration: none !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        min-width: 40px !important;
+        text-align: center !important;
+        font-weight: 700 !important;
+        font-size: 0.9rem !important;
+        transition: all 0.3s !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+    }
+    nav[role="navigation"] a:hover,
+    .pagination a:hover {
+        background: #2EC4B6 !important;
+        color: #000 !important;
+        transform: translateY(-2px) !important;
+    }
+    nav[role="navigation"] span[aria-current="page"],
+    .pagination .active span {
+        background: #2EC4B6 !important;
+        color: #000 !important;
+        border-color: #2EC4B6 !important;
+    }
+    nav[role="navigation"] span[aria-disabled="true"],
+    .pagination .disabled span {
+        color: rgba(255, 255, 255, 0.3) !important;
+        cursor: not-allowed !important;
+    }
+    nav[role="navigation"] p {
+        display: none !important;
+    }
+</style>
+
+<div style="margin-top: 2rem;">{{ $user->links() }}</div>
 
 <script>lucide.createIcons();</script>
 @endsection

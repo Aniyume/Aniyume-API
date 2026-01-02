@@ -112,8 +112,62 @@
     </div>
 </form>
 
-<div style="margin-top: 2rem;">{{ $anime->links() }}</div>
+<style>
+    nav[role="navigation"],
+    .pagination {
+        display: flex !important;
+        gap: 0.5rem !important;
+        justify-content: center !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        list-style: none !important;
+        padding: 0 !important;
+    }
+    nav[role="navigation"] svg {
+        width: 16px !important;
+        height: 16px !important;
+    }
+    nav[role="navigation"] *,
+    .pagination * {
+        background: #161616 !important;
+        color: #FFF !important;
+        padding: 10px 15px !important;
+        border-radius: 10px !important;
+        text-decoration: none !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        min-width: 40px !important;
+        text-align: center !important;
+        font-weight: 700 !important;
+        font-size: 0.9rem !important;
+        transition: all 0.3s !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+    }
+    nav[role="navigation"] a:hover,
+    .pagination a:hover {
+        background: #2EC4B6 !important;
+        color: #000 !important;
+        transform: translateY(-2px) !important;
+    }
+    nav[role="navigation"] span[aria-current="page"],
+    .pagination .active span {
+        background: #2EC4B6 !important;
+        color: #000 !important;
+        border-color: #2EC4B6 !important;
+    }
+    nav[role="navigation"] span[aria-disabled="true"],
+    .pagination .disabled span {
+        color: rgba(255, 255, 255, 0.3) !important;
+        cursor: not-allowed !important;
+    }
+    nav[role="navigation"] p {
+        display: none !important;
+    }
+</style>
 
+<div style="margin-top: 2rem;">{{ $anime->links() }}</div>
 <script>
     lucide.createIcons();
 
