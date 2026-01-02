@@ -8,10 +8,17 @@ use App\Services\UserProfileService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @group Профиль пользователя
+ * @authenticated
+ */
 class UserProfileController extends Controller
 {
     public function __construct(private UserProfileService $profileService) {}
 
+    /**
+     * Полный профиль (со статистикой)
+     */
     public function getFullProfile(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -19,6 +26,9 @@ class UserProfileController extends Controller
         return response()->json($profile);
     }
 
+    /**
+     * Краткие данные профиля
+     */
     public function show(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -34,6 +44,12 @@ class UserProfileController extends Controller
         ]);
     }
 
+    /**
+     * Обновить профиль
+     * @bodyParam name string Имя. Example: Ivan
+     * @bodyParam bio string О себе. Example: Люблю меха и сенены.
+     * @bodyParam custom_status string Статус. Example: Смотрю One Piece
+     */
     public function update(UpdateUserProfileRequest $request): JsonResponse
     {
         $user = $request->user();
@@ -52,6 +68,10 @@ class UserProfileController extends Controller
         ], 200);
     }
 
+    /**
+     * Загрузить аватар
+     * @bodyParam avatar file required Изображение (jpg, png, webp).
+     */
     public function uploadAvatar(Request $request): JsonResponse
     {
         $request->validate([
@@ -59,15 +79,14 @@ class UserProfileController extends Controller
         ]);
 
        if ($request->hasFile('avatar')) {
-    $path = $request->file('avatar')->store('avatars', 'public');
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $user = $this->profileService->updateAvatar($request->user(), $path);
 
-    $user = $this->profileService->updateAvatar($request->user(), $path);
-
-    return response()->json([
-        'message' => 'Avatar uploaded successfully',
-        'avatar' => $user->avatar,
-    ], 200);
-}
+            return response()->json([
+                'message' => 'Avatar uploaded successfully',
+                'avatar' => $user->avatar,
+            ], 200);
+        }
         return response()->json(['message' => 'No file provided'], 400);
     }
 }

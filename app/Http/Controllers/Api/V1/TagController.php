@@ -7,8 +7,17 @@ use App\Http\Resources\Api\V1\TagResource;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 
+/**
+ * @group Публичные данные
+ */
 class TagController extends Controller
 {
+    /**
+     * Список тегов
+     *
+     * Возвращает список всех жанров и категорий аниме.
+     * @queryParam search string Поиск по названию тега. Example: Action
+     */
     public function index(Request $request)
     {
         $query = Tag::query();
@@ -33,6 +42,10 @@ class TagController extends Controller
         ]);
     }
 
+    /**
+     * Детали тега
+     * @urlParam id integer ID тега. Example: 1
+     */
     public function show($id)
     {
         $tag = Tag::findOrFail($id);

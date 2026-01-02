@@ -8,8 +8,16 @@ use App\Models\Anime;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @group Избранное
+ * @authenticated
+ */
 class FavoritesController extends Controller
 {
+    /**
+     * Список избранного
+     * @queryParam per_page integer Количество на страницу. Example: 20
+     */
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -42,6 +50,10 @@ class FavoritesController extends Controller
         ]);
     }
 
+    /**
+     * Добавить в избранное
+     * @bodyParam anime_id integer required ID аниме. Example: 3
+     */
     public function store(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -72,6 +84,10 @@ class FavoritesController extends Controller
         ], 201);
     }
 
+    /**
+     * Удалить из избранного
+     * @urlParam animeId integer ID аниме. Example: 3
+     */
     public function destroy(Request $request, int $animeId): JsonResponse
     {
         $user = $request->user();
@@ -90,6 +106,10 @@ class FavoritesController extends Controller
         return response()->json(['message' => 'Removed from favorites']);
     }
 
+    /**
+     * Проверить наличие в избранном
+     * @urlParam animeId integer ID аниме. Example: 3
+     */
     public function checkFavorite(Request $request, int $animeId): JsonResponse
     {
         $user = $request->user();

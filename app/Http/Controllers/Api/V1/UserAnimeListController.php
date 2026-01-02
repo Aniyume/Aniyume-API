@@ -7,8 +7,21 @@ use App\Http\Requests\UpdateAnimeStatusRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @group Список аниме пользователя
+ *
+ * Управление личным списком аниме (статусы "Смотрю", "В планах" и т.д.)
+ * @authenticated
+ */
 class UserAnimeListController extends Controller
 {
+    /**
+     * Получить мой список аниме
+     *
+     * Возвращает аниме из списка пользователя, отфильтрованные по статусу.
+     * @urlParam status string Статус (watching, planned, completed, on_hold, dropped, all). Example: watching
+     * @queryParam per_page integer Количество записей. Example: 100
+     */
     public function getList(Request $request, ?string $status = null): JsonResponse
     {
         $user = $request->user();
@@ -46,6 +59,10 @@ class UserAnimeListController extends Controller
         ]);
     }
 
+    /**
+     * Статус конкретного аниме в моем списке
+     * @urlParam anime integer ID аниме. Example: 3
+     */
     public function getUserStatus(Request $request, int $anime): JsonResponse
     {
         $user = $request->user();
@@ -67,6 +84,11 @@ class UserAnimeListController extends Controller
         ]);
     }
 
+    /**
+     * Обновить статус аниме
+     * @urlParam anime integer ID аниме. Example: 3
+     * @bodyParam status string required Статус (watching, planned, completed, on_hold, dropped, not_watching). Example: watching
+     */
     public function updateStatus(UpdateAnimeStatusRequest $request, int $anime): JsonResponse
     {
         $user = $request->user();
@@ -92,6 +114,11 @@ class UserAnimeListController extends Controller
         ]);
     }
 
+    /**
+     * Обновить количество просмотренных серий
+     * @urlParam anime integer ID аниме. Example: 3
+     * @urlParam episodesWatched integer Количество серий. Example: 12
+     */
     public function updateEpisodesWatched(Request $request, int $anime, int $episodesWatched): JsonResponse
     {
         $user = $request->user();

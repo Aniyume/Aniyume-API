@@ -8,6 +8,9 @@ use App\Services\UserStatisticsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @group Статистика
+ */
 class UserStatisticsController extends Controller
 {
     protected UserStatisticsService $statisticsService;
@@ -17,6 +20,12 @@ class UserStatisticsController extends Controller
         $this->statisticsService = $statisticsService;
     }
 
+    /**
+     * Общая статистика пользователя
+     *
+     * Возвращает количество просмотров, время и динамику.
+     * @urlParam userId integer ID пользователя (если не указан - текущий). Example: 2
+     */
     public function getStatistics(Request $request, $userId = null): JsonResponse
     {
         $targetUserId = $userId ?? $request->user()?->id;
@@ -30,6 +39,10 @@ class UserStatisticsController extends Controller
         return response()->json($stats);
     }
 
+    /**
+     * Сводка по эпизодам
+     * @authenticated
+     */
     public function getEpisodesSummary(Request $request): UserEpisodesStatisticsResource
     {
         $summary = $this->statisticsService->getWatchEpisodesSummary($request->user()->id);

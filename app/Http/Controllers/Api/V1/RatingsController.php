@@ -11,8 +11,15 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @group Рейтинги
+ * @authenticated
+ */
 class RatingsController extends Controller
 {
+    /**
+     * Мои оценки
+     */
     public function index(Request $request): JsonResponse
     {
         $ratings = Rating::with('anime')
@@ -31,6 +38,11 @@ class RatingsController extends Controller
         ]);
     }
 
+    /**
+     * Поставить оценку
+     * @bodyParam anime_id integer required ID аниме. Example: 3
+     * @bodyParam rating number required Оценка (1-5). Example: 4.5
+     */
     public function store(StoreRatingRequest $request): JsonResponse
     {
         $userId = $request->user()->id;
@@ -64,6 +76,10 @@ class RatingsController extends Controller
         }
     }
 
+    /**
+     * Удалить оценку
+     * @urlParam rating integer ID оценки. Example: 2
+     */
     public function destroy(Request $request, Rating $rating): JsonResponse
     {
         if ($rating->user_id !== $request->user()->id) {
@@ -91,6 +107,10 @@ class RatingsController extends Controller
         }
     }
 
+    /**
+     * Моя оценка конкретного аниме
+     * @urlParam animeId integer ID аниме. Example: 3
+     */
     public function getUserRating(Request $request, $animeId): JsonResponse
     {
         $rating = Rating::where('user_id', $request->user()->id)

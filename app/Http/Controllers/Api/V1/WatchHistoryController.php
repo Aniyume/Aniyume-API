@@ -9,8 +9,15 @@ use App\Models\WatchHistory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @group История просмотров
+ * @authenticated
+ */
 class WatchHistoryController extends Controller
 {
+    /**
+     * Список истории
+     */
     public function index(Request $request): JsonResponse
     {
         $history = WatchHistory::where('user_id', $request->user()->id)
@@ -29,6 +36,12 @@ class WatchHistoryController extends Controller
         ]);
     }
 
+    /**
+     * Сохранить прогресс просмотра
+     * @bodyParam episode_id integer required ID эпизода. Example: 550
+     * @bodyParam progress integer required Время в секундах. Example: 120
+     * @bodyParam completed boolean Флаг завершения. Example: false
+     */
     public function store(UpdateWatchHistoryRequest $request): JsonResponse
     {
         $validated = $request->validated();
@@ -51,6 +64,10 @@ class WatchHistoryController extends Controller
         ], 201);
     }
 
+    /**
+     * Детали записи истории
+     * @urlParam id integer ID записи в истории. Example: 10
+     */
     public function show(Request $request, $id): JsonResponse
     {
         $watchHistory = WatchHistory::where('user_id', $request->user()->id)
@@ -61,6 +78,9 @@ class WatchHistoryController extends Controller
         return response()->json($watchHistory);
     }
 
+    /**
+     * Удалить из истории
+     */
     public function destroy(Request $request, $id): JsonResponse
     {
         $watchHistory = WatchHistory::where('user_id', $request->user()->id)
@@ -71,6 +91,10 @@ class WatchHistoryController extends Controller
         return response()->json(['message' => 'Watch history removed'], 200);
     }
 
+    /**
+     * История по конкретному аниме
+     * @urlParam animeId integer ID аниме. Example: 3
+     */
     public function getByAnime(Request $request, $animeId): JsonResponse
     {
         $watchHistory = WatchHistory::where('user_id', $request->user()->id)
@@ -100,6 +124,10 @@ class WatchHistoryController extends Controller
         ]);
     }
 
+    /**
+     * Последний просмотренный эпизод аниме
+     * @urlParam animeId integer ID аниме. Example: 3
+     */
     public function getLastWatchedEpisode(Request $request, $animeId): JsonResponse
     {
         $lastWatched = WatchHistory::where('user_id', $request->user()->id)
