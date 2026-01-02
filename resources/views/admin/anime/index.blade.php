@@ -42,7 +42,7 @@
 
 <div class="page-header">
     <h1 class="page-title">Аниме <span>Каталог</span></h1>
-    <a href="{{ route('admin.anime.create') }}" class="btn-create"><i data-lucide="plus"></i> Добавить релиз</a>
+    <a href="{{ route('admin.admin.anime.create') }}" class="btn-create"><i data-lucide="plus"></i> Добавить релиз</a>
 </div>
 
 <div class="filter-card">
@@ -72,7 +72,8 @@
     </button>
 </div>
 
-<form id="bulkDeleteForm" action="{{ route('admin.anime.bulk-delete') }}" method="POST">
+{{-- ВНИМАНИЕ: Здесь изменен роут на admin.admin.anime.bulk-delete --}}
+<form id="bulkDeleteForm" action="{{ route('admin.admin.anime.bulk-delete') }}" method="POST">
     @csrf
     <div class="table-container">
         <table>
@@ -94,7 +95,7 @@
                         <div class="anime-cell">
                             <img src="{{ $item->poster_url }}" class="anime-poster">
                             <div>
-                                <a href="{{ route('admin.anime.show', $item->id) }}" class="anime-title-link">{{ $item->title }}</a>
+                                <a href="{{ route('admin.admin.anime.show', $item->id) }}" class="anime-title-link">{{ $item->title }}</a>
                             </div>
                         </div>
                     </td>
@@ -102,7 +103,7 @@
                     <td><span class="status-badge status-{{ $item->status }}">{{ $item->status }}</span></td>
                     <td><div style="color: #FFC107; font-weight: 900;">★ {{ number_format($item->rating, 1) }}</div></td>
                     <td style="display: flex; gap: 10px; justify-content: flex-end;">
-                        <a href="{{ route('admin.anime.edit', $item->id) }}" class="action-btn"><i data-lucide="edit-3" style="width:18px"></i></a>
+                        <a href="{{ route('admin.admin.anime.edit', $item->id) }}" class="action-btn"><i data-lucide="edit-3" style="width:18px"></i></a>
                     </td>
                 </tr>
                 @endforeach
