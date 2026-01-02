@@ -148,7 +148,7 @@
     }
 </style>
 
-<div style="margin-top: 2rem;">{{ $user->links() }}</div>
+<div style="margin-top: 2rem;">{{ $users->links() }}</div>
 
 <script>lucide.createIcons();</script>
 @endsection
