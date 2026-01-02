@@ -10,6 +10,7 @@ use App\Models\Comment;
 use App\Models\Anime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class CommentsController extends Controller
 {
@@ -36,38 +37,41 @@ class CommentsController extends Controller
             ]);
 
             $anime = Anime::find($request->validated('anime_id'));
-            if ($anime) {
+            if ($anime && Schema::hasColumn('anime', 'comments_count')) {
                 $anime->increment('comments_count');
             }
 
             DB::commit();
-
-            $comment->load(['user', 'anime']);
-            return new CommentResource($comment);
-
+            return new CommentResource($comment->load('user'));
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'message' => 'Failed to add comment',
-            ], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
-    public function update(UpdateCommentRequest $request, Comment $comment)
+    public function update(UpdateCommentRequest $request, $id)
     {
-        $this->authorize('update', $comment);
+        $comment = Comment::findOrFail($id);
 
-        $comment->update([
-            'comment' => $request->validated('comment'),
-        ]);
+        if ($comment->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
-        $comment->load(['user', 'anime']);
-        return new CommentResource($comment);
+        $comment->update(['comment' => $request->validated('comment')]);
+        return new CommentResource($comment->load('user'));
     }
 
-    public function destroy(Request $request, Comment $comment)
+    public function destroy(Request $request, $id)
     {
-        $this->authorize('delete', $comment);
+        $comment = Comment::find($id);
+
+        if (!$comment) {
+            return response()->json(['message' => 'Comment not found'], 404);
+        }
+
+        if ($comment->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
         DB::beginTransaction();
         try {
@@ -75,30 +79,15 @@ class CommentsController extends Controller
             $comment->delete();
 
             $anime = Anime::find($animeId);
-            if ($anime) {
+            if ($anime && Schema::hasColumn('anime', 'comments_count')) {
                 $anime->decrement('comments_count');
             }
 
             DB::commit();
-
-            return response()->json([
-                'message' => 'Comment deleted successfully'
-            ], 200);
-
+            return response()->json(['message' => 'Deleted'], 200);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'message' => 'Failed to delete comment',
-            ], 500);
+            return response()->json(['message' => 'Server Error'], 500);
         }
     }
-
-   public function userComments(Request $request)
-{
-    $comments = Comment::with(['anime'])
-        ->where('user_id', $request->user()->id)
-        ->orderBy('created_at', 'desc')
-        ->get();
-    return CommentResource::collection($comments);
-}
 }
