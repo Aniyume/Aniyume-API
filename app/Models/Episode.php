@@ -29,7 +29,7 @@ class Episode extends Model
         'quality',
         'source',
         'priority',
-        'translation_name', // ДОБАВЛЕНО
+        'translation_name',
     ];
 
     protected $casts = [

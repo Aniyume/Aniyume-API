@@ -6,5 +6,5 @@ use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull as Middlewar
 
 class ConvertEmptyStringsToNull extends Middleware
 {
-    //
+
 }

@@ -18,7 +18,7 @@ class Handler extends ExceptionHandler
     public function register(): void
     {
         $this->reportable(function (Throwable $e) {
-            //
+
         });
     }
 
@@ -30,7 +30,7 @@ class Handler extends ExceptionHandler
                 'url' => $request->fullUrl(),
                 'user_agent' => $request->userAgent(),
             ]);
-            
+
             return response()->json([
                 'message' => 'Unauthenticated.'
             ], 401);
