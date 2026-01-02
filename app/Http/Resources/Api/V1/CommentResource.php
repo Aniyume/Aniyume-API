@@ -27,6 +27,7 @@ class CommentResource extends JsonResource
                 'id' => $this->anime->id,
                 'title' => $this->anime->title,
                 'slug' => $this->anime->slug,
+                'poster_url' => $this->anime->poster_url,
             ],
         ];
     }
