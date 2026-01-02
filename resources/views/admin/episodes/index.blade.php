@@ -1,69 +1,81 @@
 @extends('layouts.admin')
-@section('title', 'Правка эпизода - AniYume Админ')
+@section('title', 'Эпизоды - AniYume Админ')
 @section('content')
 <style>
-    .page-header { margin-bottom: 3rem; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; }
     .page-title { color: #FFF; font-weight: 900; font-size: 2.5rem; text-transform: uppercase; italic: italic; letter-spacing: -0.05em; }
     .page-title span { color: #2EC4B6; }
-
-    .form-container { background: #111111; border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; padding: 3rem; max-width: 900px; }
-    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; }
-    .form-group.full { grid-column: span 2; }
-    
-    .form-label { color: rgba(255,255,255,0.4); font-weight: 900; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 1rem; display: block; }
-    .form-input, .form-select, .form-textarea { background: #161616; border: 1px solid rgba(255,255,255,0.1); color: #FFF; border-radius: 14px; padding: 1.25rem; transition: 0.3s; font-size: 1rem; font-weight: 600; width: 100%; }
-    .form-input:focus, .form-textarea:focus { border-color: #2EC4B6; outline: none; box-shadow: 0 0 20px rgba(46, 196, 182, 0.1); }
-    .form-textarea { min-height: 150px; }
-
-    .info-strip { background: rgba(46, 196, 182, 0.05); border: 1px solid rgba(46, 196, 182, 0.1); border-radius: 12px; padding: 1rem; color: #2EC4B6; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 10px; }
-
-    .form-actions { display: flex; justify-content: flex-end; gap: 1.5rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); }
-    .btn { padding: 1.25rem 2.5rem; border-radius: 14px; font-weight: 900; text-transform: uppercase; font-size: 0.85rem; transition: 0.3s; text-decoration: none; cursor: pointer; border: none; }
-    .btn-primary { background: #2EC4B6; color: #000; box-shadow: 0 0 20px rgba(46, 196, 182, 0.2); }
-    .btn-primary:hover { transform: scale(1.05); }
-    .btn-secondary { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); }
+    .btn-group { display: flex; gap: 1rem; }
+    .btn-main { background: #2EC4B6; color: #000; padding: 1rem 1.5rem; border-radius: 12px; font-weight: 900; text-transform: uppercase; font-size: 0.8rem; border: none; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: 0.3s; text-decoration: none; }
+    .btn-main:hover { transform: translateY(-3px); box-shadow: 0 0 20px rgba(46, 196, 182, 0.3); }
+    .filter-card { background: #111111; border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 2rem; margin-bottom: 2.5rem; }
+    .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; align-items: flex-end; }
+    .filter-input, .filter-select { background: #161616; border: 1px solid rgba(255,255,255,0.1); color: #FFF; border-radius: 12px; padding: 1rem; font-size: 0.9rem; font-weight: 700; width: 100%; }
+    .table-container { background: #111111; border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    th { color: rgba(255,255,255,0.3); padding: 1.5rem; text-align: left; font-weight: 900; font-size: 0.7rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    td { padding: 1.5rem; color: #FFF; border-bottom: 1px solid rgba(255,255,255,0.02); }
+    .ep-number { color: #2EC4B6; font-weight: 900; font-size: 1.1rem; }
+    .actions-cell { display: flex; gap: 0.5rem; justify-content: flex-end; }
+    .action-link { background: #161616; color: #FFF; padding: 8px 15px; border-radius: 10px; font-size: 0.7rem; font-weight: 900; text-decoration: none; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.05); }
 </style>
 
 <div class="page-header">
-    <h1 class="page-title">Правка <span>Эпизода</span></h1>
+    <h1 class="page-title">Эпизоды <span>Менеджер</span></h1>
+    <div class="btn-group">
+        <form action="{{ route('admin.episodes.import-all') }}" method="POST">
+            @csrf
+            <button type="submit" class="btn-main"><i data-lucide="refresh-cw"></i> Обновить всё</button>
+        </form>
+    </div>
 </div>
 
-<div class="form-container">
-    <div class="info-strip">
-        <i data-lucide="film"></i> Аниме: {{ optional($episode->anime)->title }} / Эпизод #{{ $episode->episode_number }}
-    </div>
+<div class="filter-card">
+    <form method="GET" class="filter-grid">
+        <input type="text" name="search" value="{{ request('search') }}" placeholder="Поиск аниме..." class="filter-input">
+        <select name="anime_id" class="filter-select">
+            <option value="">Все релизы</option>
+            @foreach($allAnimes as $a)
+                <option value="{{ $a->id }}" {{ request('anime_id') == $a->id ? 'selected' : '' }}>{{ $a->title }}</option>
+            @endforeach
+        </select>
+        <button type="submit" class="btn-main">Фильтр</button>
+    </form>
+</div>
 
-    <form action="{{ route('admin.episodes.update', $episode->id) }}" method="POST">
-        @csrf
-        @method('PUT')
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Серия</th>
+                <th>Аниме</th>
+                <th>Название</th>
+                <th>Перевод</th>
+                <th style="text-align: right;">Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($episodes as $episode)
+                <tr>
+                    <td class="ep-number">#{{ $episode->episode_number }}</td>
+                    <td style="font-weight: 800; text-transform: uppercase; font-size: 0.8rem;">
+                        {{ $episode->anime->title ?? 'N/A' }}
+                    </td>
+                    <td>{{ $episode->title ?? '---' }}</td>
+                    <td>{{ $episode->translator ?? '---' }}</td>
+                    <td class="actions-cell">
+                        <a href="{{ route('admin.episodes.edit', $episode->id) }}" class="action-link">Правка</a>
+                        <form action="{{ route('admin.episodes.destroy', $episode->id) }}" method="POST" onsubmit="return confirm('Удалить?')">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="action-link" style="color: #FF4D4D; cursor: pointer; background: transparent;">Удалить</button>
+                        </form>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
 
-        <div class="form-grid">
-            <div class="form-group">
-                <label class="form-label">Порядковый номер</label>
-                <input type="number" name="episode_number" value="{{ old('episode_number', $episode->episode_number) }}" required class="form-input">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Длительность (мин)</label>
-                <input type="number" name="duration" value="{{ old('duration', $episode->duration) }}" class="form-input">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Статус публикации</label>
-                <select name="status" class="form-select">
-                    <option value="published" {{ $episode->status == 'published' ? 'selected' : '' }}>Опубликовано</option>
-                    <option value="draft" {{ $episode->status == 'draft' ? 'selected' : '' }}>Черновик</option>
-                </select>
-            </div>
-
-            <div class="form-group full">
-                <label class="form-label">Название эпизода</label>
-                <input type="text" name="title" value="{{ old('title', $episode->title) }}" class="form-input">
-            </div>
-
-            <div class="form-group full">
-                <label class="form-label">Прямой URL плеера / IFRAME</label>
-                <input type="url" name="player_url" value="{{ old('player_url', $episode->player_url) }}" class="form-input">
-            </div>
-
-            <div class="form-group full"
+<div style="margin-top: 2rem;">{{ $episodes->links() }}</div>
+<script>lucide.createIcons();</script>
+@endsection

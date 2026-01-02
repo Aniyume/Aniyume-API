@@ -26,101 +26,15 @@ class EpisodeManagementController extends Controller
             });
         }
 
-        if ($request->filled('translator')) {
-            $query->where('translator', $request->translator);
-        }
-
-        if ($request->filled('quality')) {
-            $query->where('quality', $request->quality);
-        }
-
         $episodes = $query
-            ->orderBy('anime_id')
-            ->orderBy('season_number')
-            ->orderBy('episode_number')
+            ->orderBy('anime_id', 'desc')
+            ->orderBy('episode_number', 'desc')
             ->paginate(50);
 
-        $anime = null;
-        if ($request->filled('anime_id')) {
-            $anime = Anime::find($request->anime_id);
-        }
-
         $allAnimes = Anime::orderBy('title')->get();
+        $anime = $request->filled('anime_id') ? Anime::find($request->anime_id) : null;
 
         return view('admin.episodes.index', compact('episodes', 'anime', 'allAnimes'));
-    }
-
-    public function importForAnime(Request $request, string $animeId)
-    {
-        $anime = Anime::findOrFail($animeId);
-
-        $importLog = ImportLog::create([
-            'import_type' => 'episodes_update',
-            'started_at' => now(),
-            'status' => 'running',
-        ]);
-
-        EpisodesImportJob::dispatch($anime->id, false);
-
-        AuditLog::create([
-            'user_id' => auth()->id(),
-            'action' => 'import_episodes',
-            'description' => "Started episodes import for anime: {$anime->title}",
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
-
-        return redirect()
-            ->route('admin.episodes.index', ['anime_id' => $animeId])
-            ->with('success', 'Episodes import started for '.$anime->title);
-    }
-
-    public function importAll(Request $request)
-    {
-        $importLog = ImportLog::create([
-            'import_type' => 'episodes_initial',
-            'started_at' => now(),
-            'status' => 'running',
-        ]);
-
-        $anime = Anime::all();
-
-        foreach ($anime as $animeItem) {
-            EpisodesImportJob::dispatch($animeItem->id, false);
-        }
-
-        AuditLog::create([
-            'user_id' => auth()->id(),
-            'action' => 'import_all_episodes',
-            'description' => 'Started mass episodes import (initial, only new episodes) for all anime',
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
-
-        return redirect()
-            ->route('admin.episodes.index')
-            ->with('success', 'Mass episodes import (only new episodes) started. Check queue worker progress.');
-    }
-
-    public function destroy(Request $request, string $id)
-    {
-        $episode = Episode::findOrFail($id);
-        $animeId = $episode->anime_id;
-        $episodeInfo = "{$episode->anime->title} - S{$episode->season_number}E{$episode->episode_number}";
-
-        $episode->delete();
-
-        AuditLog::create([
-            'user_id' => auth()->id(),
-            'action' => 'delete_episode',
-            'description' => "Deleted episode: {$episodeInfo}",
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
-
-        return redirect()
-            ->route('admin.episodes.index', ['anime_id' => $animeId])
-            ->with('success', 'Episode deleted successfully');
     }
 
     public function edit(Episode $episode)
@@ -134,42 +48,48 @@ class EpisodeManagementController extends Controller
             'episode_number' => ['required', 'integer', 'min:1'],
             'title' => ['nullable', 'string', 'max:255'],
             'duration' => ['nullable', 'integer', 'min:0'],
-            'status' => ['required', 'in:published,draft,archived'],
             'player_url' => ['nullable', 'url', 'max:2048'],
-            'description' => ['nullable', 'string'],
+            'player_iframe' => ['nullable', 'string'],
         ]);
 
         $episode->update($data);
 
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'update_episode',
+            'description' => "Updated episode #{$episode->episode_number} for anime ID: {$episode->anime_id}",
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'created_at' => now(),
+        ]);
+
         return redirect()
-            ->route('admin.episodes.index')
+            ->route('admin.episodes.index', ['anime_id' => $episode->anime_id])
             ->with('success', 'Episode updated successfully');
     }
 
-    public function bulkImport(Request $request)
+    public function importForAnime(Request $request, string $animeId)
     {
-        $data = $request->validate([
-            'anime_id' => ['required', 'exists:anime,id'],
-        ]);
+        $anime = Anime::findOrFail($animeId);
+        EpisodesImportJob::dispatch($anime->id, false);
 
-        $importLog = ImportLog::create([
-            'import_type' => 'episodes_bulk_new',
-            'started_at' => now(),
-            'status' => 'running',
-        ]);
+        return redirect()->back()->with('success', 'Import started');
+    }
 
-        EpisodesImportJob::dispatch((int) $data['anime_id'], false);
+    public function importAll(Request $request)
+    {
+        $anime = Anime::all();
+        foreach ($anime as $item) {
+            EpisodesImportJob::dispatch($item->id, false);
+        }
+        return redirect()->back()->with('success', 'Mass import started');
+    }
 
-        AuditLog::create([
-            'user_id' => auth()->id(),
-            'action' => 'bulk_import_episodes',
-            'description' => "Started bulk import for anime ID {$data['anime_id']} (only new episodes)",
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
+    public function destroy(Request $request, string $id)
+    {
+        $episode = Episode::findOrFail($id);
+        $episode->delete();
 
-        return redirect()
-            ->route('admin.episodes.index', ['anime_id' => $data['anime_id']])
-            ->with('success', 'Bulk episodes import started');
+        return redirect()->back()->with('success', 'Episode deleted');
     }
 }
