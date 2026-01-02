@@ -76,28 +76,6 @@
     </table>
 </div>
 
-<div style="margin-top: 2rem;">
-    <style>
-        .pagination { display: flex; gap: 0.5rem; justify-content: center; align-items: center; }
-        .pagination svg { width: 20px !important; height: 20px !important; }
-        .pagination a, .pagination span {
-            background: #161616;
-            color: #FFF;
-            padding: 10px 15px;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            text-decoration: none;
-            border: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 40px;
-        }
-        .pagination .active span { background: #2EC4B6; color: #000; }
-        .pagination a:hover { background: #2EC4B6; color: #000; }
-    </style>
-    {{ $episodes->links() }}
-</div>
+<div style="margin-top: 2rem;">{{ $episodes->links() }}</div>
 <script>lucide.createIcons();</script>
 @endsection
