@@ -1,0 +1,2512 @@
+name: Endpoints
+description: ''
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/documentation
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Handles the API request and renders the Swagger documentation view.'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 500
+        content: '{"message":"Server error"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/oauth2-callback
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Handles the OAuth2 callback and retrieves the required file for the redirect.'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |
+          <!doctype html>
+          <html lang="en-US">
+          <body>
+          <script src="oauth2-redirect.js"></script>
+          </body>
+          </html>
+        headers:
+          content-type: 'text/html; charset=utf-8'
+          cache-control: 'no-cache, private'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/public/anime
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":[{"id":2,"title":"Cowboy Bebop","slug":"cowboy-bebop-1","description":"Enter a world in the distant future, where Bounty Hunters roam the solar system. Spike and Jet, bounty hunting partners, set out on journeys in an ever struggling effort to win bounty rewards to survive.<br><br>\nWhile traveling, they meet up with other very interesting people. Could Faye, the beautiful and ridiculously poor gambler, Edward, the computer genius, and Ein, the engineered dog be a good addition to the group?","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/large\/bx1-GCsPm7waJ4kS.png","rating":"8.60","year":1998,"status":"finished","type":"tv","number_of_episodes":26,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":420938,"favorites":25786,"external_id":"1","external_source":"anilist","tags":[{"id":1,"name":"Action","slug":"action"},{"id":2,"name":"Adventure","slug":"adventure"},{"id":3,"name":"Drama","slug":"drama"},{"id":4,"name":"Sci-Fi","slug":"sci-fi"},{"id":5,"name":"Space","slug":"space"},{"id":6,"name":"Crime","slug":"crime"},{"id":7,"name":"Episodic","slug":"episodic"},{"id":8,"name":"Ensemble Cast","slug":"ensemble-cast"},{"id":9,"name":"Primarily Adult Cast","slug":"primarily-adult-cast"},{"id":10,"name":"Tragedy","slug":"tragedy"},{"id":11,"name":"Travel","slug":"travel"},{"id":12,"name":"Noir","slug":"noir"},{"id":13,"name":"Anti-Hero","slug":"anti-hero"},{"id":14,"name":"Philosophy","slug":"philosophy"},{"id":15,"name":"Guns","slug":"guns"},{"id":16,"name":"Male Protagonist","slug":"male-protagonist"},{"id":17,"name":"Cyberpunk","slug":"cyberpunk"},{"id":18,"name":"Found Family","slug":"found-family"},{"id":19,"name":"Terrorism","slug":"terrorism"},{"id":20,"name":"Female Protagonist","slug":"female-protagonist"},{"id":21,"name":"Martial Arts","slug":"martial-arts"},{"id":22,"name":"Heterosexual","slug":"heterosexual"},{"id":23,"name":"Cyborg","slug":"cyborg"},{"id":24,"name":"Tomboy","slug":"tomboy"},{"id":25,"name":"Amnesia","slug":"amnesia"},{"id":26,"name":"Gambling","slug":"gambling"},{"id":27,"name":"Cowboys","slug":"cowboys"},{"id":28,"name":"Yakuza","slug":"yakuza"},{"id":29,"name":"Drugs","slug":"drugs"},{"id":30,"name":"Police","slug":"police"},{"id":31,"name":"Nudity","slug":"nudity"},{"id":32,"name":"Tanned Skin","slug":"tanned-skin"},{"id":33,"name":"Cult","slug":"cult"},{"id":34,"name":"Circus","slug":"circus"},{"id":35,"name":"CGI","slug":"cgi"},{"id":36,"name":"Work","slug":"work"}],"created_at":"2026-01-01T09:33:52.000000Z","updated_at":"2026-01-01T10:23:04.000000Z"},{"id":3,"title":"Cowboy Bebop: The Movie - Knockin'' on Heaven''s Door","slug":"cowboy-bebop-the-movie-knockin-on-heavens-door-5","description":"As the Cowboy Bebop crew travels the stars, they learn of the largest bounty yet, a huge 300 million Woolongs. Apparently, someone is wielding a hugely powerful chemical weapon, and of course the authorities are at a loss to stop it. The war to take down the most dangerous criminal yet forces the crew to face a true madman, with bare hope to succeed.\n<br><br>\n(Source: Anime News Network)","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/large\/bx5-NozHwXWdNLCz.jpg","rating":"8.20","year":2001,"status":"finished","type":"movie","number_of_episodes":1,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":77448,"favorites":1409,"external_id":"5","external_source":"anilist","tags":[{"id":1,"name":"Action","slug":"action"},{"id":3,"name":"Drama","slug":"drama"},{"id":4,"name":"Sci-Fi","slug":"sci-fi"},{"id":5,"name":"Space","slug":"space"},{"id":6,"name":"Crime","slug":"crime"},{"id":8,"name":"Ensemble Cast","slug":"ensemble-cast"},{"id":9,"name":"Primarily Adult Cast","slug":"primarily-adult-cast"},{"id":12,"name":"Noir","slug":"noir"},{"id":13,"name":"Anti-Hero","slug":"anti-hero"},{"id":14,"name":"Philosophy","slug":"philosophy"},{"id":15,"name":"Guns","slug":"guns"},{"id":16,"name":"Male Protagonist","slug":"male-protagonist"},{"id":17,"name":"Cyberpunk","slug":"cyberpunk"},{"id":19,"name":"Terrorism","slug":"terrorism"},{"id":20,"name":"Female Protagonist","slug":"female-protagonist"},{"id":21,"name":"Martial Arts","slug":"martial-arts"},{"id":23,"name":"Cyborg","slug":"cyborg"},{"id":24,"name":"Tomboy","slug":"tomboy"},{"id":25,"name":"Amnesia","slug":"amnesia"},{"id":36,"name":"Work","slug":"work"},{"id":37,"name":"Mystery","slug":"mystery"},{"id":38,"name":"Urban","slug":"urban"},{"id":39,"name":"Foreign","slug":"foreign"},{"id":40,"name":"Military","slug":"military"}],"created_at":"2026-01-01T09:33:52.000000Z","updated_at":"2026-01-01T10:23:04.000000Z"},{"id":4,"title":"Trigun","slug":"trigun-6","description":"Vash the Stampede is a wanted man with a habit of turning entire towns into rubble. The price on his head is a fortune, and his path of destruction reaches across the arid wastelands of a desert planet. Unfortunately, most encounters with the spiky-haired gunslinger don''t end well for the bounty hunters who catch up with him; someone almost always gets hurt - and it''s never Vash.<br>\n<br>\nOddly enough, for such an infamous fugitive, there''s no proof that he''s ever taken a life. In fact, he''s a pacifist with a doughnut obsession who''s more doofus than desperado. There''s a whole lot more to him than his reputation lets on - Vash the Stampede definitely ain''t your typical outlaw.<br>\n<br>\n(Source: Funimation)","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/large\/bx6-wd4saT1JzStH.jpg","rating":"8.00","year":1998,"status":"finished","type":"tv","number_of_episodes":26,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":152749,"favorites":5834,"external_id":"6","external_source":"anilist","tags":[{"id":1,"name":"Action","slug":"action"},{"id":2,"name":"Adventure","slug":"adventure"},{"id":3,"name":"Drama","slug":"drama"},{"id":4,"name":"Sci-Fi","slug":"sci-fi"},{"id":5,"name":"Space","slug":"space"},{"id":6,"name":"Crime","slug":"crime"},{"id":7,"name":"Episodic","slug":"episodic"},{"id":9,"name":"Primarily Adult Cast","slug":"primarily-adult-cast"},{"id":10,"name":"Tragedy","slug":"tragedy"},{"id":11,"name":"Travel","slug":"travel"},{"id":14,"name":"Philosophy","slug":"philosophy"},{"id":15,"name":"Guns","slug":"guns"},{"id":16,"name":"Male Protagonist","slug":"male-protagonist"},{"id":27,"name":"Cowboys","slug":"cowboys"},{"id":41,"name":"Comedy","slug":"comedy"},{"id":42,"name":"Fugitive","slug":"fugitive"},{"id":43,"name":"Post-Apocalyptic","slug":"post-apocalyptic"},{"id":44,"name":"Desert","slug":"desert"},{"id":45,"name":"Steampunk","slug":"steampunk"},{"id":46,"name":"Shounen","slug":"shounen"},{"id":47,"name":"Twins","slug":"twins"},{"id":48,"name":"Aliens","slug":"aliens"},{"id":49,"name":"Slapstick","slug":"slapstick"},{"id":50,"name":"Acrobatics","slug":"acrobatics"},{"id":51,"name":"Rural","slug":"rural"},{"id":52,"name":"Religion","slug":"religion"},{"id":53,"name":"Body Horror","slug":"body-horror"}],"created_at":"2026-01-01T09:33:52.000000Z","updated_at":"2026-01-01T10:23:05.000000Z"},{"id":5,"title":"Witch Hunter ROBIN","slug":"witch-hunter-robin-7","description":"Robin Sena is a powerful craft user drafted into the STNJ - a group of specialized hunters that fight deadly beings known as Witches. Though her fire power is great, she\u2019s got a lot to learn about her powers and working with her cool and aloof partner, Amon. But the truth about the Witches and herself will leave Robin on an entirely new path that she never expected!<br>\n<br>\n(Source: Funimation)","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/large\/bx7-6uh1fPvbgS9t.png","rating":"6.80","year":2002,"status":"finished","type":"tv","number_of_episodes":26,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":21453,"favorites":229,"external_id":"7","external_source":"anilist","tags":[{"id":1,"name":"Action","slug":"action"},{"id":3,"name":"Drama","slug":"drama"},{"id":9,"name":"Primarily Adult Cast","slug":"primarily-adult-cast"},{"id":12,"name":"Noir","slug":"noir"},{"id":20,"name":"Female Protagonist","slug":"female-protagonist"},{"id":30,"name":"Police","slug":"police"},{"id":37,"name":"Mystery","slug":"mystery"},{"id":42,"name":"Fugitive","slug":"fugitive"},{"id":54,"name":"Supernatural","slug":"supernatural"},{"id":55,"name":"Conspiracy","slug":"conspiracy"},{"id":56,"name":"Magic","slug":"magic"},{"id":57,"name":"Urban Fantasy","slug":"urban-fantasy"},{"id":58,"name":"Witch","slug":"witch"},{"id":59,"name":"Bar","slug":"bar"},{"id":60,"name":"Kuudere","slug":"kuudere"}],"created_at":"2026-01-01T09:33:52.000000Z","updated_at":"2026-01-01T10:23:05.000000Z"},{"id":6,"title":"Beet the Vandel Buster","slug":"beet-the-vandel-buster-8","description":"It is the dark century and the people are suffering under the rule of the devil, Vandel, who is able to manipulate monsters. The Vandel Busters are a group of people who hunt these devils, and among them, the Zenon Squad is known to be the strongest busters on the continent. A young boy, Beet, dreams of joining the Zenon Squad. However, one day, as a result of Beet''s fault, the Zenon squad was defeated by the devil, Beltose. The five dying busters sacrificed their life power into their five weapons, Saiga. After giving their weapons to Beet, they passed away. Years have passed since then and the young Vandel Buster, Beet, begins his adventure to carry out the Zenon Squad''s will to put an end to the dark century. ","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/medium\/b8-ReS3TwSgrDDi.jpg","rating":"6.60","year":2004,"status":"finished","type":"tv","number_of_episodes":52,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":2932,"favorites":38,"external_id":"8","external_source":"anilist","tags":[{"id":2,"name":"Adventure","slug":"adventure"},{"id":46,"name":"Shounen","slug":"shounen"},{"id":54,"name":"Supernatural","slug":"supernatural"},{"id":61,"name":"Fantasy","slug":"fantasy"},{"id":62,"name":"Spearplay","slug":"spearplay"},{"id":63,"name":"Swordplay","slug":"swordplay"}],"created_at":"2026-01-01T09:33:52.000000Z","updated_at":"2026-01-01T10:23:05.000000Z"},{"id":7,"title":"Eyeshield 21","slug":"eyeshield-21-15","description":"Welcome To the Gridiron of the Damned!   Huge hulking bodies throw themselves at each other, while a tiny lithe body runs between them for the goal!  No, it&rsquo;s not a game of football, it&rsquo;s Sena Kobayakawa trying to evade the monstrous Ha-Ha brothers down the halls of Deimon High School!  But wait!  Sena&rsquo;s incredible skills at not getting caught have been spotted by the devilish (possibly actually demonic) captain of the school&rsquo;s embryonic American style football team, and when Sena asks to be the teams manager, he gets  thrust onto the field as a running back instead!  But there are two BIG catches: first, to keep the identity of their new &ldquo;star&rdquo; player an absolute secret, Yoichi makes Sena wear an opaque visor on his helmet and gives him the alias of &ldquo;Eyeshield 21.&rdquo;  And the second catch?  Well, in order to hit his fastest &ldquo;speed of light&rdquo; running mode, Sena usually has to be absolutely terrified. Not that THAT will be a problem with the monstrous players that he&rsquo;ll soon find himself running from!  The insanity hits the streets when the feet meet the cleats in EYESHIELD 21! <br><br>\n(Source: Sentai Filmworks)","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/large\/bx15-A4F2t0TgWoi4.png","rating":"7.60","year":2005,"status":"finished","type":"tv","number_of_episodes":145,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":31507,"favorites":704,"external_id":"15","external_source":"anilist","tags":[{"id":1,"name":"Action","slug":"action"},{"id":10,"name":"Tragedy","slug":"tragedy"},{"id":16,"name":"Male Protagonist","slug":"male-protagonist"},{"id":41,"name":"Comedy","slug":"comedy"},{"id":46,"name":"Shounen","slug":"shounen"},{"id":49,"name":"Slapstick","slug":"slapstick"},{"id":64,"name":"Sports","slug":"sports"},{"id":65,"name":"American Football","slug":"american-football"},{"id":66,"name":"School","slug":"school"},{"id":67,"name":"Primarily Male Cast","slug":"primarily-male-cast"},{"id":68,"name":"School Club","slug":"school-club"},{"id":69,"name":"Coming of Age","slug":"coming-of-age"},{"id":70,"name":"Bullying","slug":"bullying"},{"id":71,"name":"Delinquents","slug":"delinquents"}],"created_at":"2026-01-01T09:33:52.000000Z","updated_at":"2026-01-01T10:23:05.000000Z"},{"id":8,"title":"Honey and Clover","slug":"honey-and-clover-16","description":"Takemoto Yuuta, Mayama Takumi, and Morita Shinobu are college students who share the small apartment. Even though they live in poverty, the three of them are able to obtain pleasure through small things in life. The story follows these characters'' life stories as poor college students, as well as their love lives when a short but talented 18 year old girl called Hanamoto Hagumi appears.\n<br><br>\n(Source: Anime News Network)","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/large\/bx16-S9k8qahNXoYP.jpg","rating":"7.60","year":2005,"status":"finished","type":"tv","number_of_episodes":24,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":54611,"favorites":854,"external_id":"16","external_source":"anilist","tags":[{"id":3,"name":"Drama","slug":"drama"},{"id":9,"name":"Primarily Adult Cast","slug":"primarily-adult-cast"},{"id":16,"name":"Male Protagonist","slug":"male-protagonist"},{"id":22,"name":"Heterosexual","slug":"heterosexual"},{"id":41,"name":"Comedy","slug":"comedy"},{"id":60,"name":"Kuudere","slug":"kuudere"},{"id":67,"name":"Primarily Male Cast","slug":"primarily-male-cast"},{"id":69,"name":"Coming of Age","slug":"coming-of-age"},{"id":72,"name":"Romance","slug":"romance"},{"id":73,"name":"Slice of Life","slug":"slice-of-life"},{"id":74,"name":"College","slug":"college"},{"id":75,"name":"Love Triangle","slug":"love-triangle"},{"id":76,"name":"Josei","slug":"josei"},{"id":77,"name":"Unrequited Love","slug":"unrequited-love"},{"id":78,"name":"Chibi","slug":"chibi"},{"id":79,"name":"Drawing","slug":"drawing"}],"created_at":"2026-01-01T09:33:52.000000Z","updated_at":"2026-01-01T10:23:05.000000Z"},{"id":9,"title":"Hungry Heart: Wild Striker","slug":"hungry-heart-wild-striker-17","description":"Kyosuke Kano has lived under the shadow of his successful brother Seisuke all his life who is a professional soccer player. Tired of being compared and downgraded at, he abandoned playing soccer until a boy from his new highschool discovered him and asked him to join their team. Kyosuke joins it and befriends two other first year players named Rodrigo and Sakai with the dream of becomming professional soccer players themselves.\n<br><br>\n(Source: Anime News Network)","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/large\/bx17-6kqIbdUk3dgi.png","rating":"7.10","year":2002,"status":"finished","type":"tv","number_of_episodes":52,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":4514,"favorites":79,"external_id":"17","external_source":"anilist","tags":[{"id":41,"name":"Comedy","slug":"comedy"},{"id":46,"name":"Shounen","slug":"shounen"},{"id":64,"name":"Sports","slug":"sports"},{"id":67,"name":"Primarily Male Cast","slug":"primarily-male-cast"},{"id":68,"name":"School Club","slug":"school-club"},{"id":73,"name":"Slice of Life","slug":"slice-of-life"},{"id":80,"name":"Football","slug":"football"}],"created_at":"2026-01-01T09:33:52.000000Z","updated_at":"2026-01-01T10:23:05.000000Z"},{"id":10,"title":"Initial D 4th Stage","slug":"initial-d-4th-stage-18","description":"Takumi Fujiwara and brothers Keisuke and Ryousuke Takahashi have formed \"Project D,\" a racing team aimed at bringing their driving skills to their full potential outside their prefecture. Using the internet, Project D issues challenges to other racing teams and posts results of their races. Managed by Ryousuke, the team has Takumi engaging in downhill battles with his AE86, while Keisuke challenges opponents uphill. Among their rivals are the Seven-Star Leaf (SSR) and Todo-juku.","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/medium\/b18-r7IirVmwP89u.jpg","rating":"8.00","year":2004,"status":"finished","type":"tv","number_of_episodes":24,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":44804,"favorites":846,"external_id":"18","external_source":"anilist","tags":[{"id":1,"name":"Action","slug":"action"},{"id":3,"name":"Drama","slug":"drama"},{"id":9,"name":"Primarily Adult Cast","slug":"primarily-adult-cast"},{"id":16,"name":"Male Protagonist","slug":"male-protagonist"},{"id":22,"name":"Heterosexual","slug":"heterosexual"},{"id":35,"name":"CGI","slug":"cgi"},{"id":51,"name":"Rural","slug":"rural"},{"id":64,"name":"Sports","slug":"sports"},{"id":67,"name":"Primarily Male Cast","slug":"primarily-male-cast"},{"id":81,"name":"Cars","slug":"cars"},{"id":82,"name":"Seinen","slug":"seinen"},{"id":83,"name":"Rape","slug":"rape"}],"created_at":"2026-01-01T09:33:52.000000Z","updated_at":"2026-01-01T10:23:05.000000Z"},{"id":11,"title":"Monster","slug":"monster-19","description":"Dr. Kenzo Tenma is a renowned Japanese brain surgeon working at a leading hospital in Germany. One night, Dr. Tenma risks his reputation and career to save the life of a critically wounded young boy over that of the town mayor who had been planning to support the hospital financially. A string of mysterious murders begin to occur soon after the operation, and Dr. Tenma emerges as the primary suspect despite no incriminating evidence. \n<br><br>\nA doctor is taught to believe that all life is equal; however, when another series of murders occur in the surgeon''s vicinity, Dr. Tenma''s beliefs are shaken as his actions that night are shown to have much broader consequences than he could have imagined. Leaving behind his life as a surgeon he embarks on a journey across the country to unravel the mystery of the boy he saved.","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/large\/bx19-gtMC64182sm4.jpg","rating":"8.80","year":2004,"status":"finished","type":"tv","number_of_episodes":74,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":294354,"favorites":19674,"external_id":"19","external_source":"anilist","tags":[{"id":3,"name":"Drama","slug":"drama"},{"id":6,"name":"Crime","slug":"crime"},{"id":7,"name":"Episodic","slug":"episodic"},{"id":8,"name":"Ensemble Cast","slug":"ensemble-cast"},{"id":9,"name":"Primarily Adult Cast","slug":"primarily-adult-cast"},{"id":10,"name":"Tragedy","slug":"tragedy"},{"id":11,"name":"Travel","slug":"travel"},{"id":12,"name":"Noir","slug":"noir"},{"id":14,"name":"Philosophy","slug":"philosophy"},{"id":15,"name":"Guns","slug":"guns"},{"id":16,"name":"Male Protagonist","slug":"male-protagonist"},{"id":25,"name":"Amnesia","slug":"amnesia"},{"id":30,"name":"Police","slug":"police"},{"id":31,"name":"Nudity","slug":"nudity"},{"id":37,"name":"Mystery","slug":"mystery"},{"id":38,"name":"Urban","slug":"urban"},{"id":39,"name":"Foreign","slug":"foreign"},{"id":42,"name":"Fugitive","slug":"fugitive"},{"id":47,"name":"Twins","slug":"twins"},{"id":55,"name":"Conspiracy","slug":"conspiracy"},{"id":67,"name":"Primarily Male Cast","slug":"primarily-male-cast"},{"id":70,"name":"Bullying","slug":"bullying"},{"id":82,"name":"Seinen","slug":"seinen"},{"id":83,"name":"Rape","slug":"rape"},{"id":84,"name":"Horror","slug":"horror"},{"id":85,"name":"Psychological","slug":"psychological"},{"id":86,"name":"Thriller","slug":"thriller"},{"id":87,"name":"Detective","slug":"detective"},{"id":88,"name":"Memory Manipulation","slug":"memory-manipulation"},{"id":89,"name":"Revenge","slug":"revenge"},{"id":90,"name":"Adoption","slug":"adoption"},{"id":91,"name":"Politics","slug":"politics"},{"id":92,"name":"Dissociative Identities","slug":"dissociative-identities"},{"id":93,"name":"Medicine","slug":"medicine"},{"id":94,"name":"Orphan","slug":"orphan"},{"id":95,"name":"Historical","slug":"historical"},{"id":96,"name":"Time Skip","slug":"time-skip"},{"id":97,"name":"Suicide","slug":"suicide"},{"id":98,"name":"Torture","slug":"torture"},{"id":99,"name":"Crossdressing","slug":"crossdressing"},{"id":100,"name":"Gore","slug":"gore"},{"id":101,"name":"Rescue","slug":"rescue"}],"created_at":"2026-01-01T09:33:52.000000Z","updated_at":"2026-01-01T10:23:05.000000Z"},{"id":12,"title":"Naruto","slug":"naruto-20","description":"Naruto Uzumaki, a hyperactive and knuckle-headed ninja, lives in Konohagakure, the Hidden Leaf village. Moments prior to his birth, a huge demon known as the Kyuubi, the Nine-tailed Fox, attacked Konohagakure and wreaked havoc. In order to put an end to the Kyuubi''s rampage, the leader of the village, the 4th Hokage, sacrificed his life and sealed the monstrous beast inside the newborn Naruto. <br><br>\nShunned because of the presence of the Kyuubi inside him, Naruto struggles to find his place in the village. He strives to become the Hokage of Konohagakure, and he meets many friends and foes along the way. <br><br>\n(Source: MAL Rewrite)","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/large\/bx20-dE6UHbFFg1A5.jpg","rating":"8.00","year":2002,"status":"finished","type":"tv","number_of_episodes":220,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":645564,"favorites":29428,"external_id":"20","external_source":"anilist","tags":[{"id":1,"name":"Action","slug":"action"},{"id":2,"name":"Adventure","slug":"adventure"},{"id":3,"name":"Drama","slug":"drama"},{"id":8,"name":"Ensemble Cast","slug":"ensemble-cast"},{"id":11,"name":"Travel","slug":"travel"},{"id":16,"name":"Male Protagonist","slug":"male-protagonist"},{"id":18,"name":"Found Family","slug":"found-family"},{"id":21,"name":"Martial Arts","slug":"martial-arts"},{"id":22,"name":"Heterosexual","slug":"heterosexual"},{"id":26,"name":"Gambling","slug":"gambling"},{"id":41,"name":"Comedy","slug":"comedy"},{"id":46,"name":"Shounen","slug":"shounen"},{"id":49,"name":"Slapstick","slug":"slapstick"},{"id":54,"name":"Supernatural","slug":"supernatural"},{"id":61,"name":"Fantasy","slug":"fantasy"},{"id":66,"name":"School","slug":"school"},{"id":69,"name":"Coming of Age","slug":"coming-of-age"},{"id":70,"name":"Bullying","slug":"bullying"},{"id":75,"name":"Love Triangle","slug":"love-triangle"},{"id":77,"name":"Unrequited Love","slug":"unrequited-love"},{"id":89,"name":"Revenge","slug":"revenge"},{"id":94,"name":"Orphan","slug":"orphan"},{"id":102,"name":"Ninja","slug":"ninja"},{"id":103,"name":"Super Power","slug":"super-power"},{"id":104,"name":"Criminal Organization","slug":"criminal-organization"},{"id":105,"name":"Primarily Child Cast","slug":"primarily-child-cast"},{"id":106,"name":"Shapeshifting","slug":"shapeshifting"},{"id":107,"name":"Anachronism","slug":"anachronism"},{"id":108,"name":"Kaiju","slug":"kaiju"},{"id":109,"name":"Necromancy","slug":"necromancy"},{"id":110,"name":"Estranged Family","slug":"estranged-family"},{"id":111,"name":"Gender Bending","slug":"gender-bending"},{"id":112,"name":"Assassins","slug":"assassins"},{"id":113,"name":"Battle Royale","slug":"battle-royale"},{"id":114,"name":"Anthropomorphism","slug":"anthropomorphism"},{"id":115,"name":"Primarily Teen Cast","slug":"primarily-teen-cast"}],"created_at":"2026-01-01T09:33:53.000000Z","updated_at":"2026-01-01T10:23:05.000000Z"},{"id":13,"title":"ONE PIECE","slug":"one-piece-21","description":"Gold Roger was known as the Pirate King, the strongest and most infamous being to have sailed the Grand Line. The capture and death of Roger by the World Government brought a change throughout the world. His last words before his death revealed the location of the greatest treasure in the world, One Piece. It was this revelation that brought about the Grand Age of Pirates, men who dreamed of finding One Piece (which promises an unlimited amount of riches and fame), and quite possibly the most coveted of titles for the person who found it, the title of the Pirate King.<br><br>\nEnter Monkey D. Luffy, a 17-year-old boy that defies your standard definition of a pirate. Rather than the popular persona of a wicked, hardened, toothless pirate who ransacks villages for fun, Luffy\u2019s reason for being a pirate is one of pure wonder; the thought of an exciting adventure and meeting new and intriguing people, along with finding One Piece, are his reasons of becoming a pirate. Following in the footsteps of his childhood hero, Luffy and his crew travel across the Grand Line, experiencing crazy adventures, unveiling dark mysteries and battling strong enemies, all in order to reach One Piece.<br><br>\n<b>*This includes following special episodes:<\/b><br>\n- Chopperman to the Rescue! Protect the TV Station by the Shore! (Episode 336)<br>\n- The Strongest Tag-Team! Luffy and Toriko''s Hard Struggle! (Episode 492)<br>\n- Team Formation! Save Chopper (Episode 542)<br>\n- History''s Strongest Collaboration vs. Glutton of the Sea (Episode 590)<br>\n- 20th Anniversary! Special Romance Dawn (Episode 907)","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/large\/bx21-ELSYx3yMPcKM.jpg","rating":"8.80","year":1999,"status":"releasing","type":"tv","number_of_episodes":null,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":650614,"favorites":90798,"external_id":"21","external_source":"anilist","tags":[{"id":1,"name":"Action","slug":"action"},{"id":2,"name":"Adventure","slug":"adventure"},{"id":3,"name":"Drama","slug":"drama"},{"id":6,"name":"Crime","slug":"crime"},{"id":8,"name":"Ensemble Cast","slug":"ensemble-cast"},{"id":9,"name":"Primarily Adult Cast","slug":"primarily-adult-cast"},{"id":10,"name":"Tragedy","slug":"tragedy"},{"id":11,"name":"Travel","slug":"travel"},{"id":13,"name":"Anti-Hero","slug":"anti-hero"},{"id":14,"name":"Philosophy","slug":"philosophy"},{"id":15,"name":"Guns","slug":"guns"},{"id":16,"name":"Male Protagonist","slug":"male-protagonist"},{"id":18,"name":"Found Family","slug":"found-family"},{"id":23,"name":"Cyborg","slug":"cyborg"},{"id":29,"name":"Drugs","slug":"drugs"},{"id":31,"name":"Nudity","slug":"nudity"},{"id":35,"name":"CGI","slug":"cgi"},{"id":41,"name":"Comedy","slug":"comedy"},{"id":42,"name":"Fugitive","slug":"fugitive"},{"id":43,"name":"Post-Apocalyptic","slug":"post-apocalyptic"},{"id":44,"name":"Desert","slug":"desert"},{"id":46,"name":"Shounen","slug":"shounen"},{"id":49,"name":"Slapstick","slug":"slapstick"},{"id":55,"name":"Conspiracy","slug":"conspiracy"},{"id":60,"name":"Kuudere","slug":"kuudere"},{"id":61,"name":"Fantasy","slug":"fantasy"},{"id":63,"name":"Swordplay","slug":"swordplay"},{"id":77,"name":"Unrequited Love","slug":"unrequited-love"},{"id":89,"name":"Revenge","slug":"revenge"},{"id":90,"name":"Adoption","slug":"adoption"},{"id":91,"name":"Politics","slug":"politics"},{"id":93,"name":"Medicine","slug":"medicine"},{"id":96,"name":"Time Skip","slug":"time-skip"},{"id":102,"name":"Ninja","slug":"ninja"},{"id":103,"name":"Super Power","slug":"super-power"},{"id":106,"name":"Shapeshifting","slug":"shapeshifting"},{"id":107,"name":"Anachronism","slug":"anachronism"},{"id":111,"name":"Gender Bending","slug":"gender-bending"},{"id":112,"name":"Assassins","slug":"assassins"},{"id":113,"name":"Battle Royale","slug":"battle-royale"},{"id":114,"name":"Anthropomorphism","slug":"anthropomorphism"},{"id":116,"name":"Pirates","slug":"pirates"},{"id":117,"name":"Ships","slug":"ships"},{"id":118,"name":"War","slug":"war"},{"id":119,"name":"Slavery","slug":"slavery"},{"id":120,"name":"Dystopian","slug":"dystopian"},{"id":121,"name":"Gods","slug":"gods"},{"id":122,"name":"Lost Civilization","slug":"lost-civilization"},{"id":123,"name":"Monster Boy","slug":"monster-boy"},{"id":124,"name":"Prison","slug":"prison"},{"id":125,"name":"Henshin","slug":"henshin"},{"id":126,"name":"Food","slug":"food"},{"id":127,"name":"Robots","slug":"robots"},{"id":128,"name":"Samurai","slug":"samurai"},{"id":129,"name":"Animals","slug":"animals"},{"id":130,"name":"Skeleton","slug":"skeleton"},{"id":131,"name":"Dragons","slug":"dragons"},{"id":132,"name":"Asexual","slug":"asexual"},{"id":133,"name":"Espionage","slug":"espionage"},{"id":134,"name":"Monster Girl","slug":"monster-girl"},{"id":135,"name":"Marriage","slug":"marriage"},{"id":136,"name":"Artificial Intelligence","slug":"artificial-intelligence"},{"id":137,"name":"Demons","slug":"demons"},{"id":138,"name":"Fairy","slug":"fairy"},{"id":139,"name":"Aromantic","slug":"aromantic"},{"id":140,"name":"Arranged Marriage","slug":"arranged-marriage"},{"id":141,"name":"Mermaid","slug":"mermaid"},{"id":142,"name":"Time Manipulation","slug":"time-manipulation"},{"id":143,"name":"Clone","slug":"clone"},{"id":144,"name":"Musical Theater","slug":"musical-theater"},{"id":145,"name":"Zombie","slug":"zombie"},{"id":146,"name":"Kabuki","slug":"kabuki"},{"id":147,"name":"Angels","slug":"angels"},{"id":148,"name":"Trains","slug":"trains"},{"id":149,"name":"LGBTQ+ Themes","slug":"lgbtq-themes"}],"created_at":"2026-01-01T09:33:53.000000Z","updated_at":"2026-01-01T10:23:05.000000Z"},{"id":14,"title":"The Prince of Tennis","slug":"the-prince-of-tennis-22","description":"Echizen Ryoma is a young tennis prodigy who has won 4 consecutive tennis championships but who constantly lies in the shadow of his father, a former pro tennis player. He joins the Seishun Gakuen junior highschool, one of the best tennis schools in Japan, and there along with his teamates he learns to find his own type of tennis in an attempt to defeat his biggest obstacle of all: his father as well as himself.\n<br><br>\n(Source: Anime News Network)","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/large\/bx22-yEguU9EmxkjK.png","rating":"7.50","year":2001,"status":"finished","type":"tv","number_of_episodes":178,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":33359,"favorites":674,"external_id":"22","external_source":"anilist","tags":[{"id":1,"name":"Action","slug":"action"},{"id":13,"name":"Anti-Hero","slug":"anti-hero"},{"id":16,"name":"Male Protagonist","slug":"male-protagonist"},{"id":39,"name":"Foreign","slug":"foreign"},{"id":41,"name":"Comedy","slug":"comedy"},{"id":46,"name":"Shounen","slug":"shounen"},{"id":64,"name":"Sports","slug":"sports"},{"id":66,"name":"School","slug":"school"},{"id":67,"name":"Primarily Male Cast","slug":"primarily-male-cast"},{"id":68,"name":"School Club","slug":"school-club"},{"id":70,"name":"Bullying","slug":"bullying"},{"id":103,"name":"Super Power","slug":"super-power"},{"id":105,"name":"Primarily Child Cast","slug":"primarily-child-cast"},{"id":150,"name":"Tennis","slug":"tennis"}],"created_at":"2026-01-01T09:33:53.000000Z","updated_at":"2026-01-01T10:23:05.000000Z"},{"id":15,"title":"Ring ni Kakero 1","slug":"ring-ni-kakero-1-23","description":"In order to fulfill their dead father''s wish, the siblings, Kiku Takane and Ryuuji Takane aim for the champion title of the boxing arena. The sister, Kiku, will act as the trainer while her brother, Ryuuji, will concentrate on the role of the boxer and learn the Boomerang Hook technique. His battle with many rivals has led to the growth and maturity of Ryuuji. The junior high boxing tournament has began and Ryuuji will be fighting his arch-rival, Jun Kenzaki. The battle begins.\n<br><br>\n(Source: Anime News Network)","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/large\/bx23-OwtP69d9B9kg.jpg","rating":"6.00","year":2004,"status":"finished","type":"tv","number_of_episodes":12,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":1573,"favorites":23,"external_id":"23","external_source":"anilist","tags":[{"id":1,"name":"Action","slug":"action"},{"id":16,"name":"Male Protagonist","slug":"male-protagonist"},{"id":21,"name":"Martial Arts","slug":"martial-arts"},{"id":46,"name":"Shounen","slug":"shounen"},{"id":64,"name":"Sports","slug":"sports"},{"id":67,"name":"Primarily Male Cast","slug":"primarily-male-cast"},{"id":71,"name":"Delinquents","slug":"delinquents"},{"id":103,"name":"Super Power","slug":"super-power"},{"id":151,"name":"Boxing","slug":"boxing"},{"id":152,"name":"Cultivation","slug":"cultivation"}],"created_at":"2026-01-01T09:33:53.000000Z","updated_at":"2026-01-01T10:23:05.000000Z"},{"id":16,"title":"School Rumble","slug":"school-rumble-24","description":"Tsukamoto Tenma is an ordinary 2nd year high school student who has fallen in love with one of her classmates, Karasuma Ooji. However, currently she is unable to confess her feelings to him. To make things worse, she found out that Karasuma is transferring to another school in a year. On the other hand, Tenma''s other classmate, Harima Kenji (who is a delinquent) is also in love with Tenma. Not being able to confess his feelings, Harima gets depressed day by day.<br><br>\n(Source: Anime News Network)","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/large\/bx24-FY8Y08LrROKE.png","rating":"7.60","year":2004,"status":"finished","type":"tv","number_of_episodes":26,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":55072,"favorites":1036,"external_id":"24","external_source":"anilist","tags":[{"id":7,"name":"Episodic","slug":"episodic"},{"id":8,"name":"Ensemble Cast","slug":"ensemble-cast"},{"id":22,"name":"Heterosexual","slug":"heterosexual"},{"id":35,"name":"CGI","slug":"cgi"},{"id":41,"name":"Comedy","slug":"comedy"},{"id":46,"name":"Shounen","slug":"shounen"},{"id":60,"name":"Kuudere","slug":"kuudere"},{"id":66,"name":"School","slug":"school"},{"id":71,"name":"Delinquents","slug":"delinquents"},{"id":72,"name":"Romance","slug":"romance"},{"id":73,"name":"Slice of Life","slug":"slice-of-life"},{"id":75,"name":"Love Triangle","slug":"love-triangle"},{"id":103,"name":"Super Power","slug":"super-power"},{"id":115,"name":"Primarily Teen Cast","slug":"primarily-teen-cast"},{"id":153,"name":"Parody","slug":"parody"},{"id":154,"name":"Tsundere","slug":"tsundere"},{"id":155,"name":"Butler","slug":"butler"}],"created_at":"2026-01-01T09:33:53.000000Z","updated_at":"2026-01-01T10:23:05.000000Z"},{"id":17,"title":"Desert Punk","slug":"desert-punk-25","description":"The Great Kanto Desert is a miserable place. It\u2019s also the home of hero-for-hire Desert Punk, the closest thing to a good guy the wasteland\u2019s got. He\u2019s known as the best man for any job, but his reputation is undone by his raging hormones when curvy Junko uses her double-D charms to double-cross him. With debt hanging over his head, Desert Punk sets out to salvage his name. <br><br>\n(Source: Crunchyroll)","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/large\/bx25-H1etX7IgfFtQ.jpg","rating":"6.80","year":2004,"status":"finished","type":"tv","number_of_episodes":24,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":27073,"favorites":331,"external_id":"25","external_source":"anilist","tags":[{"id":1,"name":"Action","slug":"action"},{"id":2,"name":"Adventure","slug":"adventure"},{"id":4,"name":"Sci-Fi","slug":"sci-fi"},{"id":7,"name":"Episodic","slug":"episodic"},{"id":13,"name":"Anti-Hero","slug":"anti-hero"},{"id":15,"name":"Guns","slug":"guns"},{"id":19,"name":"Terrorism","slug":"terrorism"},{"id":40,"name":"Military","slug":"military"},{"id":41,"name":"Comedy","slug":"comedy"},{"id":43,"name":"Post-Apocalyptic","slug":"post-apocalyptic"},{"id":44,"name":"Desert","slug":"desert"},{"id":46,"name":"Shounen","slug":"shounen"},{"id":49,"name":"Slapstick","slug":"slapstick"},{"id":55,"name":"Conspiracy","slug":"conspiracy"},{"id":118,"name":"War","slug":"war"},{"id":119,"name":"Slavery","slug":"slavery"},{"id":122,"name":"Lost Civilization","slug":"lost-civilization"},{"id":136,"name":"Artificial Intelligence","slug":"artificial-intelligence"},{"id":156,"name":"Ecchi","slug":"ecchi"},{"id":157,"name":"Survival","slug":"survival"},{"id":158,"name":"Gangs","slug":"gangs"},{"id":159,"name":"POV","slug":"pov"}],"created_at":"2026-01-01T09:33:53.000000Z","updated_at":"2026-01-01T10:23:05.000000Z"},{"id":18,"title":"Texhnolyze","slug":"texhnolyze-26","description":"In a man-made underground society, descendants of a banished generation vie for control of the crumbling city of Lux. Ichise, an orphan turned prize fighter, loses a leg and an arm to satisfy an enraged fight promoter. On the brink of death he is taken in by a young woman doctor and used as a guinea pig for the next evolution of Texhnolyze. With his new limbs, Ichise is taken under the wing of Oonishi, a powerful leader of Organ, an organization with some hold on Lux. As Ichise is drawn deeper into a war for territorial control of the city, he learns of his possible future from the young girl prophet Ran, who guides him from the shadows in his darkest times. With the explosion of the warfare, Ichise must uncover the truth about Lux and fight for his survival as he realizes his destiny.\n<br><br>\n(Source: Anime News Network)","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/large\/bx26-ADSztyHBNO39.jpg","rating":"7.60","year":2003,"status":"finished","type":"tv","number_of_episodes":22,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":75508,"favorites":2614,"external_id":"26","external_source":"anilist","tags":[{"id":1,"name":"Action","slug":"action"},{"id":3,"name":"Drama","slug":"drama"},{"id":4,"name":"Sci-Fi","slug":"sci-fi"},{"id":6,"name":"Crime","slug":"crime"},{"id":9,"name":"Primarily Adult Cast","slug":"primarily-adult-cast"},{"id":10,"name":"Tragedy","slug":"tragedy"},{"id":12,"name":"Noir","slug":"noir"},{"id":14,"name":"Philosophy","slug":"philosophy"},{"id":15,"name":"Guns","slug":"guns"},{"id":16,"name":"Male Protagonist","slug":"male-protagonist"},{"id":17,"name":"Cyberpunk","slug":"cyberpunk"},{"id":19,"name":"Terrorism","slug":"terrorism"},{"id":20,"name":"Female Protagonist","slug":"female-protagonist"},{"id":22,"name":"Heterosexual","slug":"heterosexual"},{"id":23,"name":"Cyborg","slug":"cyborg"},{"id":29,"name":"Drugs","slug":"drugs"},{"id":33,"name":"Cult","slug":"cult"},{"id":38,"name":"Urban","slug":"urban"},{"id":43,"name":"Post-Apocalyptic","slug":"post-apocalyptic"},{"id":55,"name":"Conspiracy","slug":"conspiracy"},{"id":67,"name":"Primarily Male Cast","slug":"primarily-male-cast"},{"id":83,"name":"Rape","slug":"rape"},{"id":85,"name":"Psychological","slug":"psychological"},{"id":97,"name":"Suicide","slug":"suicide"},{"id":100,"name":"Gore","slug":"gore"},{"id":118,"name":"War","slug":"war"},{"id":120,"name":"Dystopian","slug":"dystopian"},{"id":122,"name":"Lost Civilization","slug":"lost-civilization"},{"id":151,"name":"Boxing","slug":"boxing"},{"id":157,"name":"Survival","slug":"survival"},{"id":158,"name":"Gangs","slug":"gangs"},{"id":160,"name":"Mafia","slug":"mafia"},{"id":161,"name":"Denpa","slug":"denpa"},{"id":162,"name":"Class Struggle","slug":"class-struggle"},{"id":163,"name":"Disability","slug":"disability"},{"id":164,"name":"Amputation","slug":"amputation"},{"id":165,"name":"Afterlife","slug":"afterlife"}],"created_at":"2026-01-01T09:33:53.000000Z","updated_at":"2026-01-01T10:23:05.000000Z"},{"id":19,"title":"Trinity Blood","slug":"trinity-blood-27","description":"The background is in the distant future after the destruction brought about by Armageddon. The war between the vampires and the humans continue to persist. In order to protect the humans from the vampires, the Vatican has to rely on other allies to counter the situation. The protagonist,  Abel Nightroad, is a traveling priest from the Vatican and a crusnik, a vampire that drinks the blood of vampires. He is a member of the \"Ax\", a special operations group led by Cardinal Catherina Sforza. He encounters a young girl called Esther, who decides to go with him to Rome and train at the Vatican. Soon after he meets her, the order of Rozencreuz, led by Abel''s twin, Cain, tries to continue the war so they can rule the world. It''s up to Abel and the AX to try and stop them.","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/large\/bx27-MOAaiBHHLfOY.png","rating":"6.80","year":2005,"status":"finished","type":"tv","number_of_episodes":24,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":26377,"favorites":942,"external_id":"27","external_source":"anilist","tags":[{"id":1,"name":"Action","slug":"action"},{"id":3,"name":"Drama","slug":"drama"},{"id":4,"name":"Sci-Fi","slug":"sci-fi"},{"id":15,"name":"Guns","slug":"guns"},{"id":16,"name":"Male Protagonist","slug":"male-protagonist"},{"id":19,"name":"Terrorism","slug":"terrorism"},{"id":35,"name":"CGI","slug":"cgi"},{"id":39,"name":"Foreign","slug":"foreign"},{"id":43,"name":"Post-Apocalyptic","slug":"post-apocalyptic"},{"id":52,"name":"Religion","slug":"religion"},{"id":54,"name":"Supernatural","slug":"supernatural"},{"id":84,"name":"Horror","slug":"horror"},{"id":100,"name":"Gore","slug":"gore"},{"id":106,"name":"Shapeshifting","slug":"shapeshifting"},{"id":107,"name":"Anachronism","slug":"anachronism"},{"id":127,"name":"Robots","slug":"robots"},{"id":136,"name":"Artificial Intelligence","slug":"artificial-intelligence"},{"id":166,"name":"Vampire","slug":"vampire"},{"id":167,"name":"Nun","slug":"nun"},{"id":168,"name":"Aviation","slug":"aviation"},{"id":169,"name":"Shoujo","slug":"shoujo"}],"created_at":"2026-01-01T09:33:53.000000Z","updated_at":"2026-01-01T10:23:05.000000Z"},{"id":20,"title":"Yakitate!! Japan","slug":"yakitate-japan-28","description":"Kazuma Azuma wants to make bread. Not just any kind of bread, though. He wants to make a bread that represents Japan itself and can stand toe-to-toe with rice as a national food. Thanks to his legendary \"Hands of the Sun,\" unnaturally warm hands that allow dough to ferment faster, Kazuma''s bread is like a slice of Heaven.<br>\n<br>\nAnd when the Pantasia Rookie Competition arrives, everyone will get a taste of his skill! Along with his friend Kawachi (who''s only in it for the dough), he\u2019ll go up against koala karate masters, Harvard bread scientists, samurai with rolling-pin swords, and more! Can Kazuma create bread like naan other and bake his way to glory, or should he quit before he''s toast?<br>\n<br>\n(Source: Right Stuf)","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/large\/bx28-QuKcZpUjTXzV.png","rating":"7.60","year":2004,"status":"finished","type":"tv","number_of_episodes":69,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":18755,"favorites":300,"external_id":"28","external_source":"anilist","tags":[{"id":8,"name":"Ensemble Cast","slug":"ensemble-cast"},{"id":16,"name":"Male Protagonist","slug":"male-protagonist"},{"id":41,"name":"Comedy","slug":"comedy"},{"id":46,"name":"Shounen","slug":"shounen"},{"id":56,"name":"Magic","slug":"magic"},{"id":126,"name":"Food","slug":"food"},{"id":142,"name":"Time Manipulation","slug":"time-manipulation"},{"id":153,"name":"Parody","slug":"parody"},{"id":170,"name":"Meta","slug":"meta"},{"id":171,"name":"Surreal Comedy","slug":"surreal-comedy"},{"id":172,"name":"Isekai","slug":"isekai"},{"id":173,"name":"Educational","slug":"educational"}],"created_at":"2026-01-01T09:33:53.000000Z","updated_at":"2026-01-01T10:23:05.000000Z"},{"id":21,"title":"Zipang","slug":"zipang-29","description":"Mirai, an improved Kongou-class Aegis guided missile destroyer, is one of the newest and most advanced ships in the entire Japanese Self Defense Force (SDF). Her crew, also one of the newest, is lead by Capt. Umezu Saburo and Executive Officer Kadomatsu Yosuke. While running scheduled training exercises one day, Mirai encounters a fierce storm that throws their navigation systems into temporary disarray. After a few minutes of recovery, the crew is shocked to discover that they''ve been transported back in time to June 4, 1942&mdash;The Battle of Midway, during World War II. Letting history take its course for this battle, they manage to avoid the conflict firsthand and make a vow to remain annonymous, changing history as little as possible. However, when the crew comes across the dying Lt. Commander Kusaka Takumi, XO. Kadomatsu''s instincts to save lives takes over, changing the course of history more than he could''ve imagined.\n<br><br>\n(Source: Anime News Network)","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/large\/bx29-0PsnJVadMG7k.jpg","rating":"7.10","year":2004,"status":"finished","type":"tv","number_of_episodes":26,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":6052,"favorites":64,"external_id":"29","external_source":"anilist","tags":[{"id":1,"name":"Action","slug":"action"},{"id":4,"name":"Sci-Fi","slug":"sci-fi"},{"id":9,"name":"Primarily Adult Cast","slug":"primarily-adult-cast"},{"id":10,"name":"Tragedy","slug":"tragedy"},{"id":11,"name":"Travel","slug":"travel"},{"id":40,"name":"Military","slug":"military"},{"id":67,"name":"Primarily Male Cast","slug":"primarily-male-cast"},{"id":82,"name":"Seinen","slug":"seinen"},{"id":95,"name":"Historical","slug":"historical"},{"id":107,"name":"Anachronism","slug":"anachronism"},{"id":117,"name":"Ships","slug":"ships"},{"id":118,"name":"War","slug":"war"},{"id":142,"name":"Time Manipulation","slug":"time-manipulation"}],"created_at":"2026-01-01T09:33:53.000000Z","updated_at":"2026-01-01T10:23:05.000000Z"}],"links":{"first":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime?page=1","last":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime?page=1094","prev":null,"next":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime?page=2"},"meta":{"current_page":1,"from":1,"last_page":1094,"links":[{"url":null,"label":"&laquo; Previous","page":null,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime?page=1","label":"1","page":1,"active":true},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime?page=2","label":"2","page":2,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime?page=3","label":"3","page":3,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime?page=4","label":"4","page":4,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime?page=5","label":"5","page":5,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime?page=6","label":"6","page":6,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime?page=7","label":"7","page":7,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime?page=8","label":"8","page":8,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime?page=9","label":"9","page":9,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime?page=10","label":"10","page":10,"active":false},{"url":null,"label":"...","active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime?page=1093","label":"1093","page":1093,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime?page=1094","label":"1094","page":1094,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime?page=2","label":"Next &raquo;","page":2,"active":false}],"path":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime","per_page":20,"to":20,"total":21864}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/public/episodes/translators
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":[{"translator":"Amazing Dubbing","translation_type":"voice"},{"translator":"\u041b\u044e\u0431. \u041e\u0434\u043d\u043e\u0433\u043e\u043b\u043e\u0441\u044b\u0439","translation_type":"voice"},{"translator":"AniDUB","translation_type":"voice"},{"translator":"\u041c\u0435\u0433\u0430-\u0410\u043d\u0438\u043c\u0435","translation_type":"voice"},{"translator":"Ancord","translation_type":"voice"},{"translator":"Persona99","translation_type":"voice"}]}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/public/episodes
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"current_page":1,"data":[{"id":1,"anime_id":2,"episode_number":1,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757652\/fb2ff431ebe0d42a9829b5ea07f2183d\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"},{"id":2,"anime_id":2,"episode_number":2,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757653\/830ce6fd979c58cde8c675e07f10199d\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"},{"id":3,"anime_id":2,"episode_number":3,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757654\/5fc08508d8c8eb4b6288ff157a785789\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"},{"id":4,"anime_id":2,"episode_number":4,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757655\/409323faa27bd9abf50f057a9effed88\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"},{"id":5,"anime_id":2,"episode_number":5,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757656\/e6ddbd9918910afc0f42440d909b2e6c\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"},{"id":6,"anime_id":2,"episode_number":6,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757657\/6ce66ff386dd1e61754f0d8509f14c5e\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"},{"id":7,"anime_id":2,"episode_number":7,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757658\/9875a8b9ff0dad3bcb4e5ac30e0f0c39\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"},{"id":8,"anime_id":2,"episode_number":8,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757659\/2c9c6fa5988a7d1cd11bf71ad022e494\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"},{"id":9,"anime_id":2,"episode_number":9,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757660\/482edb57db55d1dc168be51b45369d0b\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"},{"id":10,"anime_id":2,"episode_number":10,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757661\/995c0dee43413d7c0d44d727d61737d9\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"},{"id":11,"anime_id":2,"episode_number":11,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757662\/e304d4d1ca5f63ba9fc22fb30e418a56\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"},{"id":12,"anime_id":2,"episode_number":12,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757663\/793503e1d48b72369370d714cdce8f21\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"},{"id":13,"anime_id":2,"episode_number":13,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757664\/686bb487969688f11546abacf0dc6961\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"},{"id":14,"anime_id":2,"episode_number":14,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757665\/f644efe7e0d49568eacad12930642efa\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"},{"id":15,"anime_id":2,"episode_number":15,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757666\/2859269875b63a785eacd374f78c2b57\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"},{"id":16,"anime_id":2,"episode_number":16,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757667\/0fea4c597bce9619010bd6acc51e48e1\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"},{"id":17,"anime_id":2,"episode_number":17,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757668\/a7023f6c89d1b8683ada81ea8bacd90a\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"},{"id":18,"anime_id":2,"episode_number":18,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757669\/368db45ff85851e70fc0277c70617f57\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"},{"id":19,"anime_id":2,"episode_number":19,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757670\/25c9c0bcef01c52b7599699e02060458\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"},{"id":20,"anime_id":2,"episode_number":20,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757671\/f08f84eedf55a4bd5d60a4e960536d3d\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"}],"first_page_url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/episodes?page=1","from":1,"last_page":23,"last_page_url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/episodes?page=23","links":[{"url":null,"label":"&laquo; Previous","page":null,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/episodes?page=1","label":"1","page":1,"active":true},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/episodes?page=2","label":"2","page":2,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/episodes?page=3","label":"3","page":3,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/episodes?page=4","label":"4","page":4,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/episodes?page=5","label":"5","page":5,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/episodes?page=6","label":"6","page":6,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/episodes?page=7","label":"7","page":7,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/episodes?page=8","label":"8","page":8,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/episodes?page=9","label":"9","page":9,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/episodes?page=10","label":"10","page":10,"active":false},{"url":null,"label":"...","active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/episodes?page=22","label":"22","page":22,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/episodes?page=23","label":"23","page":23,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/episodes?page=2","label":"Next &raquo;","page":2,"active":false}],"next_page_url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/episodes?page=2","path":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/episodes","per_page":20,"prev_page_url":null,"to":20,"total":449}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/public/tags
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"success":true,"data":[{"id":409,"name":"4-koma","slug":"4-koma"},{"id":323,"name":"Achromatic","slug":"achromatic"},{"id":182,"name":"Achronological Order","slug":"achronological-order"},{"id":50,"name":"Acrobatics","slug":"acrobatics"},{"id":320,"name":"Acting","slug":"acting"},{"id":1,"name":"Action","slug":"action"},{"id":90,"name":"Adoption","slug":"adoption"},{"id":2,"name":"Adventure","slug":"adventure"},{"id":386,"name":"Advertisement","slug":"advertisement"},{"id":165,"name":"Afterlife","slug":"afterlife"},{"id":213,"name":"Age Gap","slug":"age-gap"},{"id":282,"name":"Age Regression","slug":"age-regression"},{"id":314,"name":"Agender","slug":"agender"},{"id":234,"name":"Agriculture","slug":"agriculture"},{"id":395,"name":"Ahegao","slug":"ahegao"},{"id":318,"name":"Airsoft","slug":"airsoft"},{"id":250,"name":"Alchemy","slug":"alchemy"},{"id":48,"name":"Aliens","slug":"aliens"},{"id":220,"name":"Alternate Universe","slug":"alternate-universe"},{"id":65,"name":"American Football","slug":"american-football"},{"id":25,"name":"Amnesia","slug":"amnesia"},{"id":164,"name":"Amputation","slug":"amputation"},{"id":107,"name":"Anachronism","slug":"anachronism"},{"id":295,"name":"Anal Sex","slug":"anal-sex"},{"id":253,"name":"Ancient China","slug":"ancient-china"},{"id":147,"name":"Angels","slug":"angels"},{"id":129,"name":"Animals","slug":"animals"},{"id":364,"name":"Anthology","slug":"anthology"},{"id":114,"name":"Anthropomorphism","slug":"anthropomorphism"},{"id":13,"name":"Anti-Hero","slug":"anti-hero"},{"id":188,"name":"Archery","slug":"archery"},{"id":426,"name":"Armpits","slug":"armpits"},{"id":139,"name":"Aromantic","slug":"aromantic"},{"id":140,"name":"Arranged Marriage","slug":"arranged-marriage"},{"id":136,"name":"Artificial Intelligence","slug":"artificial-intelligence"},{"id":132,"name":"Asexual","slug":"asexual"},{"id":396,"name":"Ashikoki","slug":"ashikoki"},{"id":424,"name":"Asphyxiation","slug":"asphyxiation"},{"id":112,"name":"Assassins","slug":"assassins"},{"id":321,"name":"Astronomy","slug":"astronomy"},{"id":264,"name":"Athletics","slug":"athletics"},{"id":262,"name":"Augmented Reality","slug":"augmented-reality"},{"id":362,"name":"Autobiographical","slug":"autobiographical"},{"id":168,"name":"Aviation","slug":"aviation"},{"id":249,"name":"Badminton","slug":"badminton"},{"id":373,"name":"Ballet","slug":"ballet"},{"id":184,"name":"Band","slug":"band"},{"id":59,"name":"Bar","slug":"bar"},{"id":209,"name":"Baseball","slug":"baseball"},{"id":276,"name":"Basketball","slug":"basketball"},{"id":113,"name":"Battle Royale","slug":"battle-royale"},{"id":385,"name":"Biographical","slug":"biographical"},{"id":180,"name":"Bisexual","slug":"bisexual"},{"id":299,"name":"Blackmail","slug":"blackmail"},{"id":259,"name":"Board Game","slug":"board-game"},{"id":272,"name":"Boarding School","slug":"boarding-school"},{"id":53,"name":"Body Horror","slug":"body-horror"},{"id":331,"name":"Body Image","slug":"body-image"},{"id":322,"name":"Body Swapping","slug":"body-swapping"},{"id":269,"name":"Bondage","slug":"bondage"},{"id":377,"name":"Boobjob","slug":"boobjob"},{"id":309,"name":"Bowling","slug":"bowling"},{"id":151,"name":"Boxing","slug":"boxing"},{"id":181,"name":"Boys'' Love","slug":"boys-love"},{"id":70,"name":"Bullying","slug":"bullying"},{"id":155,"name":"Butler","slug":"butler"},{"id":289,"name":"Calligraphy","slug":"calligraphy"},{"id":360,"name":"Camping","slug":"camping"},{"id":328,"name":"Cannibalism","slug":"cannibalism"},{"id":260,"name":"Card Battle","slug":"card-battle"},{"id":81,"name":"Cars","slug":"cars"},{"id":327,"name":"Centaur","slug":"centaur"},{"id":422,"name":"Cervix Penetration","slug":"cervix-penetration"},{"id":35,"name":"CGI","slug":"cgi"},{"id":354,"name":"Cheating","slug":"cheating"},{"id":363,"name":"Cheerleading","slug":"cheerleading"},{"id":78,"name":"Chibi","slug":"chibi"},{"id":204,"name":"Chimera","slug":"chimera"},{"id":342,"name":"Chuunibyou","slug":"chuunibyou"},{"id":34,"name":"Circus","slug":"circus"},{"id":162,"name":"Class Struggle","slug":"class-struggle"},{"id":232,"name":"Classic Literature","slug":"classic-literature"},{"id":344,"name":"Classical Music","slug":"classical-music"},{"id":143,"name":"Clone","slug":"clone"},{"id":222,"name":"Coastal","slug":"coastal"},{"id":197,"name":"Cohabitation","slug":"cohabitation"},{"id":74,"name":"College","slug":"college"},{"id":41,"name":"Comedy","slug":"comedy"},{"id":69,"name":"Coming of Age","slug":"coming-of-age"},{"id":55,"name":"Conspiracy","slug":"conspiracy"},{"id":177,"name":"Cosmic Horror","slug":"cosmic-horror"},{"id":296,"name":"Cosplay","slug":"cosplay"},{"id":27,"name":"Cowboys","slug":"cowboys"},{"id":358,"name":"Creature Taming","slug":"creature-taming"},{"id":6,"name":"Crime","slug":"crime"},{"id":104,"name":"Criminal Organization","slug":"criminal-organization"},{"id":99,"name":"Crossdressing","slug":"crossdressing"},{"id":233,"name":"Crossover","slug":"crossover"},{"id":33,"name":"Cult","slug":"cult"},{"id":152,"name":"Cultivation","slug":"cultivation"},{"id":387,"name":"Cumflation","slug":"cumflation"},{"id":301,"name":"Cunnilingus","slug":"cunnilingus"},{"id":189,"name":"Curses","slug":"curses"},{"id":230,"name":"Cute Boys Doing Cute Things","slug":"cute-boys-doing-cute-things"},{"id":219,"name":"Cute Girls Doing Cute Things","slug":"cute-girls-doing-cute-things"},{"id":17,"name":"Cyberpunk","slug":"cyberpunk"},{"id":23,"name":"Cyborg","slug":"cyborg"},{"id":325,"name":"Cycling","slug":"cycling"},{"id":240,"name":"Dancing","slug":"dancing"},{"id":261,"name":"Death Game","slug":"death-game"},{"id":397,"name":"Deepthroat","slug":"deepthroat"},{"id":348,"name":"Defloration","slug":"defloration"},{"id":71,"name":"Delinquents","slug":"delinquents"},{"id":137,"name":"Demons","slug":"demons"},{"id":161,"name":"Denpa","slug":"denpa"},{"id":44,"name":"Desert","slug":"desert"},{"id":87,"name":"Detective","slug":"detective"},{"id":308,"name":"DILF","slug":"dilf"},{"id":243,"name":"Dinosaurs","slug":"dinosaurs"},{"id":163,"name":"Disability","slug":"disability"},{"id":92,"name":"Dissociative Identities","slug":"dissociative-identities"},{"id":307,"name":"Double Penetration","slug":"double-penetration"},{"id":131,"name":"Dragons","slug":"dragons"},{"id":3,"name":"Drama","slug":"drama"},{"id":79,"name":"Drawing","slug":"drawing"},{"id":29,"name":"Drugs","slug":"drugs"},{"id":255,"name":"Dullahan","slug":"dullahan"},{"id":194,"name":"Dungeon","slug":"dungeon"},{"id":120,"name":"Dystopian","slug":"dystopian"},{"id":404,"name":"E-Sports","slug":"e-sports"},{"id":156,"name":"Ecchi","slug":"ecchi"},{"id":274,"name":"Eco-Horror","slug":"eco-horror"},{"id":283,"name":"Economics","slug":"economics"},{"id":173,"name":"Educational","slug":"educational"},{"id":333,"name":"Elderly Protagonist","slug":"elderly-protagonist"},{"id":291,"name":"Elf","slug":"elf"},{"id":8,"name":"Ensemble Cast","slug":"ensemble-cast"},{"id":228,"name":"Environmental","slug":"environmental"},{"id":7,"name":"Episodic","slug":"episodic"},{"id":381,"name":"Ero Guro","slug":"ero-guro"},{"id":133,"name":"Espionage","slug":"espionage"},{"id":110,"name":"Estranged Family","slug":"estranged-family"},{"id":405,"name":"Exhibitionism","slug":"exhibitionism"},{"id":214,"name":"Exorcism","slug":"exorcism"},{"id":279,"name":"Facial","slug":"facial"},{"id":138,"name":"Fairy","slug":"fairy"},{"id":238,"name":"Fairy Tale","slug":"fairy-tale"},{"id":420,"name":"Fake Relationship","slug":"fake-relationship"},{"id":218,"name":"Family Life","slug":"family-life"},{"id":61,"name":"Fantasy","slug":"fantasy"},{"id":313,"name":"Fashion","slug":"fashion"},{"id":399,"name":"Feet","slug":"feet"},{"id":278,"name":"Fellatio","slug":"fellatio"},{"id":198,"name":"Female Harem","slug":"female-harem"},{"id":20,"name":"Female Protagonist","slug":"female-protagonist"},{"id":229,"name":"Femboy","slug":"femboy"},{"id":334,"name":"Femdom","slug":"femdom"},{"id":345,"name":"Fencing","slug":"fencing"},{"id":352,"name":"Filmmaking","slug":"filmmaking"},{"id":375,"name":"Fingering","slug":"fingering"},{"id":412,"name":"Firefighters","slug":"firefighters"},{"id":346,"name":"Fishing","slug":"fishing"},{"id":410,"name":"Fisting","slug":"fisting"},{"id":324,"name":"Fitness","slug":"fitness"},{"id":408,"name":"Flash","slug":"flash"},{"id":388,"name":"Flat Chest","slug":"flat-chest"},{"id":126,"name":"Food","slug":"food"},{"id":80,"name":"Football","slug":"football"},{"id":39,"name":"Foreign","slug":"foreign"},{"id":18,"name":"Found Family","slug":"found-family"},{"id":42,"name":"Fugitive","slug":"fugitive"},{"id":203,"name":"Full CGI","slug":"full-cgi"},{"id":337,"name":"Futanari","slug":"futanari"},{"id":26,"name":"Gambling","slug":"gambling"},{"id":158,"name":"Gangs","slug":"gangs"},{"id":111,"name":"Gender Bending","slug":"gender-bending"},{"id":258,"name":"Ghost","slug":"ghost"},{"id":257,"name":"Go","slug":"go"},{"id":292,"name":"Goblin","slug":"goblin"},{"id":121,"name":"Gods","slug":"gods"},{"id":315,"name":"Golf","slug":"golf"},{"id":100,"name":"Gore","slug":"gore"},{"id":304,"name":"Group Sex","slug":"group-sex"},{"id":15,"name":"Guns","slug":"guns"},{"id":210,"name":"Gyaru","slug":"gyaru"},{"id":302,"name":"Hair Pulling","slug":"hair-pulling"},{"id":355,"name":"Handball","slug":"handball"},{"id":280,"name":"Handjob","slug":"handjob"},{"id":125,"name":"Henshin","slug":"henshin"},{"id":277,"name":"Hentai","slug":"hentai"},{"id":22,"name":"Heterosexual","slug":"heterosexual"},{"id":217,"name":"Hikikomori","slug":"hikikomori"},{"id":208,"name":"Hip-hop Music","slug":"hip-hop-music"},{"id":95,"name":"Historical","slug":"historical"},{"id":241,"name":"Homeless","slug":"homeless"},{"id":84,"name":"Horror","slug":"horror"},{"id":332,"name":"Horticulture","slug":"horticulture"},{"id":372,"name":"Human Pet","slug":"human-pet"},{"id":411,"name":"Hypersexuality","slug":"hypersexuality"},{"id":267,"name":"Ice Skating","slug":"ice-skating"},{"id":251,"name":"Idol","slug":"idol"},{"id":199,"name":"Incest","slug":"incest"},{"id":271,"name":"Indigenous Cultures","slug":"indigenous-cultures"},{"id":284,"name":"Inn","slug":"inn"},{"id":298,"name":"Inseki","slug":"inseki"},{"id":339,"name":"Irrumatio","slug":"irrumatio"},{"id":172,"name":"Isekai","slug":"isekai"},{"id":329,"name":"Iyashikei","slug":"iyashikei"},{"id":402,"name":"Jazz Music","slug":"jazz-music"},{"id":76,"name":"Josei","slug":"josei"},{"id":371,"name":"Judo","slug":"judo"},{"id":146,"name":"Kabuki","slug":"kabuki"},{"id":108,"name":"Kaiju","slug":"kaiju"},{"id":316,"name":"Karuta","slug":"karuta"},{"id":223,"name":"Kemonomimi","slug":"kemonomimi"},{"id":330,"name":"Kids","slug":"kids"},{"id":270,"name":"Kingdom Management","slug":"kingdom-management"},{"id":368,"name":"Konbini","slug":"konbini"},{"id":60,"name":"Kuudere","slug":"kuudere"},{"id":366,"name":"Lacrosse","slug":"lacrosse"},{"id":376,"name":"Lactation","slug":"lactation"},{"id":207,"name":"Language Barrier","slug":"language-barrier"},{"id":300,"name":"Large Breasts","slug":"large-breasts"},{"id":149,"name":"LGBTQ+ Themes","slug":"lgbtq-themes"},{"id":122,"name":"Lost Civilization","slug":"lost-civilization"},{"id":75,"name":"Love Triangle","slug":"love-triangle"},{"id":160,"name":"Mafia","slug":"mafia"},{"id":56,"name":"Magic","slug":"magic"},{"id":256,"name":"Mahjong","slug":"mahjong"},{"id":221,"name":"Mahou Shoujo","slug":"mahou-shoujo"},{"id":224,"name":"Maids","slug":"maids"},{"id":340,"name":"Makeup","slug":"makeup"},{"id":239,"name":"Male Harem","slug":"male-harem"},{"id":423,"name":"Male Pregnancy","slug":"male-pregnancy"},{"id":16,"name":"Male Protagonist","slug":"male-protagonist"},{"id":421,"name":"Manzai","slug":"manzai"},{"id":135,"name":"Marriage","slug":"marriage"},{"id":21,"name":"Martial Arts","slug":"martial-arts"},{"id":380,"name":"Masochism","slug":"masochism"},{"id":185,"name":"Masturbation","slug":"masturbation"},{"id":430,"name":"Matchmaking","slug":"matchmaking"},{"id":428,"name":"Mating Press","slug":"mating-press"},{"id":343,"name":"Matriarchy","slug":"matriarchy"},{"id":174,"name":"Mecha","slug":"mecha"},{"id":93,"name":"Medicine","slug":"medicine"},{"id":187,"name":"Medieval","slug":"medieval"},{"id":88,"name":"Memory Manipulation","slug":"memory-manipulation"},{"id":141,"name":"Mermaid","slug":"mermaid"},{"id":170,"name":"Meta","slug":"meta"},{"id":384,"name":"Metal Music","slug":"metal-music"},{"id":336,"name":"MILF","slug":"milf"},{"id":40,"name":"Military","slug":"military"},{"id":294,"name":"Mixed Gender Harem","slug":"mixed-gender-harem"},{"id":186,"name":"Mixed Media","slug":"mixed-media"},{"id":341,"name":"Modeling","slug":"modeling"},{"id":123,"name":"Monster Boy","slug":"monster-boy"},{"id":134,"name":"Monster Girl","slug":"monster-girl"},{"id":310,"name":"Mopeds","slug":"mopeds"},{"id":191,"name":"Motorcycles","slug":"motorcycles"},{"id":248,"name":"Mountaineering","slug":"mountaineering"},{"id":205,"name":"Music","slug":"music"},{"id":144,"name":"Musical Theater","slug":"musical-theater"},{"id":37,"name":"Mystery","slug":"mystery"},{"id":178,"name":"Mythology","slug":"mythology"},{"id":303,"name":"Nakadashi","slug":"nakadashi"},{"id":359,"name":"Natural Disaster","slug":"natural-disaster"},{"id":109,"name":"Necromancy","slug":"necromancy"},{"id":215,"name":"Nekomimi","slug":"nekomimi"},{"id":231,"name":"Netorare","slug":"netorare"},{"id":393,"name":"Netorase","slug":"netorase"},{"id":407,"name":"Netori","slug":"netori"},{"id":102,"name":"Ninja","slug":"ninja"},{"id":365,"name":"No Dialogue","slug":"no-dialogue"},{"id":12,"name":"Noir","slug":"noir"},{"id":418,"name":"Non-fiction","slug":"non-fiction"},{"id":31,"name":"Nudity","slug":"nudity"},{"id":167,"name":"Nun","slug":"nun"},{"id":369,"name":"Office","slug":"office"},{"id":326,"name":"Office Lady","slug":"office-lady"},{"id":273,"name":"Oiran","slug":"oiran"},{"id":216,"name":"Ojou-sama","slug":"ojou-sama"},{"id":431,"name":"Omegaverse","slug":"omegaverse"},{"id":94,"name":"Orphan","slug":"orphan"},{"id":285,"name":"Otaku Culture","slug":"otaku-culture"},{"id":275,"name":"Outdoor Activities","slug":"outdoor-activities"},{"id":374,"name":"Pandemic","slug":"pandemic"},{"id":244,"name":"Parenthood","slug":"parenthood"},{"id":378,"name":"Parkour","slug":"parkour"},{"id":153,"name":"Parody","slug":"parody"},{"id":419,"name":"Pet Play","slug":"pet-play"},{"id":14,"name":"Philosophy","slug":"philosophy"},{"id":265,"name":"Photography","slug":"photography"},{"id":116,"name":"Pirates","slug":"pirates"},{"id":370,"name":"Poker","slug":"poker"},{"id":30,"name":"Police","slug":"police"},{"id":91,"name":"Politics","slug":"politics"},{"id":383,"name":"Polyamorous","slug":"polyamorous"},{"id":43,"name":"Post-Apocalyptic","slug":"post-apocalyptic"},{"id":159,"name":"POV","slug":"pov"},{"id":254,"name":"Pregnancy","slug":"pregnancy"},{"id":9,"name":"Primarily Adult Cast","slug":"primarily-adult-cast"},{"id":356,"name":"Primarily Animal Cast","slug":"primarily-animal-cast"},{"id":105,"name":"Primarily Child Cast","slug":"primarily-child-cast"},{"id":196,"name":"Primarily Female Cast","slug":"primarily-female-cast"},{"id":67,"name":"Primarily Male Cast","slug":"primarily-male-cast"},{"id":115,"name":"Primarily Teen Cast","slug":"primarily-teen-cast"},{"id":124,"name":"Prison","slug":"prison"},{"id":288,"name":"Prostitution","slug":"prostitution"},{"id":202,"name":"Proxy Battle","slug":"proxy-battle"},{"id":85,"name":"Psychological","slug":"psychological"},{"id":176,"name":"Psychosexual","slug":"psychosexual"},{"id":349,"name":"Public Sex","slug":"public-sex"},{"id":416,"name":"Puppetry","slug":"puppetry"},{"id":392,"name":"Rakugo","slug":"rakugo"},{"id":83,"name":"Rape","slug":"rape"},{"id":183,"name":"Real Robot","slug":"real-robot"},{"id":190,"name":"Rehabilitation","slug":"rehabilitation"},{"id":200,"name":"Reincarnation","slug":"reincarnation"},{"id":52,"name":"Religion","slug":"religion"},{"id":101,"name":"Rescue","slug":"rescue"},{"id":297,"name":"Restaurant","slug":"restaurant"},{"id":89,"name":"Revenge","slug":"revenge"},{"id":361,"name":"Reverse Isekai","slug":"reverse-isekai"},{"id":338,"name":"Rimjob","slug":"rimjob"},{"id":127,"name":"Robots","slug":"robots"},{"id":206,"name":"Rock Music","slug":"rock-music"},{"id":72,"name":"Romance","slug":"romance"},{"id":351,"name":"Rotoscoping","slug":"rotoscoping"},{"id":247,"name":"Royal Affairs","slug":"royal-affairs"},{"id":400,"name":"Rugby","slug":"rugby"},{"id":51,"name":"Rural","slug":"rural"},{"id":347,"name":"Sadism","slug":"sadism"},{"id":128,"name":"Samurai","slug":"samurai"},{"id":319,"name":"Satire","slug":"satire"},{"id":394,"name":"Scat","slug":"scat"},{"id":66,"name":"School","slug":"school"},{"id":68,"name":"School Club","slug":"school-club"},{"id":4,"name":"Sci-Fi","slug":"sci-fi"},{"id":382,"name":"Scissoring","slug":"scissoring"},{"id":401,"name":"Scuba Diving","slug":"scuba-diving"},{"id":82,"name":"Seinen","slug":"seinen"},{"id":306,"name":"Sex Toys","slug":"sex-toys"},{"id":106,"name":"Shapeshifting","slug":"shapeshifting"},{"id":425,"name":"Shimaidon","slug":"shimaidon"},{"id":117,"name":"Ships","slug":"ships"},{"id":290,"name":"Shogi","slug":"shogi"},{"id":169,"name":"Shoujo","slug":"shoujo"},{"id":46,"name":"Shounen","slug":"shounen"},{"id":237,"name":"Shrine Maiden","slug":"shrine-maiden"},{"id":390,"name":"Skateboarding","slug":"skateboarding"},{"id":130,"name":"Skeleton","slug":"skeleton"},{"id":49,"name":"Slapstick","slug":"slapstick"},{"id":119,"name":"Slavery","slug":"slavery"},{"id":73,"name":"Slice of Life","slug":"slice-of-life"},{"id":266,"name":"Snowscape","slug":"snowscape"},{"id":281,"name":"Software Development","slug":"software-development"},{"id":5,"name":"Space","slug":"space"},{"id":226,"name":"Space Opera","slug":"space-opera"},{"id":62,"name":"Spearplay","slug":"spearplay"},{"id":64,"name":"Sports","slug":"sports"},{"id":389,"name":"Squirting","slug":"squirting"},{"id":45,"name":"Steampunk","slug":"steampunk"},{"id":406,"name":"Stop Motion","slug":"stop-motion"},{"id":287,"name":"Succubus","slug":"succubus"},{"id":97,"name":"Suicide","slug":"suicide"},{"id":414,"name":"Sumata","slug":"sumata"},{"id":413,"name":"Sumo","slug":"sumo"},{"id":103,"name":"Super Power","slug":"super-power"},{"id":175,"name":"Super Robot","slug":"super-robot"},{"id":268,"name":"Superhero","slug":"superhero"},{"id":54,"name":"Supernatural","slug":"supernatural"},{"id":317,"name":"Surfing","slug":"surfing"},{"id":171,"name":"Surreal Comedy","slug":"surreal-comedy"},{"id":157,"name":"Survival","slug":"survival"},{"id":398,"name":"Sweat","slug":"sweat"},{"id":211,"name":"Swimming","slug":"swimming"},{"id":63,"name":"Swordplay","slug":"swordplay"},{"id":379,"name":"Table Tennis","slug":"table-tennis"},{"id":227,"name":"Tanks","slug":"tanks"},{"id":32,"name":"Tanned Skin","slug":"tanned-skin"},{"id":212,"name":"Teacher","slug":"teacher"},{"id":357,"name":"Teens'' Love","slug":"teens-love"},{"id":150,"name":"Tennis","slug":"tennis"},{"id":286,"name":"Tentacles","slug":"tentacles"},{"id":19,"name":"Terrorism","slug":"terrorism"},{"id":335,"name":"Threesome","slug":"threesome"},{"id":86,"name":"Thriller","slug":"thriller"},{"id":353,"name":"Time Loop","slug":"time-loop"},{"id":142,"name":"Time Manipulation","slug":"time-manipulation"},{"id":96,"name":"Time Skip","slug":"time-skip"},{"id":179,"name":"Tokusatsu","slug":"tokusatsu"},{"id":24,"name":"Tomboy","slug":"tomboy"},{"id":98,"name":"Torture","slug":"torture"},{"id":10,"name":"Tragedy","slug":"tragedy"},{"id":148,"name":"Trains","slug":"trains"},{"id":201,"name":"Transgender","slug":"transgender"},{"id":11,"name":"Travel","slug":"travel"},{"id":246,"name":"Triads","slug":"triads"},{"id":154,"name":"Tsundere","slug":"tsundere"},{"id":47,"name":"Twins","slug":"twins"},{"id":77,"name":"Unrequited Love","slug":"unrequited-love"},{"id":38,"name":"Urban","slug":"urban"},{"id":57,"name":"Urban Fantasy","slug":"urban-fantasy"},{"id":166,"name":"Vampire","slug":"vampire"},{"id":429,"name":"Vertical Video","slug":"vertical-video"},{"id":312,"name":"Veterinarian","slug":"veterinarian"},{"id":193,"name":"Video Games","slug":"video-games"},{"id":415,"name":"Vikings","slug":"vikings"},{"id":367,"name":"Villainess","slug":"villainess"},{"id":350,"name":"Virginity","slug":"virginity"},{"id":192,"name":"Virtual World","slug":"virtual-world"},{"id":417,"name":"Vocal Synth","slug":"vocal-synth"},{"id":263,"name":"Volleyball","slug":"volleyball"},{"id":311,"name":"Vore","slug":"vore"},{"id":305,"name":"Voyeur","slug":"voyeur"},{"id":427,"name":"VTuber","slug":"vtuber"},{"id":118,"name":"War","slug":"war"},{"id":391,"name":"Watersports","slug":"watersports"},{"id":245,"name":"Werewolf","slug":"werewolf"},{"id":242,"name":"Wilderness","slug":"wilderness"},{"id":58,"name":"Witch","slug":"witch"},{"id":36,"name":"Work","slug":"work"},{"id":236,"name":"Wrestling","slug":"wrestling"},{"id":293,"name":"Writing","slug":"writing"},{"id":235,"name":"Wuxia","slug":"wuxia"},{"id":28,"name":"Yakuza","slug":"yakuza"},{"id":225,"name":"Yandere","slug":"yandere"},{"id":252,"name":"Youkai","slug":"youkai"},{"id":195,"name":"Yuri","slug":"yuri"},{"id":145,"name":"Zombie","slug":"zombie"},{"id":403,"name":"Zoophilia","slug":"zoophilia"}],"total":431}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/public/anime/{anime_id}'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      anime_id:
+        custom: []
+        name: anime_id
+        description: 'The ID of the anime.'
+        required: true
+        example: 385
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      anime_id: 385
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":{"id":385,"title":"Final Fantasy VII: Last Order","slug":"final-fantasy-vii-last-order-408","description":"After the destruction of Nibelheim at the hands of Sephiroth, Zack and Cloud are on the run from Shinra Inc. As they make their way back to Midgar, they recall the horrible events that happened at Nibelheim, as well as fight for survival against Shinra.\n<br><br>\n(Source: Anime News Network)","poster_url":"https:\/\/s4.anilist.co\/file\/anilistcdn\/media\/anime\/cover\/large\/bx408-iQDfox4DSCGb.png","rating":"6.70","year":2005,"status":"finished","type":"ova","number_of_episodes":1,"aired_from":null,"aired_to":null,"nsfw_flag":false,"popularity":9157,"favorites":52,"external_id":"408","external_source":"anilist","tags":[{"id":1,"name":"Action","slug":"action"},{"id":2,"name":"Adventure","slug":"adventure"},{"id":3,"name":"Drama","slug":"drama"},{"id":4,"name":"Sci-Fi","slug":"sci-fi"},{"id":15,"name":"Guns","slug":"guns"},{"id":16,"name":"Male Protagonist","slug":"male-protagonist"},{"id":17,"name":"Cyberpunk","slug":"cyberpunk"},{"id":40,"name":"Military","slug":"military"},{"id":42,"name":"Fugitive","slug":"fugitive"},{"id":48,"name":"Aliens","slug":"aliens"},{"id":61,"name":"Fantasy","slug":"fantasy"},{"id":63,"name":"Swordplay","slug":"swordplay"},{"id":67,"name":"Primarily Male Cast","slug":"primarily-male-cast"},{"id":191,"name":"Motorcycles","slug":"motorcycles"}],"created_at":"2026-01-01T09:34:14.000000Z","updated_at":"2026-01-01T09:34:14.000000Z"}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/public/anime/{anime_id}/comments'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      anime_id:
+        custom: []
+        name: anime_id
+        description: 'The ID of the anime.'
+        required: true
+        example: 385
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      anime_id: 385
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":[],"links":{"first":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime\/385\/comments?page=1","last":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime\/385\/comments?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":null,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","page":null,"active":false},{"url":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime\/385\/comments?page=1","label":"1","page":1,"active":true},{"url":null,"label":"Next &raquo;","page":null,"active":false}],"path":"https:\/\/leanna-superurgent-unfearfully.ngrok-free.dev\/api\/v1\/public\/anime\/385\/comments","per_page":50,"to":null,"total":0}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/public/anime/{anime_id}/episodes'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      anime_id:
+        custom: []
+        name: anime_id
+        description: 'The ID of the anime.'
+        required: true
+        example: 385
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      anime_id: 385
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":[]}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/public/anime/{anime_id}/community-stats'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      anime_id:
+        custom: []
+        name: anime_id
+        description: 'The ID of the anime.'
+        required: true
+        example: 385
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      anime_id: 385
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"watching":0,"planned":0,"completed":0,"on_hold":0,"dropped":0,"total":0}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/public/episodes/{episode}'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      episode:
+        custom: []
+        name: episode
+        description: 'The episode.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      episode: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"id":1,"anime_id":2,"episode_number":1,"season_number":1,"title":null,"player_url":"\/\/kodik.info\/seria\/757652\/fb2ff431ebe0d42a9829b5ea07f2183d\/720p","player_iframe":null,"translator":"Amazing Dubbing","translation_type":"voice","quality":"BDRip 720p","source":"kodik","external_id":null,"external_episode_id":null,"aired_at":null,"release_date":null,"duration":null,"thumbnail_url":null,"poster_url":null,"priority":50,"created_at":"2026-01-01T10:23:11.000000Z","updated_at":"2026-01-01T10:23:11.000000Z"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/public/episodes/{episode}/player'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      episode:
+        custom: []
+        name: episode
+        description: 'The episode.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      episode: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"player_url":"\/\/kodik.info\/seria\/757652\/fb2ff431ebe0d42a9829b5ea07f2183d\/720p","player_iframe":null}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/public/users/{userId}/statistics'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      userId:
+        custom: []
+        name: userId
+        description: ''
+        required: true
+        example: 2
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      userId: 2
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"status_counts":{"watching":0,"planned":0,"completed":0,"on_hold":0,"dropped":0},"episodes_watched":0,"total_watch_time":0,"recent_ratings":[],"watch_dynamics":[{"date":"2025-12-24","count":0},{"date":"2025-12-25","count":0},{"date":"2025-12-26","count":0},{"date":"2025-12-27","count":0},{"date":"2025-12-28","count":0},{"date":"2025-12-29","count":0},{"date":"2025-12-30","count":0},{"date":"2025-12-31","count":0},{"date":"2026-01-01","count":0},{"date":"2026-01-02","count":0}],"recently_watched":[],"comments_count":0}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/auth/register
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: b
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      email:
+        custom: []
+        name: email
+        description: 'Must be a valid email address.'
+        required: true
+        example: zbailey@example.net
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      password:
+        custom: []
+        name: password
+        description: 'Must be at least 8 characters.'
+        required: true
+        example: '-0pBNvYgxw'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      name: b
+      email: zbailey@example.net
+      password: '-0pBNvYgxw'
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/auth/login
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      email:
+        custom: []
+        name: email
+        description: 'Must be a valid email address.'
+        required: true
+        example: gbailey@example.net
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      password:
+        custom: []
+        name: password
+        description: ''
+        required: true
+        example: '|]|{+-'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      email: gbailey@example.net
+      password: '|]|{+-'
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/user
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/auth/logout
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/my-comments
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/comments
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      anime_id:
+        custom: []
+        name: anime_id
+        description: 'The <code>id</code> of an existing record in the anime table.'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      comment:
+        custom: []
+        name: comment
+        description: 'Must be at least 3 characters. Must not be greater than 1000 characters.'
+        required: true
+        example: 'n'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      anime_id: 16
+      comment: 'n'
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+      - PATCH
+    uri: 'api/v1/comments/{id}'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the comment.'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 16
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      comment:
+        custom: []
+        name: comment
+        description: 'Must be at least 3 characters. Must not be greater than 1000 characters.'
+        required: true
+        example: b
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      comment: b
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/v1/comments/{id}'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the comment.'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 16
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/profile/me
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: api/v1/profile/me
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'Must not be greater than 255 characters.'
+        required: false
+        example: b
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      bio:
+        custom: []
+        name: bio
+        description: 'Must not be greater than 500 characters.'
+        required: false
+        example: 'n'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      custom_status:
+        custom: []
+        name: custom_status
+        description: 'Must not be greater than 100 characters.'
+        required: false
+        example: g
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      name: b
+      bio: 'n'
+      custom_status: g
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/profile/me/avatar
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: multipart/form-data
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      avatar:
+        custom: []
+        name: avatar
+        description: 'Must be an image. Must not be greater than 2048 kilobytes.'
+        required: true
+        example: null
+        type: file
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters: []
+    fileParameters:
+      avatar: null
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/statistics/me
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/statistics/me/episodes-summary
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/anime/{anime}/status'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      anime:
+        custom: []
+        name: anime
+        description: 'The anime.'
+        required: true
+        example: 385
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      anime: 385
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      status:
+        custom: []
+        name: status
+        description: ''
+        required: true
+        example: dropped
+        type: string
+        enumValues:
+          - watching
+          - planned
+          - completed
+          - on_hold
+          - dropped
+          - not_watching
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      status: dropped
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/anime/{anime}/user-status'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      anime:
+        custom: []
+        name: anime
+        description: 'The anime.'
+        required: true
+        example: 385
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      anime: 385
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PATCH
+    uri: 'api/v1/anime/{anime}/episodes-watched/{episodesWatched}'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      anime:
+        custom: []
+        name: anime
+        description: 'The anime.'
+        required: true
+        example: 385
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      episodesWatched:
+        custom: []
+        name: episodesWatched
+        description: ''
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      anime: 385
+      episodesWatched: architecto
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/my-anime-list/{status?}'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      status:
+        custom: []
+        name: status
+        description: ''
+        required: false
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      status: architecto
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/favorites
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/favorites
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      anime_id:
+        custom: []
+        name: anime_id
+        description: 'The <code>id</code> of an existing record in the anime table.'
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      anime_id: architecto
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/v1/favorites/{animeId}'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      animeId:
+        custom: []
+        name: animeId
+        description: ''
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      animeId: architecto
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/favorites/{animeId}/check'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      animeId:
+        custom: []
+        name: animeId
+        description: ''
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      animeId: architecto
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/watch-history
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/watch-history
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      episode_id:
+        custom: []
+        name: episode_id
+        description: 'The <code>id</code> of an existing record in the episodes table.'
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      progress:
+        custom: []
+        name: progress
+        description: 'Must be at least 0.'
+        required: true
+        example: 39
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      completed:
+        custom: []
+        name: completed
+        description: ''
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      episode_id: architecto
+      progress: 39
+      completed: false
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/watch-history/{id}'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the watch history.'
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: architecto
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/v1/watch-history/{id}'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the watch history.'
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: architecto
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/watch-history/anime/{animeId}/history'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      animeId:
+        custom: []
+        name: animeId
+        description: ''
+        required: true
+        example: 385
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      animeId: 385
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/watch-history/anime/{animeId}/last-episode'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      animeId:
+        custom: []
+        name: animeId
+        description: ''
+        required: true
+        example: 385
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      animeId: 385
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/ratings
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/ratings
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      anime_id:
+        custom: []
+        name: anime_id
+        description: 'The <code>id</code> of an existing record in the anime table.'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      rating:
+        custom: []
+        name: rating
+        description: 'Must be at least 1. Must not be greater than 5.'
+        required: true
+        example: 2
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      anime_id: 16
+      rating: 2
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/v1/ratings/{rating_id}'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      rating_id:
+        custom: []
+        name: rating_id
+        description: 'The ID of the rating.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      rating_id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/ratings/anime/{animeId}'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      animeId:
+        custom: []
+        name: animeId
+        description: ''
+        required: true
+        example: 385
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      animeId: 385
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/anime-list/{status?}'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      status:
+        custom: []
+        name: status
+        description: ''
+        required: false
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      status: architecto
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/anime-list/anime/{anime}/status'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      anime:
+        custom: []
+        name: anime
+        description: 'The anime.'
+        required: true
+        example: 385
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      anime: 385
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated"}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+          x-frame-options: DENY
+          x-xss-protection: '1; mode=block'
+          x-content-type-options: nosniff
+          referrer-policy: strict-origin-when-cross-origin
+          content-security-policy: "default-src 'self' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: *; connect-src 'self' *; frame-ancestors 'none';"
+          strict-transport-security: 'max-age=31536000; includeSubDomains'
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: 'api/v1/anime-list/anime/{anime}/status'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      anime:
+        custom: []
+        name: anime
+        description: 'The anime.'
+        required: true
+        example: 385
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      anime: 385
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      status:
+        custom: []
+        name: status
+        description: ''
+        required: true
+        example: dropped
+        type: string
+        enumValues:
+          - watching
+          - planned
+          - completed
+          - on_hold
+          - dropped
+          - not_watching
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      status: dropped
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: 'api/v1/anime-list/anime/{anime}/watched'
+    metadata:
+      custom: []
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      anime:
+        custom: []
+        name: anime
+        description: 'The anime.'
+        required: true
+        example: 385
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      anime: 385
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
