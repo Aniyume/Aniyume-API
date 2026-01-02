@@ -8,6 +8,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\AuthenticationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,29 +18,23 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->web(append: [
-            \App\Http\Middleware\BlockTunnelAccess::class,
-        ]);
-        
+        $middleware->append(\App\Http\Middleware\SecurityShield::class);
+
         $middleware->api(prepend: [
             \Illuminate\Http\Middleware\HandleCors::class,
-            \App\Http\Middleware\ReadOnlyTunnel::class,
-            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
         ]);
-        
+
         $middleware->validateCsrfTokens(except: [
             'api/*',
         ]);
-        
+
         $middleware->alias([
-            'block.tunnel' => \App\Http\Middleware\BlockTunnelAccess::class,
-            'readonly.tunnel' => \App\Http\Middleware\ReadOnlyTunnel::class,
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->render(function (Throwable $e) {
-            if (request()->is('api/*')) {
+        $exceptions->render(function (Throwable $e, Request $request) {
+            if ($request->is('api/*')) {
                 if ($e instanceof ValidationException) {
                     return response()->json([
                         'message' => 'Validation failed',
@@ -71,14 +66,8 @@ return Application::configure(basePath: dirname(__DIR__))
                     ], $e->getStatusCode());
                 }
 
-                if (app()->environment('production')) {
-                    return response()->json([
-                        'message' => 'Server error',
-                    ], 500);
-                }
-
                 return response()->json([
-                    'message' => $e->getMessage() ?: 'Server error',
+                    'message' => app()->environment('production') ? 'Server error' : $e->getMessage(),
                 ], 500);
             }
         });
