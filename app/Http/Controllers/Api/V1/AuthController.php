@@ -9,8 +9,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * @group Авторизация
+ *
+ * Регистрация, логин и управление сессиями.
+ */
 class AuthController extends Controller
 {
+    /**
+     * Регистрация
+     *
+     * @bodyParam name string required Имя пользователя. Example: Ivan
+     * @bodyParam email string required Email. Example: ivan@example.com
+     * @bodyParam password string required Пароль (мин. 8 симв). Example: password123
+     * @bodyParam password_confirmation string required Подтверждение пароля. Example: password123
+     */
     public function register(Request $request)
     {
         $validated = $request->validate([
@@ -42,6 +55,12 @@ class AuthController extends Controller
         ], 201);
     }
 
+    /**
+     * Логин
+     *
+     * @bodyParam email string required Email. Example: ivan@example.com
+     * @bodyParam password string required Пароль. Example: password123
+     */
     public function login(Request $request)
     {
         $validated = $request->validate([
@@ -77,6 +96,12 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Текущий пользователь
+     *
+     * Возвращает данные авторизованного пользователя.
+     * @authenticated
+     */
     public function me(Request $request)
     {
         return response()->json([
@@ -85,6 +110,12 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Выход
+     *
+     * Удаляет текущий токен доступа.
+     * @authenticated
+     */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
