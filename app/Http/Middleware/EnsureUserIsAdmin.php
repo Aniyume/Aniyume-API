@@ -12,7 +12,7 @@ class EnsureUserIsAdmin
     {
         if (! $request->user() || ! $request->user()->hasRole('admin')) {
             if ($request->expectsJson()) {
-                return response()->json(['message' => 'Access denied. Admins only.'], 403);
+                return response()->json(['message' => 'Access denied'], 403);
             }
             abort(403);
         }
