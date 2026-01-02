@@ -76,6 +76,55 @@
     </table>
 </div>
 
-<div style="margin-top: 2rem;">{{ $episodes->links() }}</div>
+<div style="margin-top: 2rem;">
+    <style>
+        nav[role="navigation"] {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        nav[role="navigation"] svg {
+            width: 16px !important;
+            height: 16px !important;
+        }
+        nav[role="navigation"] a,
+        nav[role="navigation"] span {
+            background: #161616;
+            color: #FFF;
+            padding: 10px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 40px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        nav[role="navigation"] a:hover {
+            background: #2EC4B6;
+            color: #000;
+            transform: translateY(-2px);
+        }
+        nav[role="navigation"] span[aria-current="page"] {
+            background: #2EC4B6;
+            color: #000;
+            border-color: #2EC4B6;
+        }
+        nav[role="navigation"] span[aria-disabled="true"] {
+            color: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+        }
+        nav[role="navigation"] p {
+            display: none;
+        }
+    </style>
+    {{ $episodes->links() }}
+</div>
 <script>lucide.createIcons();</script>
 @endsection
