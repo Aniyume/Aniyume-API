@@ -7,6 +7,7 @@ use App\Models\Anime;
 use App\Models\Tag;
 use App\Models\AuditLog;
 use App\Models\Episode;
+use App\Models\BlacklistedAnime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -122,17 +123,25 @@ class AnimeManagementController extends Controller
     {
         $anime = Anime::findOrFail($id);
         $title = $anime->title;
+
+        if ($anime->external_id) {
+            BlacklistedAnime::firstOrCreate([
+                'external_id' => $anime->external_id,
+                'external_source' => $anime->external_source ?? 'anilist'
+            ]);
+        }
+
         $anime->delete();
 
         AuditLog::create([
             'user_id' => auth()->id(),
             'action' => 'delete_anime',
-            'description' => "Deleted anime: {$title} (ID: {$id})",
+            'description' => "Deleted anime: {$title} (ID: {$id}) and added to blacklist",
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
             'created_at' => now(),
         ]);
 
-        return redirect()->route('admin.anime.index')->with('success', 'Anime deleted');
+        return redirect()->route('admin.anime.index')->with('success', 'Anime deleted and blacklisted');
     }
 }

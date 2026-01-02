@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Anime;
 use App\Models\Tag;
 use App\Models\ImportLog;
+use App\Models\BlacklistedAnime;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -28,7 +29,7 @@ class AnilistImportService
 
             while ($hasNextPage) {
                 $result = $this->importPage($currentPage, $isInitialImport, $importLog);
-                
+
                 if (!$result['success']) {
                     throw new \Exception($result['error'] ?? 'Unknown error');
                 }
@@ -182,6 +183,15 @@ class AnilistImportService
         $externalId = (string) $mediaData['id'];
         $externalSource = 'anilist';
 
+        $isBlacklisted = BlacklistedAnime::where('external_id', $externalId)
+            ->where('external_source', $externalSource)
+            ->exists();
+
+        if ($isBlacklisted) {
+            $importLog->increment('total_skipped');
+            return;
+        }
+
         $existing = Anime::where('external_source', $externalSource)
             ->where('external_id', $externalId)
             ->first();
@@ -210,10 +220,10 @@ class AnilistImportService
     protected function mapAnilistMediaToAnime(array $mediaData): array
     {
         $title = $mediaData['title']['english'] ?? $mediaData['title']['romaji'] ?? 'Unknown';
-        
+
         $baseSlug = Str::slug($title);
         $slug = $this->generateUniqueSlug($baseSlug, $mediaData['id']);
-        
+
         $rating = null;
         if (isset($mediaData['averageScore']) && $mediaData['averageScore'] > 0) {
             $rating = round($mediaData['averageScore'] / 10, 1);
