@@ -222,43 +222,53 @@
 <div class="pagination-wrapper">
     <nav class="custom-pagination">
         @if ($anime->onFirstPage())
-            <span class="page-link disabled">
-                <i data-lucide="chevron-left"></i>
-            </span>
+            <span class="page-link disabled"><i data-lucide="chevron-left"></i></span>
         @else
-            <a href="{{ $anime->previousPageUrl() }}" class="page-link">
-                <i data-lucide="chevron-left"></i>
-            </a>
+            <a href="{{ $anime->previousPageUrl() }}" class="page-link"><i data-lucide="chevron-left"></i></a>
         @endif
-        @foreach ($anime->getUrlRange(1, $anime->lastPage()) as $page => $url)
-            @if ($page == $anime->currentPage())
-                <span class="page-link active">{{ $page }}</span>
-            @else
-                <a href="{{ $url }}" class="page-link">{{ $page }}</a>
+
+        @php
+            $current = $anime->currentPage();
+            $last = $anime->lastPage();
+            $start = max(1, $current - 2);
+            $end = min($last, $current + 2);
+        @endphp
+
+        @if ($start > 1)
+            <a href="{{ $anime->url(1) }}" class="page-link">1</a>
+            @if ($start > 2)
+                <span class="page-dots">...</span>
             @endif
-        @endforeach
+        @endif
+
+        @for ($i = $start; $i <= $end; $i++)
+            @if ($i == $current)
+                <span class="page-link active">{{ $i }}</span>
+            @else
+                <a href="{{ $anime->url($i) }}" class="page-link">{{ $i }}</a>
+            @endif
+        @endfor
+
+        @if ($end < $last)
+            @if ($end < $last - 1)
+                <span class="page-dots">...</span>
+            @endif
+            <a href="{{ $anime->url($last) }}" class="page-link">{{ $last }}</a>
+        @endif
+
         @if ($anime->hasMorePages())
-            <a href="{{ $anime->nextPageUrl() }}" class="page-link">
-                <i data-lucide="chevron-right"></i>
-            </a>
+            <a href="{{ $anime->nextPageUrl() }}" class="page-link"><i data-lucide="chevron-right"></i></a>
         @else
-            <span class="page-link disabled">
-                <i data-lucide="chevron-right"></i>
-            </span>
+            <span class="page-link disabled"><i data-lucide="chevron-right"></i></span>
         @endif
     </nav>
-    <div class="pagination-info">
-        Показано <span class="highlight">{{ $anime->firstItem() }}</span> - <span class="highlight">{{ $anime->lastItem() }}</span> из <span class="highlight">{{ $anime->total() }}</span> релизов
-    </div>
 </div>
 
 <style>
     .pagination-wrapper {
         margin-top: 2.5rem;
         display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1.5rem;
+        justify-content: center;
         animation: fadeInUp 0.5s ease 0.3s forwards;
         opacity: 0;
     }
@@ -267,16 +277,15 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        flex-wrap: wrap;
-        justify-content: center;
     }
 
     .page-link {
         background: #111111;
         border: 1px solid rgba(255, 255, 255, 0.1);
         color: rgba(255, 255, 255, 0.6);
-        width: 45px;
+        min-width: 45px;
         height: 45px;
+        padding: 0 1rem;
         border-radius: 12px;
         display: flex;
         align-items: center;
@@ -299,9 +308,8 @@
         background: linear-gradient(135deg, #2EC4B6 0%, #20a89a 100%);
         border-color: #2EC4B6;
         color: #000;
-        font-weight: 900;
         box-shadow: 0 0 20px rgba(46, 196, 182, 0.4);
-        transform: scale(1.1);
+        transform: scale(1.05);
     }
 
     .page-link.disabled {
@@ -316,28 +324,19 @@
         height: 18px;
     }
 
-    .pagination-info {
-        color: rgba(255, 255, 255, 0.4);
-        font-size: 0.85rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
+    .page-dots {
+        color: rgba(255, 255, 255, 0.3);
+        font-weight: 900;
+        padding: 0 0.5rem;
+        user-select: none;
     }
 
-    .pagination-info .highlight {
-        color: #2EC4B6;
-        font-weight: 900;
-    }
     @media (max-width: 768px) {
         .page-link {
-            width: 40px;
+            min-width: 40px;
             height: 40px;
             font-size: 0.85rem;
-        }
-
-        .pagination-info {
-            font-size: 0.75rem;
-            text-align: center;
+            padding: 0 0.75rem;
         }
     }
 </style>
