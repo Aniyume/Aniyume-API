@@ -143,8 +143,132 @@
     </table>
 </div>
 
+@if ($comments->hasPages())
 <div class="pagination-wrapper">
-    {{ $comments->links() }}
+    <nav class="custom-pagination">
+        @if ($comments->onFirstPage())
+            <span class="page-link disabled">
+                <i data-lucide="chevron-left"></i>
+            </span>
+        @else
+            <a href="{{ $comments->previousPageUrl() }}" class="page-link">
+                <i data-lucide="chevron-left"></i>
+            </a>
+        @endif
+        @foreach ($comments->getUrlRange(1, $comments->lastPage()) as $page => $url)
+            @if ($page == $comments->currentPage())
+                <span class="page-link active">{{ $page }}</span>
+            @else
+                <a href="{{ $url }}" class="page-link">{{ $page }}</a>
+            @endif
+        @endforeach
+
+        @if ($comments->hasMorePages())
+            <a href="{{ $comments->nextPageUrl() }}" class="page-link">
+                <i data-lucide="chevron-right"></i>
+            </a>
+        @else
+            <span class="page-link disabled">
+                <i data-lucide="chevron-right"></i>
+            </span>
+        @endif
+    </nav>
+
+    <div class="pagination-info">
+        Показано <span class="highlight">{{ $comments->firstItem() }}</span> - <span class="highlight">{{ $comments->lastItem() }}</span> из <span class="highlight">{{ $comments->total() }}</span> релизов
+    </div>
 </div>
+
+<style>
+    .pagination-wrapper {
+        margin-top: 2.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        animation: fadeInUp 0.5s ease 0.3s forwards;
+        opacity: 0;
+    }
+
+    .custom-pagination {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .page-link {
+        background: #111111;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.6);
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-weight: 900;
+        font-size: 0.9rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+    }
+
+    .page-link:hover:not(.disabled):not(.active) {
+        background: rgba(46, 196, 182, 0.1);
+        border-color: #2EC4B6;
+        color: #2EC4B6;
+        transform: translateY(-2px);
+    }
+
+    .page-link.active {
+        background: linear-gradient(135deg, #2EC4B6 0%, #20a89a 100%);
+        border-color: #2EC4B6;
+        color: #000;
+        font-weight: 900;
+        box-shadow: 0 0 20px rgba(46, 196, 182, 0.4);
+        transform: scale(1.1);
+    }
+
+    .page-link.disabled {
+        background: #0a0a0a;
+        border-color: rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.15);
+        cursor: not-allowed;
+    }
+
+    .page-link i {
+        width: 18px;
+        height: 18px;
+    }
+
+    .pagination-info {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .pagination-info .highlight {
+        color: #2EC4B6;
+        font-weight: 900;
+    }
+
+    @media (max-width: 768px) {
+        .page-link {
+            width: 40px;
+            height: 40px;
+            font-size: 0.85rem;
+        }
+
+        .pagination-info {
+            font-size: 0.75rem;
+            text-align: center;
+        }
+    }
+</style>
+@endif
 <script>lucide.createIcons();</script>
 @endsection
