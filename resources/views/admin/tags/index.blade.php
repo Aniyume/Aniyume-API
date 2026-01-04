@@ -143,9 +143,133 @@
     </table>
 </div>
 
+@php
+    $paginator = $tags ;
+@endphp
+
+@if ($paginator && $paginator->hasPages())
 <div class="pagination-wrapper">
-    {{ $tags->links() }}
+    <nav class="custom-pagination">
+        @if ($paginator->onFirstPage())
+            <span class="page-link disabled"><i data-lucide="chevron-left"></i></span>
+        @else
+            <a href="{{ $paginator->previousPageUrl() }}" class="page-link"><i data-lucide="chevron-left"></i></a>
+        @endif
+
+        @php
+            $current = $paginator->currentPage();
+            $last = $paginator->lastPage();
+            $start = max(1, $current - 2);
+            $end = min($last, $current + 2);
+        @endphp
+
+        @if ($start > 1)
+            <a href="{{ $paginator->url(1) }}" class="page-link">1</a>
+            @if ($start > 2)
+                <span class="page-dots">...</span>
+            @endif
+        @endif
+
+        @for ($i = $start; $i <= $end; $i++)
+            @if ($i == $current)
+                <span class="page-link active">{{ $i }}</span>
+            @else
+                <a href="{{ $paginator->url($i) }}" class="page-link">{{ $i }}</a>
+            @endif
+        @endfor
+
+        @if ($end < $last)
+            @if ($end < $last - 1)
+                <span class="page-dots">...</span>
+            @endif
+            <a href="{{ $paginator->url($last) }}" class="page-link">{{ $last }}</a>
+        @endif
+
+        @if ($paginator->hasMorePages())
+            <a href="{{ $paginator->nextPageUrl() }}" class="page-link"><i data-lucide="chevron-right"></i></a>
+        @else
+            <span class="page-link disabled"><i data-lucide="chevron-right"></i></span>
+        @endif
+    </nav>
 </div>
+
+<style>
+    .pagination-wrapper {
+        margin-top: 2.5rem;
+        display: flex;
+        justify-content: center;
+        animation: fadeInUp 0.5s ease 0.3s forwards;
+        opacity: 0;
+    }
+
+    .custom-pagination {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .page-link {
+        background: #111111;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.6);
+        min-width: 45px;
+        height: 45px;
+        padding: 0 1rem;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-weight: 900;
+        font-size: 0.9rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+    }
+
+    .page-link:hover:not(.disabled):not(.active) {
+        background: rgba(46, 196, 182, 0.1);
+        border-color: #2EC4B6;
+        color: #2EC4B6;
+        transform: translateY(-2px);
+    }
+
+    .page-link.active {
+        background: linear-gradient(135deg, #2EC4B6 0%, #20a89a 100%);
+        border-color: #2EC4B6;
+        color: #000;
+        box-shadow: 0 0 20px rgba(46, 196, 182, 0.4);
+        transform: scale(1.05);
+    }
+
+    .page-link.disabled {
+        background: #0a0a0a;
+        border-color: rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.15);
+        cursor: not-allowed;
+    }
+
+    .page-link i {
+        width: 18px;
+        height: 18px;
+    }
+
+    .page-dots {
+        color: rgba(255, 255, 255, 0.3);
+        font-weight: 900;
+        padding: 0 0.5rem;
+        user-select: none;
+    }
+
+    @media (max-width: 768px) {
+        .page-link {
+            min-width: 40px;
+            height: 40px;
+            font-size: 0.85rem;
+            padding: 0 0.75rem;
+        }
+    }
+</style>
+@endif
 
 <script>lucide.createIcons();</script>
 @endsection
