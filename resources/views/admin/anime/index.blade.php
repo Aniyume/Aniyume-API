@@ -219,7 +219,7 @@
 </form>
 
 <div class="pagination-wrapper">
-    {{ $anime->links() }}
+    <x-pagination :paginator="$anime" />
 </div>
 
 <script>
