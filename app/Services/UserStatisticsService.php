@@ -9,14 +9,16 @@ class UserStatisticsService
 {
     public function getStatistics(int $userId): array
     {
+        $totalSeconds = $this->getTotalWatchTime($userId);
+
         return [
             'status_counts' => $this->getStatusCounts($userId),
             'episodes_watched' => $this->getTotalEpisodesWatched($userId),
-            'total_watch_time' => $this->getTotalWatchTime($userId),
+            'total_watch_time' => $this->formatWatchTime($totalSeconds),
             'recent_ratings' => $this->getRecentRatings($userId, 3),
             'watch_dynamics' => $this->getWatchDynamics($userId, 10),
             'recently_watched' => $this->getRecentlyWatched($userId, 5),
-             'comments_count' => $this->getTotalCommentsCount($userId),
+            'comments_count' => $this->getTotalCommentsCount($userId),
         ];
     }
 
@@ -96,6 +98,20 @@ class UserStatisticsService
         return (int) ($total ?? 0);
     }
 
+    private function formatWatchTime(int $totalSeconds): array
+    {
+        $days = intdiv($totalSeconds, 60 * 60 * 24);
+        $hours = intdiv($totalSeconds % (60 * 60 * 24), 60 * 60);
+        $minutes = intdiv($totalSeconds % (60 * 60), 60);
+
+        return [
+            'total_seconds' => $totalSeconds,
+            'days' => $days,
+            'hours' => $hours,
+            'minutes' => $minutes,
+        ];
+    }
+
     private function getRecentRatings(int $userId, int $limit): array
     {
         $ratings = DB::table('ratings')
@@ -159,8 +175,9 @@ class UserStatisticsService
 
         return $watched ? $watched->toArray() : [];
     }
+
     private function getTotalCommentsCount(int $userId): int
-{
-    return DB::table('comments')->where('user_id', $userId)->count();
-}
+    {
+        return DB::table('comments')->where('user_id', $userId)->count();
+    }
 }
