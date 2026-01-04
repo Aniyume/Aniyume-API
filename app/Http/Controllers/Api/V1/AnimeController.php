@@ -27,38 +27,53 @@ class AnimeController extends Controller
      * @queryParam search string Поиск по названию или слагу. Example: Attack
      * @queryParam sort string Сортировка (rating, popularity, newest, title). Example: rating
      */
-    public function index(Request $request)
-    {
-        $query = Anime::query()
-            ->with(['tags'])
-            ->when($request->filled('type'), fn ($q) => $q->where('type', $request->type))
-            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
-            ->when($request->filled('year'), fn ($q) => $q->where('year', $request->year))
-            ->when($request->filled('search'), function ($q) use ($request) {
-                $q->where(function ($subQ) use ($request) {
-                    $subQ->where('title', 'ILIKE', "%{$request->search}%")
-                        ->orWhere('slug', 'ILIKE', "%{$request->search}%");
-                });
+ public function index(Request $request)
+{
+    $query = Anime::query()
+        ->with(['tags'])
+        ->when($request->filled('type'), function ($q) use ($request) {
+            $q->where('type', $request->type);
+        })
+        ->when($request->filled('status'), function ($q) use ($request) {
+            $q->where('status', $request->status);
+        })
+        ->when($request->filled('year'), function ($q) use ($request) {
+            $q->where('year', $request->year);
+        })
+        ->when($request->filled('search'), function ($q) use ($request) {
+            $q->where(function ($subQ) use ($request) {
+                $subQ->where('title', 'ILIKE', '%' . $request->search . '%')
+                    ->orWhere('slug', 'ILIKE', '%' . $request->search . '%');
             });
+        });
 
-        if ($request->has('sort')) {
-            $sortMap = [
-                'rating' => ['rating', 'DESC'],
-                'popularity' => ['popularity', 'DESC'],
-                'newest' => ['aired_from', 'DESC'],
-                'title' => ['title', 'ASC'],
-            ];
+    if ($request->filled('genre')) {
+        $genreSlug = $request->genre;
 
-            $sort = $sortMap[$request->sort] ?? ['id', 'ASC'];
-            $query->orderByRaw("{$sort[0]} {$sort[1]} NULLS LAST");
-        } else {
-            $query->orderBy('id', 'ASC');
-        }
-
-        $anime = $query->paginate(20);
-
-        return AnimeResource::collection($anime);
+        $query->whereHas('tags', function ($q) use ($genreSlug) {
+            $q->where('slug', $genreSlug);
+        });
     }
+
+    if ($request->has('sort')) {
+        $sortMap = [
+            'rating' => ['rating', 'DESC'],
+            'popularity' => ['popularity', 'DESC'],
+            'newest' => ['aired_from', 'DESC'],
+            'title' => ['title', 'ASC'],
+        ];
+
+        $sort = $sortMap[$request->sort] ?? ['id', 'ASC'];
+        $query->orderByRaw($sort[0] . ' ' . $sort[1] . ' NULLS LAST');
+    } else {
+        $query->orderBy('id', 'ASC');
+    }
+
+    $anime = $query->paginate(20);
+
+    return AnimeResource::collection($anime);
+}
+
 
     /**
      * Детальная информация об аниме
