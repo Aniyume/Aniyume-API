@@ -63,22 +63,22 @@ class UserProfileService
             ->count();
     }
 
-    private function getWatchTime(int $userId): array
-    {
-        $totalSeconds = WatchHistory::where('user_id', $userId)
-            ->sum('progress') ?? 0;
+  private function getWatchTime(int $userId): array
+{
+    $totalSeconds = WatchHistory::where('user_id', $userId)
+        ->sum('watch_time') ?? 0;
 
-        $days = floor($totalSeconds / 86400);
-        $hours = floor(($totalSeconds % 86400) / 3600);
-        $minutes = floor(($totalSeconds % 3600) / 60);
+    $days = floor($totalSeconds / 86400);
+    $hours = floor(($totalSeconds % 86400) / 3600);
+    $minutes = floor(($totalSeconds % 3600) / 60);
 
-        return [
-            'total_seconds' => $totalSeconds,
-            'days' => $days,
-            'hours' => $hours,
-            'minutes' => $minutes,
-        ];
-    }
+    return [
+        'total_seconds' => $totalSeconds,
+        'days' => $days,
+        'hours' => $hours,
+        'minutes' => $minutes,
+    ];
+}
 
     private function getWatchDynamics(int $userId, int $days): array
     {
