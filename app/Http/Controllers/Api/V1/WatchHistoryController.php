@@ -43,26 +43,28 @@ class WatchHistoryController extends Controller
      * @bodyParam completed boolean Флаг завершения. Example: false
      */
     public function store(UpdateWatchHistoryRequest $request): JsonResponse
-    {
-        $validated = $request->validated();
-        $userId = $request->user()->id;
-        $episode = Episode::findOrFail($validated['episode_id']);
+{
+    $validated = $request->validated();
+    $userId = $request->user()->id;
+    $episode = Episode::findOrFail($validated['episode_id']);
+    $watchHistory = WatchHistory::updateOrCreate(
+        ['user_id' => $userId, 'episode_id' => $validated['episode_id']],
+        [
+            'anime_id'   => $episode->anime_id,
+            'completed'  => $validated['completed'] ?? false,
+            'watched_at' => now(),
+        ]
+    );
+    $watchHistory->increment('watch_time', $validated['delta_time'], [
+        'progress' => $validated['progress']
+    ]);
 
-        $watchHistory = WatchHistory::updateOrCreate(
-            ['user_id' => $userId, 'episode_id' => $validated['episode_id']],
-            [
-                'anime_id' => $episode->anime_id,
-                'progress' => $validated['progress'] ?? 0,
-                'completed' => $validated['completed'] ?? false,
-                'watched_at' => now(),
-            ]
-        );
-
-        return response()->json([
-            'message' => 'Watch history recorded',
-            'data' => $watchHistory,
-        ], 201);
-    }
+    return response()->json([
+        'message' => 'Time recorded',
+        'total_playtime' => $watchHistory->watch_time,
+        'progress' => $watchHistory->progress
+    ], 200);
+}
 
     /**
      * Детали записи истории

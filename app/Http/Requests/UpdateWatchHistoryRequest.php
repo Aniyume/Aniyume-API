@@ -16,6 +16,7 @@ class UpdateWatchHistoryRequest extends FormRequest
         return [
             'episode_id' => 'required|exists:episodes,id',
             'progress' => 'required|integer|min:0',
+            'delta_time' => 'required|integer|min:0|max:300',
             'completed' => 'sometimes|boolean',
         ];
     }
