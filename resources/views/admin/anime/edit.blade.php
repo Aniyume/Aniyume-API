@@ -93,12 +93,18 @@
         .btn { width: 100%; justify-content: center; }
         .form-actions { flex-direction: column-reverse; }
     }
+      .error-msg { color: #ff4d4d; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; margin-top: 5px; display: block; }
 </style>
 
 <div class="page-header">
     <h1 class="page-title">{{ isset($anime) ? 'Правка' : 'Новый' }} <span>Релиз</span></h1>
     @if(isset($anime)) <span class="subtitle">{{ $anime->title }}</span> @endif
 </div>
+@if ($errors->any())
+    <div style="background: rgba(255,77,77,0.1); border: 1px solid #ff4d4d; padding: 1rem; border-radius: 14px; margin-bottom: 2rem; color: #ff4d4d; font-weight: bold;">
+        Исправьте ошибки в форме перед сохранением.
+    </div>
+@endif
 
 <div class="form-container">
     <form action="{{ isset($anime) ? route('admin.anime.update', $anime->id) : route('admin.anime.store') }}" method="POST">
@@ -109,39 +115,49 @@
             <div class="form-group full">
                 <label class="form-label"><i data-lucide="type"></i> Название релиза</label>
                 <input type="text" name="title" value="{{ old('title', $anime->title ?? '') }}" required class="form-input" placeholder="Введите название...">
+                @error('title') <span class="error-msg">{{ $message }}</span> @enderror
             </div>
 
             <div class="form-group full">
                 <label class="form-label"><i data-lucide="align-left"></i> Описание сюжета</label>
                 <textarea name="description" class="form-textarea" placeholder="О чем это аниме...">{{ old('description', $anime->description ?? '') }}</textarea>
+                @error('description') <span class="error-msg">{{ $message }}</span> @enderror
             </div>
 
             <div class="form-group">
                 <label class="form-label"><i data-lucide="image"></i> Ссылка на постер</label>
                 <input type="url" name="poster_url" value="{{ old('poster_url', $anime->poster_url ?? '') }}" class="form-input" placeholder="https://...">
+                @error('poster_url') <span class="error-msg">{{ $message }}</span> @enderror
             </div>
 
             <div class="form-group">
                 <label class="form-label"><i data-lucide="star"></i> Рейтинг</label>
                 <input type="number" name="rating" step="0.1" value="{{ old('rating', $anime->rating ?? '') }}" class="form-input" placeholder="8.5">
+                @error('rating') <span class="error-msg">{{ $message }}</span> @enderror
             </div>
 
             <div class="form-group">
                 <label class="form-label"><i data-lucide="activity"></i> Статус</label>
                 <select name="status" class="form-select">
-                    <option value="planned" {{ (isset($anime) && $anime->status == 'planned') ? 'selected' : '' }}>Планируется</option>
-                    <option value="ongoing" {{ (isset($anime) && $anime->status == 'ongoing') ? 'selected' : '' }}>Выходит</option>
-                    <option value="finished" {{ (isset($anime) && $anime->status == 'finished') ? 'selected' : '' }}>Завершено</option>
+                    <option value="planned" {{ old('status', $anime->status ?? '') == 'planned' ? 'selected' : '' }}>Планируется</option>
+                    <option value="ongoing" {{ old('status', $anime->status ?? '') == 'ongoing' ? 'selected' : '' }}>Выходит</option>
+                    <option value="finished" {{ old('status', $anime->status ?? '') == 'finished' ? 'selected' : '' }}>Завершено</option>
+                    <option value="paused" {{ old('status', $anime->status ?? '') == 'paused' ? 'selected' : '' }}>На паузе</option>
                 </select>
+                @error('status') <span class="error-msg">{{ $message }}</span> @enderror
             </div>
 
             <div class="form-group">
                 <label class="form-label"><i data-lucide="monitor"></i> Тип</label>
                 <select name="type" class="form-select">
-                    <option value="tv" {{ (isset($anime) && $anime->type == 'tv') ? 'selected' : '' }}>TV Сериал</option>
-                    <option value="movie" {{ (isset($anime) && $anime->type == 'movie') ? 'selected' : '' }}>Фильм</option>
-                    <option value="ova" {{ (isset($anime) && $anime->type == 'ova') ? 'selected' : '' }}>OVA</option>
+                    <option value="tv" {{ old('type', $anime->type ?? '') == 'tv' ? 'selected' : '' }}>TV Сериал</option>
+                    <option value="movie" {{ old('type', $anime->type ?? '') == 'movie' ? 'selected' : '' }}>Фильм</option>
+                    <option value="ova" {{ old('type', $anime->type ?? '') == 'ova' ? 'selected' : '' }}>OVA</option>
+                    <option value="ona" {{ old('type', $anime->type ?? '') == 'ona' ? 'selected' : '' }}>ONA</option>
+                    <option value="special" {{ old('type', $anime->type ?? '') == 'special' ? 'selected' : '' }}>Спешл</option>
+                    <option value="music" {{ old('type', $anime->type ?? '') == 'music' ? 'selected' : '' }}>Клип</option>
                 </select>
+                @error('type') <span class="error-msg">{{ $message }}</span> @enderror
             </div>
         </div>
 
@@ -149,7 +165,7 @@
         <div class="form-grid">
             <div class="form-group full">
                 <div class="checkbox-group">
-                    <input type="checkbox" name="nsfw_flag" value="1" id="nsfw" {{ (isset($anime) && $anime->nsfw_flag) ? 'checked' : '' }}>
+                    <input type="checkbox" name="nsfw_flag" value="1" id="nsfw" {{ old('nsfw_flag', $anime->nsfw_flag ?? false) ? 'checked' : '' }}>
                     <label for="nsfw">NSFW / Контент для взрослых (18+)</label>
                 </div>
             </div>
@@ -161,7 +177,7 @@
                 @foreach($tags as $tag)
                 <div class="tag-checkbox">
                     <input type="checkbox" name="tags[]" value="{{ $tag->id }}" id="tag_{{ $tag->id }}"
-                        {{ (isset($anime) && in_array($tag->id, old('tags', $anime->tags->pluck('id')->toArray()))) ? 'checked' : '' }}>
+                        {{ in_array($tag->id, old('tags', isset($anime) ? $anime->tags->pluck('id')->toArray() : [])) ? 'checked' : '' }}>
                     <label for="tag_{{ $tag->id }}">{{ $tag->name }}</label>
                 </div>
                 @endforeach
