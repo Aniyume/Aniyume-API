@@ -99,10 +99,7 @@
 <div class="page-header">
     <h1 class="page-title">Эпизоды <span>Менеджер</span></h1>
     <div class="btn-group">
-        <form action="{{ route('admin.episodes.import-all') }}" method="POST">
-            @csrf
-            <button type="submit" class="btn-main"><i data-lucide="refresh-cw"></i> Обновить базу серий</button>
-        </form>
+
     </div>
 </div>
 

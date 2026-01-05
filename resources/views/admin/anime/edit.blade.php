@@ -6,7 +6,10 @@
         from { opacity: 0; transform: translateX(30px); }
         to { opacity: 1; transform: translateX(0); }
     }
-
+   @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
     .page-header { margin-bottom: 2.5rem; animation: slideInRight 0.5s ease; }
     .page-title { color: #FFF; font-weight: 900; font-size: clamp(1.5rem, 5vw, 2.5rem); text-transform: uppercase; letter-spacing: -0.05em; line-height: 1.1; }
     .page-title span { color: #2EC4B6; font-style: italic; }
@@ -17,7 +20,7 @@
         border: 1px solid rgba(255,255,255,0.05);
         border-radius: 24px;
         padding: clamp(1.5rem, 5vw, 3rem);
-        animation: fadeInUp 0.6s ease 0.1s forwards;
+         animation: fadeInUp 0.6s ease 0.1s forwards;
         opacity: 0;
     }
 
