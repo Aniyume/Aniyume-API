@@ -2,9 +2,15 @@
 @section('title', (isset($anime) ? 'Правка: ' . $anime->title : 'Новый релиз') . ' - AniYume Админ')
 @section('content')
 <style>
-    @keyframes slideInRight {
-        from { opacity: 0; transform: translateX(30px); }
-        to { opacity: 1; transform: translateX(0); }
+ @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
    @keyframes slideInRight {
         from { opacity: 0; transform: translateX(30px); }
