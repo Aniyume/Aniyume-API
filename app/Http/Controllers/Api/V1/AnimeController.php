@@ -80,11 +80,14 @@ class AnimeController extends Controller
      *
      * @urlParam anime integer ID аниме. Example: 3
      */
-    public function show(Anime $anime)
-    {
-        $anime->load(['tags', 'episodes']);
-        return new AnimeResource($anime);
-    }
+public function show(Anime $anime)
+{
+    $anime->load(['tags']);
+    $maxEpisode = \App\Models\Episode::where('anime_id', $anime->id)->max('episode_number');
+    $anime->episodes_count = $maxEpisode ?: 0;
+
+    return new \App\Http\Resources\Api\V1\AnimeResource($anime);
+}
 
     /**
      * Список эпизодов аниме

@@ -21,6 +21,7 @@ class AnimeResource extends JsonResource
             'status' => $this->status,
             'type' => $this->type,
             'number_of_episodes' => $this->number_of_episodes,
+            'episodes_count' => (int) ($this->episodes_count ?? 0),
             'aired_from' => $this->formatDate($this->aired_from),
             'aired_to' => $this->formatDate($this->aired_to),
             'nsfw_flag' => $this->nsfw_flag,

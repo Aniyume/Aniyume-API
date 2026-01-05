@@ -69,8 +69,12 @@ class EpisodeController extends Controller
      *
      * @urlParam anime integer ID аниме. Example: 3
      */
-    public function getByAnime(Anime $anime)
-    {
-        return response()->json(['data' => $anime->episodes]);
-    }
+  public function getByAnime(Anime $anime)
+{
+    $episodes = $anime->episodes()
+        ->orderBy('episode_number', 'asc')
+        ->get();
+
+    return response()->json(['data' => $episodes]);
+}
 }
