@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Domain\Moderation\ModerationMode;
+use App\Http\Rules\PassesModeration;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreCommentRequest extends FormRequest
@@ -15,7 +17,7 @@ class StoreCommentRequest extends FormRequest
     {
         return [
             'anime_id' => 'required|integer|exists:anime,id',
-            'comment' => 'required|string|min:3|max:1000',
+            'comment' => ['required', 'string', 'min:3', 'max:1000', new PassesModeration(ModerationMode::Medium)],
         ];
     }
 }

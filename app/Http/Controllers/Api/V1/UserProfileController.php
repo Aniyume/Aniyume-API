@@ -27,24 +27,6 @@ class UserProfileController extends Controller
     }
 
     /**
-     * Краткие данные профиля
-     */
-    public function show(Request $request): JsonResponse
-    {
-        $user = $request->user();
-        return response()->json([
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'avatar' => $user->avatar,
-            'bio' => $user->bio,
-            'custom_status' => $user->custom_status,
-            'created_at' => $user->created_at,
-            'updated_at' => $user->updated_at,
-        ]);
-    }
-
-    /**
      * Обновить профиль
      * @bodyParam name string Имя. Example: Ivan
      * @bodyParam bio string О себе. Example: Люблю меха и сенены.
@@ -64,6 +46,7 @@ class UserProfileController extends Controller
                 'avatar' => $updated->avatar,
                 'bio' => $updated->bio,
                 'custom_status' => $updated->custom_status,
+                'is_premium' => (bool)$updated->is_premium,
             ],
         ], 200);
     }

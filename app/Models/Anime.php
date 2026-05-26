@@ -3,16 +3,21 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Anime extends Model
 {
+    use HasFactory;
+
     protected $table = 'anime';
 
     protected $fillable = [
         'external_id',
+        'external_source',
         'shikimori_id',
+        'anilibria_id',
         'title',
         'slug',
         'title_en',
@@ -22,15 +27,18 @@ class Anime extends Model
         'cover_url',
         'type',
         'status',
-        'episodes_count',
+        'number_of_episodes',
         'duration',
-        'release_year',
+        'year',
         'aired_from',
         'aired_to',
         'rating',
         'popularity',
         'views_count',
         'favorites_count',
+        'nsfw_flag',
+        'favorites',
+        'score_count',
     ];
 
     protected $casts = [

@@ -18,6 +18,7 @@ class UserProfileService
                 'avatar' => $user->avatar,
                 'bio' => $user->bio,
                 'custom_status' => $user->custom_status,
+                'is_premium' => (bool)$user->is_premium,
                 'created_at' => $user->created_at,
             ],
             'stats' => $this->getAnimeStats($user->id),

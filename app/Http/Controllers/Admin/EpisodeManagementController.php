@@ -85,6 +85,26 @@ class EpisodeManagementController extends Controller
         return redirect()->back()->with('success', 'Mass import started');
     }
 
+    public function bulkImport(Request $request)
+    {
+        $data = $request->validate([
+            'anime_ids' => ['nullable', 'array'],
+            'anime_ids.*' => ['integer', 'exists:anime,id'],
+        ]);
+
+        $animeIds = $data['anime_ids'] ?? [];
+
+        if (empty($animeIds)) {
+            return $this->importAll($request);
+        }
+
+        foreach ($animeIds as $animeId) {
+            EpisodesImportJob::dispatch((int) $animeId, false);
+        }
+
+        return redirect()->back()->with('success', 'Bulk import started');
+    }
+
     public function destroy(Request $request, string $id)
     {
         $episode = Episode::findOrFail($id);

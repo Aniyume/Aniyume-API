@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Application\Actions\Ratings\DeleteRating;
+use App\Application\Actions\Ratings\UpsertRating;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreRatingRequest;
 use App\Http\Resources\Api\V1\RatingResource;
-use App\Models\Anime;
 use App\Models\Rating;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 /**
  * @group Рейтинги
@@ -43,35 +43,20 @@ class RatingsController extends Controller
      * @bodyParam anime_id integer required ID аниме. Example: 3
      * @bodyParam rating number required Оценка (1-5). Example: 4.5
      */
-    public function store(StoreRatingRequest $request): JsonResponse
+    public function store(StoreRatingRequest $request, UpsertRating $upsertRating): JsonResponse
     {
-        $userId = $request->user()->id;
-        $animeId = $request->validated('anime_id');
-        $ratingValue = $request->validated('rating');
-
-        DB::beginTransaction();
         try {
-            $rating = Rating::updateOrCreate(
-                ['user_id' => $userId, 'anime_id' => $animeId],
-                ['rating' => $ratingValue]
+            $rating = $upsertRating->handle(
+                $request->user()->id,
+                (int) $request->validated('anime_id'),
+                (float) $request->validated('rating')
             );
-
-            $anime = Anime::find($animeId);
-            $totalRatings = Rating::where('anime_id', $animeId)->count();
-            $sumRatings = Rating::where('anime_id', $animeId)->sum('rating');
-
-            $anime->update([
-                'rating' => $totalRatings > 0 ? round($sumRatings / $totalRatings, 2) : null,
-            ]);
-
-            DB::commit();
 
             return response()->json([
                 'message' => 'Rating added',
                 'data' => new RatingResource($rating->load('anime')),
             ], 201);
         } catch (\Exception $e) {
-            DB::rollBack();
             return response()->json(['message' => 'Failed to add rating'], 500);
         }
     }
@@ -80,29 +65,17 @@ class RatingsController extends Controller
      * Удалить оценку
      * @urlParam rating integer ID оценки. Example: 2
      */
-    public function destroy(Request $request, Rating $rating): JsonResponse
+    public function destroy(Request $request, Rating $rating, DeleteRating $deleteRating): JsonResponse
     {
         if ($rating->user_id !== $request->user()->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        DB::beginTransaction();
         try {
-            $animeId = $rating->anime_id;
-            $rating->delete();
+            $deleteRating->handle($rating);
 
-            $anime = Anime::find($animeId);
-            $totalRatings = Rating::where('anime_id', $animeId)->count();
-            $sumRatings = Rating::where('anime_id', $animeId)->sum('rating');
-
-            $anime->update([
-                'rating' => $totalRatings > 0 ? round($sumRatings / $totalRatings, 2) : null,
-            ]);
-
-            DB::commit();
             return response()->json(['message' => 'Rating deleted'], 200);
         } catch (\Exception $e) {
-            DB::rollBack();
             return response()->json(['message' => 'Failed to delete rating'], 500);
         }
     }

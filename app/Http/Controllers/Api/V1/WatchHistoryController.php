@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Application\Actions\WatchHistory\SyncWatchProgressAction;
+use App\Application\Queries\WatchHistoryQuery;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateWatchHistoryRequest;
-use App\Models\Episode;
-use App\Models\WatchHistory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -15,15 +15,18 @@ use Illuminate\Http\Request;
  */
 class WatchHistoryController extends Controller
 {
+    public function __construct(
+        private readonly WatchHistoryQuery $watchHistoryQuery,
+        private readonly SyncWatchProgressAction $syncWatchProgress,
+    ) {
+    }
+
     /**
      * Список истории
      */
     public function index(Request $request): JsonResponse
     {
-        $history = WatchHistory::where('user_id', $request->user()->id)
-            ->with(['episode', 'episode.anime', 'anime'])
-            ->orderByDesc('watched_at')
-            ->paginate(20);
+        $history = $this->watchHistoryQuery->paginatedForUser($request->user()->id);
 
         return response()->json([
             'data' => $history->items(),
@@ -43,28 +46,18 @@ class WatchHistoryController extends Controller
      * @bodyParam completed boolean Флаг завершения. Example: false
      */
     public function store(UpdateWatchHistoryRequest $request): JsonResponse
-{
-    $validated = $request->validated();
-    $userId = $request->user()->id;
-    $episode = Episode::findOrFail($validated['episode_id']);
-    $watchHistory = WatchHistory::updateOrCreate(
-        ['user_id' => $userId, 'episode_id' => $validated['episode_id']],
-        [
-            'anime_id'   => $episode->anime_id,
-            'completed'  => $validated['completed'] ?? false,
-            'watched_at' => now(),
-        ]
-    );
-    $watchHistory->increment('watch_time', $validated['delta_time'], [
-        'progress' => $validated['progress']
-    ]);
+    {
+        $watchHistory = $this->syncWatchProgress->execute(
+            $request->user()->id,
+            $request->validated()
+        );
 
-    return response()->json([
-        'message' => 'Time recorded',
-        'total_playtime' => $watchHistory->watch_time,
-        'progress' => $watchHistory->progress
-    ], 200);
-}
+        return response()->json([
+            'message' => 'Time recorded',
+            'total_playtime' => $watchHistory->watch_time,
+            'progress' => $watchHistory->progress,
+        ], 200);
+    }
 
     /**
      * Детали записи истории
@@ -72,10 +65,7 @@ class WatchHistoryController extends Controller
      */
     public function show(Request $request, $id): JsonResponse
     {
-        $watchHistory = WatchHistory::where('user_id', $request->user()->id)
-            ->where('id', $id)
-            ->with('episode', 'anime')
-            ->firstOrFail();
+        $watchHistory = $this->watchHistoryQuery->findForUser($request->user()->id, (int) $id);
 
         return response()->json($watchHistory);
     }
@@ -85,11 +75,10 @@ class WatchHistoryController extends Controller
      */
     public function destroy(Request $request, $id): JsonResponse
     {
-        $watchHistory = WatchHistory::where('user_id', $request->user()->id)
-            ->where('id', $id)
-            ->firstOrFail();
+        $watchHistory = $this->watchHistoryQuery->findForUser($request->user()->id, (int) $id);
 
-        $watchHistory->delete();
+        $watchHistory->deleteOrFail();
+
         return response()->json(['message' => 'Watch history removed'], 200);
     }
 
@@ -99,11 +88,7 @@ class WatchHistoryController extends Controller
      */
     public function getByAnime(Request $request, $animeId): JsonResponse
     {
-        $watchHistory = WatchHistory::where('user_id', $request->user()->id)
-            ->where('anime_id', $animeId)
-            ->with('episode')
-            ->orderByDesc('watched_at')
-            ->get();
+        $watchHistory = $this->watchHistoryQuery->forAnime($request->user()->id, (int) $animeId);
 
         if ($watchHistory->isEmpty()) {
             return response()->json([
@@ -132,11 +117,7 @@ class WatchHistoryController extends Controller
      */
     public function getLastWatchedEpisode(Request $request, $animeId): JsonResponse
     {
-        $lastWatched = WatchHistory::where('user_id', $request->user()->id)
-            ->where('anime_id', $animeId)
-            ->with('episode')
-            ->orderByDesc('watched_at')
-            ->first();
+        $lastWatched = $this->watchHistoryQuery->lastWatchedForAnime($request->user()->id, (int) $animeId);
 
         if (!$lastWatched) {
             return response()->json([

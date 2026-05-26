@@ -15,10 +15,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-    'avatar',
+        'avatar',
         'bio',
         'custom_status',
         'is_online',
+        'is_premium',
     ];
 
     protected $hidden = [
@@ -30,6 +31,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'is_online' => 'boolean',
+        'is_premium' => 'boolean',
     ];
 
     public function roles()
@@ -77,16 +79,6 @@ public function animeList()
         return $this->belongsToMany(User::class, 'friendships', 'friend_id', 'user_id')
             ->wherePivot('status', 'pending')
             ->withTimestamps();
-    }
-
-    public function videos()
-    {
-        return $this->hasMany(UserVideo::class);
-    }
-
-    public function collections()
-    {
-        return $this->hasMany(UserCollection::class);
     }
 
     public function hasRole(string $roleName): bool

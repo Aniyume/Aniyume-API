@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\V1\TagResource;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 
@@ -42,14 +41,4 @@ class TagController extends Controller
         ]);
     }
 
-    /**
-     * Детали тега
-     * @urlParam id integer ID тега. Example: 1
-     */
-    public function show($id)
-    {
-        $tag = Tag::findOrFail($id);
-
-        return new TagResource($tag);
-    }
 }

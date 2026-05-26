@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\ImportLog;
-use App\Services\AnilistImportService;
+use App\Services\ShikimoriImportService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -24,7 +24,7 @@ class ImportAnimeJob implements ShouldQueue
         public int $importLogId
     ) {}
 
-    public function handle(AnilistImportService $importService): void
+    public function handle(ShikimoriImportService $importService): void
     {
         $importLog = ImportLog::find($this->importLogId);
 

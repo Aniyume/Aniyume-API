@@ -8,11 +8,17 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (!Schema::hasTable('anime_user')) {
+            return;
+        }
+
         Schema::table('anime_user', function (Blueprint $table) {
-            $table->integer('episodes_watched')->default(0)->after('status');
-            $table->timestamp('last_watched_at')->nullable()->after('episodes_watched');
-            $table->index(['user_id', 'status']);
-            $table->index(['user_id', 'last_watched_at']);
+            if (!Schema::hasColumn('anime_user', 'episodes_watched')) {
+                $table->integer('episodes_watched')->default(0)->after('status');
+            }
+            if (!Schema::hasColumn('anime_user', 'last_watched_at')) {
+                $table->timestamp('last_watched_at')->nullable()->after('episodes_watched');
+            }
         });
 
         Schema::create('friendships', function (Blueprint $table) {
@@ -68,10 +74,19 @@ return new class extends Migration
         Schema::dropIfExists('user_videos');
         Schema::dropIfExists('friendships');
 
-        Schema::table('anime_user', function (Blueprint $table) {
-            $table->dropIndex(['user_id', 'status']);
-            $table->dropIndex(['user_id', 'last_watched_at']);
-            $table->dropColumn(['episodes_watched', 'last_watched_at']);
-        });
+        if (Schema::hasTable('anime_user')) {
+            Schema::table('anime_user', function (Blueprint $table) {
+                $columnsToDrop = [];
+                if (Schema::hasColumn('anime_user', 'episodes_watched')) {
+                    $columnsToDrop[] = 'episodes_watched';
+                }
+                if (Schema::hasColumn('anime_user', 'last_watched_at')) {
+                    $columnsToDrop[] = 'last_watched_at';
+                }
+                if (!empty($columnsToDrop)) {
+                    $table->dropColumn($columnsToDrop);
+                }
+            });
+        }
     }
 };

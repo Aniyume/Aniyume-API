@@ -32,14 +32,17 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $user = User::create([
+        $user = new User([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+        ]);
+        $user->forceFill([
             'is_active' => true,
         ]);
+        $user->save();
 
-        $userRole = Role::where('name', 'user')->first();
+        $userRole = Role::query()->where('name', '=', 'user', 'and')->first();
         if ($userRole) {
             $user->roles()->attach($userRole->id);
         }
@@ -68,7 +71,7 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        $user = User::where('email', $validated['email'])->first();
+        $user = User::query()->where('email', '=', $validated['email'], 'and')->first();
 
         if (! $user || ! Hash::check($validated['password'], $user->password)) {
             throw ValidationException::withMessages([
@@ -80,10 +83,10 @@ class AuthController extends Controller
             return response()->json(['message' => 'Аккаунт деактивирован.'], 403);
         }
 
-        $user->update([
+        $user->forceFill([
             'last_login_at' => now(),
             'last_login_ip' => $request->ip(),
-        ]);
+        ])->save();
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -104,9 +107,15 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
+        $user = $request->user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
         return response()->json([
             'status' => 'success',
-            'data' => $request->user()->load('roles'),
+            'data' => $user->load('roles'),
         ]);
     }
 
@@ -118,7 +127,17 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        $user = $request->user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        $token = $user->currentAccessToken();
+
+        if ($token !== null) {
+            $user->tokens()->where('id', '=', $token->id, 'and')->delete();
+        }
 
         return response()->json(['status' => 'success']);
     }

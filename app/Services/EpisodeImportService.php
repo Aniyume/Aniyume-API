@@ -4,51 +4,123 @@ namespace App\Services;
 
 use App\Models\Anime;
 use App\Models\Episode;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class EpisodeImportService
 {
-    protected string $kodikUrl = 'https://kodikapi.com/search';
-
-    protected ?string $kodikToken;
-
-    protected string $anilibriaUrl = 'https://api.anilibria.tv/v3/title';
-
     public int $processed = 0;
-
     public int $created = 0;
-
     public int $updated = 0;
-
     public int $skipped = 0;
-
     public int $errors = 0;
 
     protected float $startTime;
+    protected bool $anilibriaEnabled = true;
+    protected bool $kodikEnabled = true;
+    protected bool $onlyMissing = false;
 
-    public function __construct()
+    protected VideoCdnService $videoCdnService;
+    protected AnilibriaService $anilibriaService;
+    protected KodikService $kodikService;
+
+    public function __construct(
+        VideoCdnService $videoCdnService,
+        AnilibriaService $anilibriaService,
+        KodikService $kodikService
+    ) {
+        $this->videoCdnService = $videoCdnService;
+        $this->anilibriaService = $anilibriaService;
+        $this->kodikService = $kodikService;
+    }
+
+    public function setAvailableSources(bool $anilibria, bool $kodik): void
     {
-        $this->kodikToken = config('services.kodik.token');
+        $this->anilibriaEnabled = $anilibria;
+        $this->kodikEnabled     = $kodik;
+    }
+
+    public function setOnlyMissing(bool $onlyMissing): void
+    {
+        $this->onlyMissing = $onlyMissing;
+    }
+
+    /**
+     * Reset (delete) episodes from the database.
+     * @return int Number of deleted episodes
+     */
+    public function resetEpisodes(?string $source = null): int
+    {
+        if ($source) {
+            return Episode::where('source', $source)->delete();
+        }
+
+        $count = Episode::count();
+        Episode::truncate();
+        return $count;
     }
 
     public function importForSingleAnime(Anime $anime, bool $update = false): void
     {
         try {
+            // Skip anime that already have episodes when --only-missing is set
+            if ($this->onlyMissing && $anime->episodes()->exists()) {
+                $this->skipped++;
+                $this->processed++;
+                return;
+            }
+
             $episodes = [];
 
-            if ($anime->shikimori_id) {
-                $episodes = $this->fetchFromKodikByShikimori($anime);
+            // PRIORITY 1: Anilibria (No ads, HLS, internal player)
+            if ($this->anilibriaEnabled) {
+                if ($anime->anilibria_id) {
+                    $episodes = $this->anilibriaService->getEpisodes((int) $anime->anilibria_id);
+                } else {
+                    $found = $this->anilibriaService->findByTitle($anime->title, $anime->title_en);
+                    if ($found) {
+                        $anime->update(['anilibria_id' => $found['id']]);
+                        $episodes = $this->anilibriaService->getEpisodes((int) $found['id']);
+                    }
+                }
             }
 
+            // PRIORITY 2: Kodik (Broad coverage, requires premium for no ads)
+            if ($this->kodikEnabled && empty($episodes)) {
+                $kodikData = $anime->shikimori_id
+                    ? $this->kodikService->searchByShikimoriId($anime->shikimori_id)
+                    : $this->kodikService->searchByTitle($anime->title);
+                if (!empty($kodikData)) {
+                    // To prevent franchise mish-mash (e.g. Naruto mixed with Boruto or Shippuden),
+                    // we must enforce that all processed Kodik translations belong to the exact same anime entity.
+                    $targetShikimoriId = $kodikData[0]['shikimori_id'] ?? null;
+                    $targetTitle = mb_strtolower(trim($kodikData[0]['title'] ?? $kodikData[0]['title_orig'] ?? ''));
+
+                    // Process ALL Kodik results (different translations/dubs) that belong to the SAME anime
+                    foreach ($kodikData as $kodikResult) {
+                        $currentShiki = $kodikResult['shikimori_id'] ?? null;
+                        $currentTitle = mb_strtolower(trim($kodikResult['title'] ?? $kodikResult['title_orig'] ?? ''));
+
+                        $isSameAnime = false;
+                        if ($targetShikimoriId && $currentShiki) {
+                            $isSameAnime = ((string)$currentShiki === (string)$targetShikimoriId);
+                        } else {
+                            $isSameAnime = ($currentTitle === $targetTitle);
+                        }
+
+                        if ($isSameAnime) {
+                            $kodikEpisodes = $this->formatKodikEpisodes($kodikResult);
+                            $episodes = array_merge($episodes, $kodikEpisodes);
+                        }
+                    }
+                }
+            }
+
+            // PRIORITY 3: VideoCDN (Last resort)
             if (empty($episodes)) {
-                $episodes = $this->fetchFromKodik($anime);
+                $episodes = $this->fetchFromVideoCdn($anime);
             }
 
-            if (empty($episodes)) {
-                $episodes = $this->fetchFromAniLibria($anime);
-            }
-
+            // Persistence
             if (empty($episodes)) {
                 $this->skipped++;
             } else {
@@ -58,26 +130,37 @@ class EpisodeImportService
             $this->processed++;
         } catch (\Throwable $e) {
             $this->errors++;
+            dump([
+                'anime_id' => $anime->id,
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => collect(explode("\n", $e->getTraceAsString()))->take(5)->toArray(),
+            ]);
             Log::error('Episode import error', [
                 'anime_id' => $anime->id,
                 'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
         }
     }
 
-    public function import(bool $update = false, ?int $limit = null): void
+    public function import(bool $update = false, ?int $limit = null, int $offset = 0): void
     {
         $this->startTime = microtime(true);
         $query = Anime::query();
+
+        if ($offset > 0) {
+            $query->offset($offset);
+        }
 
         if ($limit !== null) {
             $query->limit($limit);
         }
 
-        $total = $query->count();
         $processedLocal = 0;
 
-        $query->orderBy('id')->chunk(100, function ($animes) use (&$processedLocal, $update) {
+        $query->orderBy('id', 'asc')->chunk(100, function ($animes) use (&$processedLocal, $update) {
             foreach ($animes as $anime) {
                 $processedLocal++;
                 $this->importForSingleAnime($anime, $update);
@@ -87,117 +170,63 @@ class EpisodeImportService
         $this->printStats();
     }
 
-    protected function fetchFromKodikByShikimori(Anime $anime): array
+    protected function fetchFromVideoCdn(Anime $anime): array
     {
-        if (! $this->kodikToken || ! $anime->shikimori_id) {
-            return [];
+        if ($anime->shikimori_id) {
+            $episodes = $this->videoCdnService->getEpisodesByShikimoriId($anime->shikimori_id);
+            if (!empty($episodes)) return $episodes;
         }
 
-        $response = Http::timeout(30)
-            ->retry(3, 500)
-            ->get($this->kodikUrl, [
-                'token' => $this->kodikToken,
-                'shikimori_id' => $anime->shikimori_id,
-                'with_episodes' => 'true',
-                'with_material_data' => 'true',
-            ]);
-
-        if (! $response->ok()) {
-            return [];
-        }
-
-        $results = $response->json('results') ?? [];
-
-        return $this->parseKodikResults($results);
+        return $this->videoCdnService->getEpisodesByTitle($anime->title);
     }
-
-    protected function fetchFromKodik(Anime $anime): array
-    {
-        if (! $this->kodikToken) {
-            return [];
-        }
-
-        $title = $this->normalizeTitle($anime->title);
-
-        $response = Http::timeout(30)
-            ->retry(3, 500)
-            ->get($this->kodikUrl, [
-                'token' => $this->kodikToken,
-                'title' => $title,
-                'types' => 'anime,anime-serial',
-                'with_episodes' => 'true',
-                'limit' => 5,
-            ]);
-
-        if (! $response->ok()) {
-            return [];
-        }
-
-        $results = $response->json('results') ?? [];
-
-        return $this->parseKodikResults($results);
-    }
-
-    private function parseKodikResults(array $results): array
+    
+    protected function formatKodikEpisodes(array $animeData): array
     {
         $episodes = [];
-        foreach ($results as $result) {
-            if (! isset($result['seasons'])) {
-                continue;
-            }
+        $seasons = $animeData['seasons'] ?? [];
 
-            foreach ($result['seasons'] as $seasonNum => $seasonData) {
-                foreach ($seasonData['episodes'] as $epNum => $link) {
-                    $episodes[] = [
-                        'episode_number' => (int) $epNum,
-                        'season_number' => (int) $seasonNum,
-                        'title' => $result['material_data']['title'] ?? "Серия {$epNum}",
-                        'player_url' => $link,
-                        'external_id' => $result['id'],
-                        'source' => 'kodik',
-                        'translation_name' => $result['translation']['title'] ?? 'Unknown',
-                        'translation_type' => $result['translation']['type'] ?? 'voice',
-                        'quality' => $result['quality'] ?? '720p',
-                    ];
+        foreach ($seasons as $seasonNumber => $seasonData) {
+            $episodesData = $seasonData['episodes'] ?? [];
+            
+            foreach ($episodesData as $episodeNumber => $link) {
+                // Ensure HTTPS explicitly, as Next.js iframe requires it
+                if (str_starts_with($link, '//')) {
+                    $link = 'https:' . $link;
                 }
+                
+                $link = $this->kodikService->buildPlayerUrl($link);
+                
+                $episodes[] = [
+                    'episode_number' => (int) $episodeNumber,
+                    'season_number' => (int) $seasonNumber,
+                    'title' => $animeData['material_data']['title'] ?? "Серия {$episodeNumber}",
+                    'player_iframe' => "<iframe src=\"{$link}\" frameborder=\"0\" allowfullscreen></iframe>",
+                    'player_url' => $link, // Keep it for backwards compatibility and fallback
+                    'external_id' => $animeData['id'] ?? null,
+                    'source' => 'kodik',
+                    'translator' => cloneKodikTranslator($animeData['translation'] ?? []),
+                    'translation_type' => $animeData['translation']['type'] ?? 'voice',
+                    'quality' => 'auto',
+                    'priority' => 5, // Medium priority, lower than Anilibria but higher than VideoCdn
+                ];
             }
         }
-
-        return $episodes;
-    }
-
-    protected function fetchFromAniLibria(Anime $anime): array
-    {
-        $title = $this->normalizeTitle($anime->title);
-
-        $response = Http::timeout(20)
-            ->get($this->anilibriaUrl, [
-                'search' => $title,
-                'playlist_type' => 'object',
-            ]);
-
-        if (! $response->ok()) {
-            return [];
-        }
-
-        $data = $response->json();
-        if (! isset($data['player']['playlist'])) {
-            return [];
-        }
-
-        $episodes = [];
-        foreach ($data['player']['playlist'] as $item) {
-            $num = $item['episode'] ?? 0;
+        
+        // Sometimes kodik returns a movie with single link:
+        if (empty($episodes) && isset($animeData['link'])) {
+            $link = str_starts_with($animeData['link'], '//') ? 'https:' . $animeData['link'] : $animeData['link'];
             $episodes[] = [
-                'episode_number' => (int) $num,
+                'episode_number' => 1,
                 'season_number' => 1,
-                'title' => $item['name'] ?? "Серия {$num}",
-                'player_url' => $item['hls']['fhd'] ?? $item['hls']['hd'] ?? null,
-                'external_id' => $data['id'] ?? null,
-                'source' => 'anilibria',
-                'translation_name' => 'AniLibria',
-                'translation_type' => 'voice',
-                'quality' => 'hls',
+                'title' => $animeData['material_data']['title'] ?? "Фильм",
+                'player_iframe' => "<iframe src=\"{$link}\" frameborder=\"0\" allowfullscreen></iframe>",
+                'player_url' => $link,
+                'external_id' => $animeData['id'] ?? null,
+                'source' => 'kodik',
+                'translator' => cloneKodikTranslator($animeData['translation'] ?? []),
+                'translation_type' => $animeData['translation']['type'] ?? 'voice',
+                'quality' => 'auto',
+                'priority' => 5,
             ];
         }
 
@@ -209,12 +238,18 @@ class EpisodeImportService
         foreach ($episodes as $data) {
             try {
                 $episodeData = array_merge(['anime_id' => $anime->id], $data);
-                unset($episodeData['translation_name']);
 
-                $existing = Episode::where('anime_id', $anime->id)
-                    ->where('episode_number', $data['episode_number'])
-                    ->where('translator', $data['translation_name'] ?? 'Unknown')
-                    ->first();
+                // Use robust matching: source + episode_number + translator
+                $existingQuery = Episode::where('anime_id', $anime->id)
+                    ->where('episode_number', $data['episode_number']);
+                    
+                if (isset($data['translator'])) {
+                    $existingQuery->where('translator', $data['translator']);
+                } elseif (isset($data['translation_name'])) {
+                    $existingQuery->where('translator', $data['translation_name']);
+                }
+
+                $existing = $existingQuery->first();
 
                 if ($existing) {
                     if ($update) {
@@ -244,6 +279,10 @@ class EpisodeImportService
     protected function printStats(): void
     {
         $duration = round(microtime(true) - $this->startTime, 2);
-        Log::info("Import stats: Processed: {$this->processed}, Created: {$this->created}, Updated: {$this->updated}, Duration: {$duration}s");
+        Log::info("Import stats: Processed: {$this->processed}, Created: {$this->created}, Updated: {$this->updated}, Skipped: {$this->skipped}, Duration: {$duration}s");
     }
+}
+
+function cloneKodikTranslator($t) {
+    return $t['title'] ?? 'Kodik';
 }

@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Application\Actions\UserAnimeList\UpdateAnimeStatusAction;
+use App\Application\Actions\UserAnimeList\UpdateEpisodesWatchedAction;
+use App\Application\Queries\UserAnimeListQuery;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateAnimeStatusRequest;
 use Illuminate\Http\JsonResponse;
@@ -15,6 +18,13 @@ use Illuminate\Http\Request;
  */
 class UserAnimeListController extends Controller
 {
+    public function __construct(
+        private readonly UserAnimeListQuery $userAnimeListQuery,
+        private readonly UpdateAnimeStatusAction $updateAnimeStatus,
+        private readonly UpdateEpisodesWatchedAction $updateEpisodesWatched,
+    ) {
+    }
+
     /**
      * Получить мой список аниме
      *
@@ -25,18 +35,8 @@ class UserAnimeListController extends Controller
     public function getList(Request $request, ?string $status = null): JsonResponse
     {
         $user = $request->user();
-        $perPage = $request->get('per_page', 100);
-
-        $query = $user->animeList();
-
-        if ($status && $status !== 'all') {
-            $validStatuses = ['watching', 'planned', 'completed', 'on_hold', 'dropped'];
-            if (in_array($status, $validStatuses)) {
-                $query->wherePivot('status', $status);
-            }
-        }
-
-        $anime = $query->paginate($perPage);
+        $perPage = (int) $request->get('per_page', 100);
+        $anime = $this->userAnimeListQuery->paginated($user, $status, $perPage);
 
         $data = $anime->getCollection()->map(function ($item) {
             return [
@@ -65,23 +65,7 @@ class UserAnimeListController extends Controller
      */
     public function getUserStatus(Request $request, int $anime): JsonResponse
     {
-        $user = $request->user();
-
-        $userAnime = $user->animeList()
-            ->where('anime_id', $anime)
-            ->first();
-
-        if (!$userAnime) {
-            return response()->json([
-                'status' => 'not_watching',
-                'episodes_watched' => 0,
-            ]);
-        }
-
-        return response()->json([
-            'status' => $userAnime->pivot->status,
-            'episodes_watched' => $userAnime->pivot->episodes_watched,
-        ]);
+        return response()->json($this->userAnimeListQuery->statusForAnime($request->user(), $anime));
     }
 
     /**
@@ -91,27 +75,11 @@ class UserAnimeListController extends Controller
      */
     public function updateStatus(UpdateAnimeStatusRequest $request, int $anime): JsonResponse
     {
-        $user = $request->user();
-        $status = $request->input('status');
-
-        if ($status === 'not_watching') {
-            $user->animeList()->detach($anime);
-            return response()->json([
-                'message' => 'Anime removed from list',
-                'status' => 'not_watching',
-            ]);
-        }
-
-        $user->animeList()->syncWithoutDetaching([
-            $anime => [
-                'status' => $status,
-            ],
-        ]);
-
-        return response()->json([
-            'message' => 'Status updated',
-            'status' => $status,
-        ]);
+        return response()->json($this->updateAnimeStatus->execute(
+            $request->user(),
+            $anime,
+            $request->input('status')
+        ));
     }
 
     /**
@@ -121,8 +89,6 @@ class UserAnimeListController extends Controller
      */
     public function updateEpisodesWatched(Request $request, int $anime, int $episodesWatched): JsonResponse
     {
-        $user = $request->user();
-
         if ($episodesWatched < 0) {
             return response()->json([
                 'message' => 'Validation failed',
@@ -132,17 +98,9 @@ class UserAnimeListController extends Controller
             ], 422);
         }
 
-        $userAnime = $user->animeList()
-            ->where('anime_id', $anime)
-            ->first();
-
-        if (!$userAnime) {
+        if (! $this->updateEpisodesWatched->execute($request->user(), $anime, $episodesWatched)) {
             return response()->json(['message' => 'Anime not in list'], 404);
         }
-
-        $user->animeList()->updateExistingPivot($anime, [
-            'episodes_watched' => $episodesWatched,
-        ]);
 
         return response()->json([
             'message' => 'Episodes watched updated',

@@ -8,19 +8,27 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (!Schema::hasTable('watch_history')) {
+            return;
+        }
+
         Schema::table('watch_history', function (Blueprint $table) {
-            $table->unsignedInteger('watch_time')->default(0)->after('progress');
-            $table->dropIndex(['user_id', 'episode_id']);
-            $table->unique(['user_id', 'episode_id']);
+            if (!Schema::hasColumn('watch_history', 'watch_time')) {
+                $table->unsignedInteger('watch_time')->default(0)->after('progress');
+            }
         });
     }
 
     public function down(): void
     {
+        if (!Schema::hasTable('watch_history')) {
+            return;
+        }
+
         Schema::table('watch_history', function (Blueprint $table) {
-            $table->dropUnique(['user_id', 'episode_id']);
-            $table->index(['user_id', 'episode_id']);
-            $table->dropColumn('watch_time');
+            if (Schema::hasColumn('watch_history', 'watch_time')) {
+                $table->dropColumn('watch_time');
+            }
         });
     }
 };

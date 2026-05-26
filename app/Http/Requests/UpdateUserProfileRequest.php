@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Domain\Moderation\ModerationMode;
+use App\Http\Rules\PassesModeration;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateUserProfileRequest extends FormRequest
@@ -14,9 +16,9 @@ class UpdateUserProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|string|max:255',
-            'bio' => 'nullable|string|max:500',
-            'custom_status' => 'nullable|string|max:100',
+            'name' => ['sometimes', 'string', 'max:255', new PassesModeration(ModerationMode::Soft)],
+            'bio' => ['nullable', 'string', 'max:500', new PassesModeration(ModerationMode::Medium)],
+            'custom_status' => ['nullable', 'string', 'max:100', new PassesModeration(ModerationMode::Medium)],
         ];
     }
 

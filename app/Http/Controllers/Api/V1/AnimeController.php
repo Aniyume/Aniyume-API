@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\AnimeResource;
-use App\Http\Resources\EpisodeResource;
 use App\Models\Anime;
 use App\Models\Episode;
+use App\Services\BannerService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @group Публичные данные
@@ -22,29 +24,42 @@ class AnimeController extends Controller
      * Получение списка всех аниме с фильтрацией и поиском.
      *
      * @queryParam type string Тип аниме (tv, movie, etc). Example: tv
-     * @queryParam status string Статус (finished, releasing). Example: finished
+     * @queryParam status string Статус (planned, ongoing, finished, paused). Example: finished
      * @queryParam year integer Год выпуска. Example: 2023
      * @queryParam search string Поиск по названию или слагу. Example: Attack
      * @queryParam sort string Сортировка (rating, popularity, newest, title). Example: rating
      */
     public function index(Request $request)
     {
+        if ($request->has('is_schedule')) {
+            return app(\App\Http\Controllers\Api\V1\ScheduleController::class)->index();
+        }
+
         $query = Anime::query()
-            ->has('episodes')
             ->with(['tags'])
+            ->withCount('episodes')
             ->when($request->filled('type'), function ($q) use ($request) {
                 $q->where('type', $request->type);
             })
             ->when($request->filled('status'), function ($q) use ($request) {
-                $q->where('status', $request->status);
+                $statusAliases = [
+                    'releasing' => 'ongoing',
+                    'upcoming' => 'planned',
+                    'anons' => 'planned',
+                ];
+                $status = $statusAliases[$request->status] ?? $request->status;
+
+                $q->where('status', $status);
             })
             ->when($request->filled('year'), function ($q) use ($request) {
                 $q->where('year', $request->year);
             })
             ->when($request->filled('search'), function ($q) use ($request) {
-                $q->where(function ($subQ) use ($request) {
-                    $subQ->where('title', 'ILIKE', '%' . $request->search . '%')
-                        ->orWhere('slug', 'ILIKE', '%' . $request->search . '%');
+                $search = '%' . mb_strtolower((string) $request->search) . '%';
+
+                $q->where(function ($subQ) use ($search) {
+                    $subQ->whereRaw('LOWER(title) LIKE ?', [$search])
+                        ->orWhereRaw('LOWER(slug) LIKE ?', [$search]);
                 });
             });
 
@@ -56,7 +71,28 @@ class AnimeController extends Controller
             });
         }
 
-        if ($request->has('sort')) {
+        $sort = $request->sort;
+        if (!$sort || $sort === 'smart') {
+            // Улучшенная умная сортировка
+            // 1. Приоритет тем, у кого есть серии в базе
+            $query->orderByRaw('CASE WHEN (SELECT count(*) FROM episodes WHERE episodes.anime_id = anime.id) > 0 THEN 0 ELSE 1 END');
+            
+            // 2. Деприоритет тега "Детское" (чтобы китайские мультики не лезли в начало)
+            $query->orderByRaw('CASE WHEN EXISTS (
+                SELECT 1 FROM anime_tag 
+                JOIN tags ON tags.id = anime_tag.tag_id 
+                WHERE anime_tag.anime_id = anime.id AND tags.name = \'Детское\'
+            ) THEN 1 ELSE 0 END');
+
+            // 3. Приоритет тем, у кого есть хоть какой-то рейтинг или популярность (отсеиваем ноунейм импорты)
+            $query->orderByRaw('CASE WHEN (popularity > 0 OR rating > 0) THEN 0 ELSE 1 END');
+
+            // 4. Сначала свежие годы, но в рамках одного года — популярные
+            $query->orderBy('year', 'DESC')
+                  ->orderBy('popularity', 'DESC')
+                  ->orderBy('rating', 'DESC')
+                  ->orderBy('id', 'DESC');
+        } else {
             $sortMap = [
                 'rating' => ['rating', 'DESC'],
                 'popularity' => ['popularity', 'DESC'],
@@ -64,13 +100,14 @@ class AnimeController extends Controller
                 'title' => ['title', 'ASC'],
             ];
 
-            $sort = $sortMap[$request->sort] ?? ['id', 'ASC'];
-            $query->orderByRaw($sort[0] . ' ' . $sort[1] . ' NULLS LAST');
-        } else {
-            $query->orderBy('id', 'ASC');
+            $s = $sortMap[$sort] ?? ['id', 'ASC'];
+            $query->orderByRaw($s[0] . ' ' . $s[1] . ' NULLS LAST');
         }
 
-        $anime = $query->paginate(20);
+        $perPage = (int) $request->integer('per_page', 20);
+        $perPage = max(1, min($perPage, 100));
+
+        $anime = $query->paginate($perPage);
 
         return AnimeResource::collection($anime);
     }
@@ -83,83 +120,11 @@ class AnimeController extends Controller
 public function show(Anime $anime)
 {
     $anime->load(['tags']);
-    $maxEpisode = \App\Models\Episode::where('anime_id', $anime->id)->max('episode_number');
+    $maxEpisode = Episode::query()->where('anime_id', '=', $anime->id)->max('episode_number');
     $anime->episodes_count = $maxEpisode ?: 0;
 
-    return new \App\Http\Resources\Api\V1\AnimeResource($anime);
+    return new AnimeResource($anime);
 }
-
-    /**
-     * Список эпизодов аниме
-     *
-     * @urlParam anime integer ID аниме. Example: 3
-     */
-    public function episodes(Anime $anime)
-    {
-        $episodes = $anime->episodes()
-            ->orderBy('season_number')
-            ->orderBy('episode_number')
-            ->paginate(50);
-
-        return EpisodeResource::collection($episodes);
-    }
-
-    /**
-     * Информация о конкретном эпизоде
-     *
-     * @urlParam anime integer ID аниме. Example: 3
-     * @urlParam episode integer ID эпизода. Example: 550
-     */
-    public function episode(Anime $anime, Episode $episode)
-    {
-        if ($episode->anime_id !== $anime->id) {
-            abort(404);
-        }
-
-        return new EpisodeResource($episode);
-    }
-
-    /**
-     * Поиск аниме (алиас списка)
-     */
-    public function search(Request $request)
-    {
-        return $this->index($request);
-    }
-
-    /**
-     * Обновить статус просмотра
-     *
-     * Изменяет статус аниме в списке пользователя (требуется авторизация).
-     *
-     * @authenticated
-     * @urlParam anime integer ID аниме. Example: 3
-     * @bodyParam status string required Статус (watching, planned, completed, on_hold, dropped). Example: watching
-     */
-    public function updateStatus(Request $request, Anime $anime)
-    {
-        $user = $request->user();
-        $status = $request->input('status');
-        $validStatuses = ['watching', 'planned', 'completed', 'on_hold', 'dropped'];
-
-        if ($status && !in_array($status, $validStatuses)) {
-            return response()->json(['error' => 'Invalid status'], 422);
-        }
-
-        try {
-            if ($status === null) {
-                $user->animes()->detach($anime->id);
-            } else {
-                $user->animes()->syncWithoutDetaching([
-                    $anime->id => ['status' => $status, 'updated_at' => now()],
-                ]);
-            }
-
-            return response()->json(['success' => true, 'status' => $status]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
-    }
 
     /**
      * Статистика сообщества
@@ -172,21 +137,142 @@ public function show(Anime $anime)
     }
 
     /**
-     * Статус аниме у текущего пользователя
+     * Получение баннера из AniList
      *
-     * @authenticated
+     * Возвращает баннер и обложку (из кеша или API).
      */
-    public function getUserStatus(Request $request, Anime $anime)
+    public function getBanner(Anime $anime, BannerService $bannerService)
     {
-        $user = $request->user();
-        $pivot = \DB::table('anime_user')
-            ->where('user_id', $user->id)
-            ->where('anime_id', $anime->id)
-            ->first();
+        $result = $bannerService->getBanner($anime);
+
+        return response()->json($result);
+    }
+
+    /**
+     * Рекомендации для аниме
+     *
+     * Возвращает связанные (сиквелы/приквелы) и похожие по жанрам аниме.
+     *
+     * @group Публичные данные
+     * @urlParam anime integer ID аниме. Example: 3
+     * @response { "has_official_related": true, "related": [...], "similar": [...] }
+     */
+    public function getRecommendations(Anime $anime)
+    {
+        $related = [];
+        $hasOfficialRelated = false;
+
+        // 1. Try to get related anime from Shikimori API
+        if ($anime->shikimori_id) {
+            try {
+                $response = Http::timeout(5)
+                    ->withHeaders(['User-Agent' => 'Aniyume/1.0'])
+                    ->get("https://shikimori.one/api/animes/{$anime->shikimori_id}/related");
+
+                if ($response->successful()) {
+                    $relatedData = collect($response->json())
+                        ->filter(fn($item) => !empty($item['anime']))
+                        ->values();
+
+                    $shikimoriIds = $relatedData
+                        ->map(fn($item) => (int) $item['anime']['id'])
+                        ->toArray();
+
+                    if (!empty($shikimoriIds)) {
+                        $relationType = [];
+                        foreach ($relatedData as $item) {
+                            $relationType[(int) $item['anime']['id']] = $item['relation'] ?? null;
+                        }
+
+                        $foundAnime = Anime::query()->whereIn('shikimori_id', $shikimoriIds, 'and', false)
+                            ->limit(10)
+                            ->get();
+
+                        $related = $foundAnime->map(function ($a) use ($relationType) {
+                            return [
+                                'id'            => $a->id,
+                                'title'         => $a->title,
+                                'poster_url'    => $a->poster_url,
+                                'type'          => $a->type,
+                                'rating'        => $a->rating,
+                                'year'          => $a->year,
+                                'relation_type' => $relationType[(int) $a->shikimori_id] ?? null,
+                            ];
+                        })->toArray();
+
+                        if (!empty($related)) {
+                            $hasOfficialRelated = true;
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                $related = [];
+            }
+        }
+
+        // 2. Get current anime tag IDs
+        $tagIds = $anime->tags()->pluck('tags.id')->toArray();
+
+        // 3. Exclude IDs
+        $excludeIds = array_merge(
+            [$anime->id],
+            array_column($related, 'id')
+        );
+
+        // 4. Similar by tags
+        $similar = [];
+        if (!empty($tagIds)) {
+            $similar = $this->getSimilarByTags($tagIds, $excludeIds, 5, 0);
+        }
+
+        // 5. Fallback: if related is empty, fill both from tags
+        if (empty($related)) {
+            $hasOfficialRelated = false;
+            if (!empty($tagIds)) {
+                $allByTags = $this->getSimilarByTags($tagIds, [$anime->id], 10, 0);
+                $related = array_slice($allByTags, 0, 5);
+                $similar = array_slice($allByTags, 5, 5);
+            }
+        }
 
         return response()->json([
-            'status' => $pivot?->status,
-            'found' => $pivot !== null,
+            'has_official_related' => $hasOfficialRelated,
+            'related' => $related,
+            'similar' => $similar,
         ]);
+    }
+
+    /**
+     * Find anime with most matching tags via SQL JOIN + GROUP BY.
+     */
+    private function getSimilarByTags(array $tagIds, array $excludeIds, int $limit, int $offset): array
+    {
+        $animeRows = DB::table('anime')
+            ->join('anime_tag', 'anime.id', '=', 'anime_tag.anime_id')
+            ->whereIn('anime_tag.tag_id', $tagIds)
+            ->whereNotIn('anime.id', $excludeIds)
+            ->groupBy('anime.id')
+            ->orderByRaw('COUNT(*) DESC')
+            ->offset($offset)
+            ->limit($limit)
+            ->select('anime.id')
+            ->pluck('id');
+
+        if ($animeRows->isEmpty()) {
+            return [];
+        }
+
+        return Anime::query()->whereIn('id', $animeRows->all(), 'and', false)
+            ->get()
+            ->map(fn($a) => [
+                'id'            => $a->id,
+                'title'         => $a->title,
+                'poster_url'    => $a->poster_url,
+                'type'          => $a->type,
+                'rating'        => $a->rating,
+                'year'          => $a->year,
+                'relation_type' => null,
+            ])
+            ->toArray();
     }
 }

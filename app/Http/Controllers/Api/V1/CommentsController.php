@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Application\Actions\Comments\CreateComment;
+use App\Application\Actions\Comments\DeleteComment;
+use App\Application\Actions\Comments\UpdateComment;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
 use App\Http\Resources\Api\V1\CommentResource;
-use App\Models\Comment;
 use App\Models\Anime;
+use App\Models\Comment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 /**
  * @group Комментарии
@@ -40,26 +41,17 @@ class CommentsController extends Controller
      * @bodyParam anime_id integer required ID аниме. Example: 3
      * @bodyParam comment string required Текст комментария (3-1000 симв). Example: Очень крутая серия!
      */
-    public function store(StoreCommentRequest $request)
+    public function store(StoreCommentRequest $request, CreateComment $createComment)
     {
-        DB::beginTransaction();
         try {
-            $comment = Comment::create([
-                'user_id' => $request->user()->id,
-                'anime_id' => $request->validated('anime_id'),
-                'comment' => $request->validated('comment'),
-                'is_approved' => true,
-            ]);
+            $comment = $createComment->handle(
+                $request->user()->id,
+                (int) $request->validated('anime_id'),
+                (string) $request->validated('comment')
+            );
 
-            $anime = Anime::find($request->validated('anime_id'));
-            if ($anime && Schema::hasColumn('anime', 'comments_count')) {
-                $anime->increment('comments_count');
-            }
-
-            DB::commit();
             return new CommentResource($comment->load('user'));
         } catch (\Exception $e) {
-            DB::rollBack();
             return response()->json(['message' => 'Error'], 500);
         }
     }
@@ -70,7 +62,7 @@ class CommentsController extends Controller
      * @urlParam id integer ID комментария. Example: 4
      * @bodyParam comment string required Новый текст комментария. Example: Изменил свое мнение, 10/10!
      */
-    public function update(UpdateCommentRequest $request, $id)
+    public function update(UpdateCommentRequest $request, $id, UpdateComment $updateComment)
     {
         $comment = Comment::findOrFail($id);
 
@@ -78,9 +70,7 @@ class CommentsController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $comment->update([
-            'comment' => $request->validated('comment')
-        ]);
+        $comment = $updateComment->handle($comment, (string) $request->validated('comment'));
 
         return new CommentResource($comment->load('user'));
     }
@@ -90,7 +80,7 @@ class CommentsController extends Controller
      * @authenticated
      * @urlParam id integer ID комментария. Example: 4
      */
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, $id, DeleteComment $deleteComment)
     {
         $comment = Comment::find($id);
         if (!$comment) return response()->json(['message' => 'Not found'], 404);
@@ -99,20 +89,11 @@ class CommentsController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        DB::beginTransaction();
         try {
-            $animeId = $comment->anime_id;
-            $comment->delete();
+            $deleteComment->handle($comment);
 
-            $anime = Anime::find($animeId);
-            if ($anime && Schema::hasColumn('anime', 'comments_count')) {
-                $anime->decrement('comments_count');
-            }
-
-            DB::commit();
             return response()->json(['message' => 'Deleted'], 200);
         } catch (\Exception $e) {
-            DB::rollBack();
             return response()->json(['message' => 'Error'], 500);
         }
     }

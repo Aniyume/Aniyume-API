@@ -30,6 +30,7 @@ class Episode extends Model
         'source',
         'priority',
         'translation_name',
+        'skip_times',
     ];
 
     protected $casts = [
@@ -39,6 +40,7 @@ class Episode extends Model
         'season_number' => 'integer',
         'duration' => 'integer',
         'priority' => 'integer',
+        'skip_times' => 'array',
     ];
 
     public function anime()

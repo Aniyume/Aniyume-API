@@ -11,7 +11,7 @@ class EnsureUserIsAdmin
     public function handle(Request $request, Closure $next): Response
     {
         if (! $request->user() || ! $request->user()->hasRole('admin')) {
-            if ($request->expectsJson()) {
+            if ($request->expectsJson() || $request->is('api/v1/admin/*')) {
                 return response()->json(['message' => 'Access denied'], 403);
             }
             abort(403);
