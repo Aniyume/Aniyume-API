@@ -1,0 +1,1285 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$avatar\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Application/Actions/WatchParty/CreateRoomAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Application/Actions/WatchParty/CreateRoomAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Application/Actions/WatchParty/CreateRoomAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$poster_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Application/Actions/WatchParty/CreateRoomAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Application/Actions/WatchParty/CreateRoomAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Application/Actions/WatchParty/CreateRoomAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Application/Actions/WatchParty/CreateRoomAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$avatar\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Application/Actions/WatchParty/InviteFriendAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Application/Actions/WatchParty/InviteFriendAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Application/Actions/WatchParty/InviteFriendAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$poster_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Application/Actions/WatchParty/InviteFriendAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Application/Actions/WatchParty/InviteFriendAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Application/Actions/WatchParty/InviteFriendAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Application/Actions/WatchParty/InviteFriendAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$avatar\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Application/Actions/WatchParty/JoinRoomAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Application/Actions/WatchParty/JoinRoomAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Application/Actions/WatchParty/JoinRoomAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$poster_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Application/Actions/WatchParty/JoinRoomAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Application/Actions/WatchParty/JoinRoomAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Application/Actions/WatchParty/JoinRoomAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Application/Actions/WatchParty/JoinRoomAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$avatar\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Application/Actions/WatchParty/SendMessageAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Application/Actions/WatchParty/SendMessageAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Application/Actions/WatchParty/SendMessageAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$poster_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Application/Actions/WatchParty/SendMessageAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Application/Actions/WatchParty/SendMessageAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Application/Actions/WatchParty/SendMessageAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Application/Actions/WatchParty/SendMessageAction.php
+
+		-
+			message: '#^Relation ''episode'' is not found in App\\Models\\WatchHistory model\.$#'
+			identifier: larastan.relationExistence
+			count: 4
+			path: app/Application/Queries/WatchHistoryQuery.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$avatar\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Application/Queries/WatchParty/GetMessagesQuery.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Application/Queries/WatchParty/GetMessagesQuery.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Application/Queries/WatchParty/GetMessagesQuery.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$poster_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Application/Queries/WatchParty/GetMessagesQuery.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Application/Queries/WatchParty/GetMessagesQuery.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Application/Queries/WatchParty/GetMessagesQuery.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Application/Queries/WatchParty/GetMessagesQuery.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AuditLog\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/CheckAuditLogs.php
+
+		-
+			message: '#^Relation ''user'' is not found in App\\Models\\AuditLog model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Console/Commands/CheckAuditLogs.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Anime\:\:\$shikimori_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Console/Commands/FillMissingDescriptionsCommand.php
+
+		-
+			message: '#^Call to an undefined method App\\Services\\AnilibriaService\:\:fetchUpdates\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Console/Commands/SyncOngoingCommand.php
+
+		-
+			message: '#^Relation ''user'' is not found in App\\Models\\AuditLog model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/Admin/AuditLogController.php
+
+		-
+			message: '#^Relation ''anime'' is not found in App\\Models\\Comment model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/Admin/CommentModerationController.php
+
+		-
+			message: '#^Relation ''user'' is not found in App\\Models\\Comment model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/Admin/CommentModerationController.php
+
+		-
+			message: '#^Relation ''anime'' is not found in App\\Models\\Episode model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Http/Controllers/Admin/EpisodeManagementController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Anime\:\:\$count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/Admin/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Anime\:\:\$shikimori_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Api/V1/AnimeController.php
+
+		-
+			message: '#^Property App\\Models\\Anime\:\:\$episodes_count is not writable\.$#'
+			identifier: assign.propertyReadOnly
+			count: 1
+			path: app/Http/Controllers/Api/V1/AnimeController.php
+
+		-
+			message: '#^Relation ''anime'' is not found in App\\Models\\Comment model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/Api/V1/CommentsController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Anime\:\:\$shikimori_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/EpisodeController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$episode_number\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/EpisodeController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/EpisodeController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$player_iframe\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/EpisodeController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$player_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/EpisodeController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$quality\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/EpisodeController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$season_number\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/EpisodeController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$skip_times\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/EpisodeController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$source\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/EpisodeController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/EpisodeController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$translation_type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/EpisodeController.php
+
+		-
+			message: '#^Anonymous function should return Illuminate\\Support\\Collection\<int, array\{id\: mixed, episode_number\: mixed, season_number\: mixed, title\: mixed, source\: mixed, player_url\: mixed, player_iframe\: mixed, translation_type\: mixed, \.\.\.\}\> but returns Illuminate\\Support\\Collection\<int, array\{id\: mixed, episode_number\: mixed, season_number\: mixed, title\: mixed, source\: mixed, player_url\: mixed, player_iframe\: mixed, translation_type\: mixed, \.\.\.\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Http/Controllers/Api/V1/EpisodeController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Favorite\:\:\$anime\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Api/V1/FavoritesController.php
+
+		-
+			message: '#^Relation ''anime'' is not found in App\\Models\\Favorite model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/Api/V1/FavoritesController.php
+
+		-
+			message: '#^Relation ''anime'' is not found in App\\Models\\Rating model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/Api/V1/RatingsController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\WatchHistory\:\:\$episode\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/WatchHistoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$episode\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/WatchHistoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$watched_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/WatchHistoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$avatar\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Api/V1/WatchPartyController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Api/V1/WatchPartyController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Api/V1/WatchPartyController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$poster_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/WatchPartyController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/WatchPartyController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/WatchPartyController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Api/V1/WatchPartyController.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 7
+			path: app/Http/Middleware/AntiScraperMiddleware.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 3
+			path: app/Http/Middleware/SecurityShield.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAnimeResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAnimeResource\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAnimeResource\:\:\$external_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAnimeResource\:\:\$external_source\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAnimeResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAnimeResource\:\:\$nsfw_flag\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAnimeResource\:\:\$number_of_episodes\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/AdminAnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAnimeResource\:\:\$poster_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAnimeResource\:\:\$rating\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAnimeResource\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAnimeResource\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAnimeResource\:\:\$tags\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAnimeResource\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAnimeResource\:\:\$type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAnimeResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAnimeResource\:\:\$year\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminImportLogResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminImportLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminImportLogResource\:\:\$errors\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/AdminImportLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminImportLogResource\:\:\$finished_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/AdminImportLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminImportLogResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminImportLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminImportLogResource\:\:\$import_type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminImportLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminImportLogResource\:\:\$started_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminImportLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminImportLogResource\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminImportLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminImportLogResource\:\:\$total_created\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminImportLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminImportLogResource\:\:\$total_processed\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminImportLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminImportLogResource\:\:\$total_skipped\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminImportLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminImportLogResource\:\:\$total_updated\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminImportLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminImportLogResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminImportLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminTagResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminTagResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminTagResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminTagResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminTagResource\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminTagResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminTagResource\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminTagResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminTagResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminTagResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminUserResource\:\:\$avatar\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminUserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminUserResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminUserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminUserResource\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminUserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminUserResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminUserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminUserResource\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminUserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminUserResource\:\:\$roles\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminUserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminUserResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminUserResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\AdminUserResource\:\:hasRole\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/AdminUserResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\Api\\V1\\AnimeCollection\:\:currentPage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeCollection.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\Api\\V1\\AnimeCollection\:\:firstItem\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeCollection.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\Api\\V1\\AnimeCollection\:\:lastItem\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeCollection.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\Api\\V1\\AnimeCollection\:\:lastPage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeCollection.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\Api\\V1\\AnimeCollection\:\:perPage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeCollection.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\Api\\V1\\AnimeCollection\:\:total\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeCollection.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\AnimeResource\:\:\$aired_from\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\AnimeResource\:\:\$aired_to\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\AnimeResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\AnimeResource\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\AnimeResource\:\:\$external_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\AnimeResource\:\:\$external_source\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\AnimeResource\:\:\$favorites\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\AnimeResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\AnimeResource\:\:\$nsfw_flag\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\AnimeResource\:\:\$number_of_episodes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\AnimeResource\:\:\$popularity\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\AnimeResource\:\:\$poster_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\AnimeResource\:\:\$rating\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\AnimeResource\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\AnimeResource\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\AnimeResource\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\AnimeResource\:\:\$type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\AnimeResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\AnimeResource\:\:\$year\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/AnimeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\CommentResource\:\:\$anime\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Resources/Api/V1/CommentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\CommentResource\:\:\$anime_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/CommentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\CommentResource\:\:\$comment\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/CommentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\CommentResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/CommentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\CommentResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/CommentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\CommentResource\:\:\$is_approved\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/CommentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\CommentResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/CommentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\CommentResource\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Resources/Api/V1/CommentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\CommentResource\:\:\$user_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/CommentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$aired_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$anime_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$duration\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$episode_number\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$external_episode_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$external_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$external_source\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$player_iframe\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$player_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$poster_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$priority\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$quality\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$release_date\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$season_number\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$source\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$thumbnail_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$translation_type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$translator\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\EpisodeResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/EpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\FavoriteResource\:\:\$anime\.$#'
+			identifier: property.notFound
+			count: 8
+			path: app/Http/Resources/Api/V1/FavoriteResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\FavoriteResource\:\:\$anime_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/FavoriteResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\FavoriteResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/FavoriteResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\FavoriteResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/FavoriteResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\FavoriteResource\:\:\$user_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/FavoriteResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\RatingResource\:\:\$anime\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Resources/Api/V1/RatingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\RatingResource\:\:\$anime_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/RatingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\RatingResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/RatingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\RatingResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/RatingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\RatingResource\:\:\$rating\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/RatingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\RatingResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/RatingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\RatingResource\:\:\$user_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/RatingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\TagResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/TagResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\TagResource\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/TagResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\TagResource\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/TagResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\UserResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/UserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\UserResource\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/UserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\UserResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/UserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\UserResource\:\:\$is_active\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/UserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\UserResource\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/UserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\UserResource\:\:\$roles\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/UserResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\Api\\V1\\UserStatsResource\:\:comments\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Http/Resources/Api/V1/UserStatsResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\Api\\V1\\UserStatsResource\:\:favorites\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Http/Resources/Api/V1/UserStatsResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\Api\\V1\\UserStatsResource\:\:ratings\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: app/Http/Resources/Api/V1/UserStatsResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\Api\\V1\\UserStatsResource\:\:watchHistory\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: app/Http/Resources/Api/V1/UserStatsResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\WatchHistoryResource\:\:\$anime\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Resources/Api/V1/WatchHistoryResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\WatchHistoryResource\:\:\$anime_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/WatchHistoryResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\WatchHistoryResource\:\:\$completed\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/WatchHistoryResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\WatchHistoryResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/WatchHistoryResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\WatchHistoryResource\:\:\$episode\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/WatchHistoryResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\WatchHistoryResource\:\:\$episode_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/WatchHistoryResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\WatchHistoryResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/WatchHistoryResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\WatchHistoryResource\:\:\$progress\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/WatchHistoryResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\WatchHistoryResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/WatchHistoryResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\WatchHistoryResource\:\:\$user_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/WatchHistoryResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\Api\\V1\\WatchHistoryResource\:\:\$watched_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/Api/V1/WatchHistoryResource.php
+
+		-
+			message: '#^Relation ''anime'' is not found in App\\Models\\Comment model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Policies/CommentPolicy.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Services/AiDescriptionService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Anime\:\:\$shikimori_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/BannerService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Anime\:\:\$shikimori_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/EpisodeImportService.php
+
+		-
+			message: '#^Variable \$total on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 2
+			path: app/Services/UserStatisticsService.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Services/VideoCdnService.php

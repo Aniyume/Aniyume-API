@@ -22,3 +22,19 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Local one-off debug scripts and generated dumps.
+# Keep reusable maintenance logic in app/Console/Commands instead.
+/anilibria_docs*.md
+/anime_list*.txt
+/eps_*.txt
+/response.txt
+/schedule.json
+/timeout_test.txt
+/check_episodes.php
+/find_anime*.php
+/fix_urls.php
+/test.php
+/test_import.php
+/verify_sort.php
+/verify_urls.php
