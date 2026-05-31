@@ -25,6 +25,9 @@ class Anime extends Model
         'description',
         'poster_url',
         'cover_url',
+        'cover_source',
+        'cover_locked',
+        'cover_updated_at',
         'type',
         'status',
         'number_of_episodes',
@@ -51,6 +54,9 @@ class Anime extends Model
         'favorites_count' => 'integer',
         'aired_from' => 'datetime',
         'aired_to' => 'datetime',
+        'nsfw_flag' => 'boolean',
+        'cover_locked' => 'boolean',
+        'cover_updated_at' => 'datetime',
     ];
 
     public function tags(): BelongsToMany

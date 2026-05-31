@@ -253,14 +253,24 @@ class EpisodeImportService
             try {
                 $episodeData = array_merge(['anime_id' => $anime->id], $data);
 
-                // Use robust matching: source + episode_number + translator
+                $source = $data['source'] ?? null;
+                $translator = $data['translator'] ?? ($data['translation_name'] ?? null);
+
+                // Idempotent matching: anime + source + season + episode + translator.
+                // Fallback to anime + episode + translator for legacy rows without source/season.
                 $existingQuery = Episode::where('anime_id', $anime->id)
                     ->where('episode_number', $data['episode_number']);
 
-                if (isset($data['translator'])) {
-                    $existingQuery->where('translator', $data['translator']);
-                } elseif (isset($data['translation_name'])) {
-                    $existingQuery->where('translator', $data['translation_name']);
+                if (isset($data['season_number'])) {
+                    $existingQuery->where('season_number', $data['season_number']);
+                }
+
+                if ($source) {
+                    $existingQuery->where('source', $source);
+                }
+
+                if ($translator) {
+                    $existingQuery->where('translator', $translator);
                 }
 
                 $existing = $existingQuery->first();
@@ -273,8 +283,23 @@ class EpisodeImportService
                         $this->skipped++;
                     }
                 } else {
-                    Episode::create($episodeData);
-                    $this->created++;
+                    // Last guard against duplicates caused by older imports with missing source/season.
+                    $legacyDuplicate = Episode::where('anime_id', $anime->id)
+                        ->where('episode_number', $data['episode_number'])
+                        ->when($translator, fn ($query) => $query->where('translator', $translator))
+                        ->first();
+
+                    if ($legacyDuplicate) {
+                        if ($update) {
+                            $legacyDuplicate->update($episodeData);
+                            $this->updated++;
+                        } else {
+                            $this->skipped++;
+                        }
+                    } else {
+                        Episode::create($episodeData);
+                        $this->created++;
+                    }
                 }
             } catch (\Throwable $e) {
                 $this->errors++;

@@ -11,6 +11,7 @@ use App\Http\Resources\AdminAnimeResource;
 use App\Models\Anime;
 use App\Models\AuditLog;
 use App\Models\BlacklistedAnime;
+use App\Services\AnimeBannerEnrichmentService;
 use App\Services\AuditService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -149,6 +150,36 @@ class AnimeController extends Controller
         return $this->deleteImage($request, $anime, 'cover', 'cover_url');
     }
 
+    public function bannerCandidates(Request $request, Anime $anime, AnimeBannerEnrichmentService $service): JsonResponse
+    {
+        return response()->json(['data' => $service->candidates($anime)]);
+    }
+
+    public function applyBanner(Request $request, Anime $anime, AnimeBannerEnrichmentService $service): JsonResponse
+    {
+        $validated = $request->validate([
+            'url' => ['required', 'url', 'max:2048'],
+            'source' => ['sometimes', 'string', 'max:80'],
+            'force' => ['sometimes', 'boolean'],
+        ]);
+
+        $before = $anime->only(['cover_url', 'cover_source', 'cover_locked', 'cover_updated_at']);
+        $anime = $service->apply($anime, $validated['url'], $validated['source'] ?? 'anilist', (bool) ($validated['force'] ?? false));
+        app(AuditService::class)->log($request, 'apply_anime_banner', "Applied banner for anime {$anime->title} (ID {$anime->id})", $anime, $before, $anime->only(['cover_url', 'cover_source', 'cover_locked', 'cover_updated_at']));
+
+        return response()->json(['data' => (new AdminAnimeResource($anime->load('tags')))->resolve($request)]);
+    }
+
+    public function lockCover(Request $request, Anime $anime): JsonResponse
+    {
+        $validated = $request->validate(['locked' => ['required', 'boolean']]);
+        $before = $anime->only(['cover_locked']);
+        $anime->update(['cover_locked' => $validated['locked']]);
+        app(AuditService::class)->log($request, $validated['locked'] ? 'lock_anime_cover' : 'unlock_anime_cover', ($validated['locked'] ? 'Locked' : 'Unlocked')." cover for anime {$anime->title}", $anime, $before, $anime->only(['cover_locked']));
+
+        return response()->json(['data' => (new AdminAnimeResource($anime->refresh()->load('tags')))->resolve($request)]);
+    }
+
     private function uploadImage(Request $request, Anime $anime, string $kind, string $column, string $directory): JsonResponse
     {
         $validated = $request->validate([
@@ -159,7 +190,13 @@ class AnimeController extends Controller
         /** @var UploadedFile $image */
         $image = $validated['image'];
         $path = $image->store($directory, 'public');
-        $anime->update([$column => url(Storage::url($path))]);
+        $updates = [$column => url(Storage::url($path))];
+        if ($kind === 'cover') {
+            $updates['cover_source'] = 'manual';
+            $updates['cover_locked'] = true;
+            $updates['cover_updated_at'] = now();
+        }
+        $anime->update($updates);
         $this->deleteLocalPublicUrl($oldUrl);
         app(AuditService::class)->log($request, "upload_anime_{$kind}", "Uploaded {$kind} for anime {$anime->title} (ID {$anime->id})", $anime, [$column => $oldUrl], [$column => $anime->{$column}]);
 
@@ -171,7 +208,13 @@ class AnimeController extends Controller
     private function deleteImage(Request $request, Anime $anime, string $kind, string $column): JsonResponse
     {
         $oldUrl = $anime->{$column};
-        $anime->update([$column => null]);
+        $updates = [$column => null];
+        if ($kind === 'cover') {
+            $updates['cover_source'] = null;
+            $updates['cover_locked'] = false;
+            $updates['cover_updated_at'] = now();
+        }
+        $anime->update($updates);
         $this->deleteLocalPublicUrl($oldUrl);
         app(AuditService::class)->log($request, "delete_anime_{$kind}", "Deleted {$kind} for anime {$anime->title} (ID {$anime->id})", $anime, [$column => $oldUrl], [$column => null]);
 

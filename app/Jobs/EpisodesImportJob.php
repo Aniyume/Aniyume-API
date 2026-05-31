@@ -22,6 +22,7 @@ class EpisodesImportJob implements ShouldQueue
     public function __construct(
         public int $animeId,
         public bool $update = false,
+        public bool $onlyMissing = true,
     ) {}
 
     public function handle(EpisodeImportService $importService): void
@@ -36,6 +37,7 @@ class EpisodesImportJob implements ShouldQueue
             return;
         }
 
+        $importService->setOnlyMissing($this->onlyMissing);
         $importService->importForSingleAnime($anime, $this->update);
     }
 }
