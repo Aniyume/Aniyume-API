@@ -1,0 +1,7 @@
+[allowlist]
+description = "Known test/docs/generated false positives in historical commits"
+commits = [
+  "80a5e347aa5cac1360f5e6c591e4a0717383159e",
+  "7a8529c5e06990fa34211d0456ada5905c968d15",
+  "9b5de0fb54d8133609ef42bdc53b54abf53ca4ce",
+]
