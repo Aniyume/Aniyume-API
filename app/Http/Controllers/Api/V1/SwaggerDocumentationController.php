@@ -104,7 +104,7 @@ class SwaggerDocumentationController extends Controller
      *
      *         @OA\JsonContent(
      *
-     *             @OA\Property(property="token", type="string", example="3|vWUOWe2DhVNMqcFLANNguxNuPCWVJJkYMa3Jog9s9c61ba6f"),
+     *             @OA\Property(property="token", type="string", example="1|example-sanctum-token"),
      *             @OA\Property(property="user", ref="#/components/schemas/User")
      *         )
      *     ),
@@ -138,7 +138,7 @@ class SwaggerDocumentationController extends Controller
      *
      *         @OA\JsonContent(
      *
-     *             @OA\Property(property="token", type="string", example="3|vWUOWe2DhVNMqcFLANNguxNuPCWVJJkYMa3Jog9s9c61ba6f"),
+     *             @OA\Property(property="token", type="string", example="1|example-sanctum-token"),
      *             @OA\Property(property="user", ref="#/components/schemas/User")
      *         )
      *     ),

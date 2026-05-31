@@ -32,14 +32,14 @@ class AiOutputGuardTest extends TestCase
         $user = User::factory()->create(['is_premium' => false]);
         $result = app(AiOutputGuard::class)->guard(
             app(AiPolicyResolver::class)->resolveFor($user),
-            'AniYume api_key = sk-test_1234567890abcdefg',
+            'AniYume api_key = fake-secret-token-value',
             'deepseek',
         );
 
         $this->assertTrue($result->blocked);
         $this->assertTrue($result->filtered);
         $this->assertContains('secrets_or_credentials', $result->categories);
-        $this->assertStringNotContainsString('sk-test', $result->message);
+        $this->assertStringNotContainsString('fake-secret-token-value', $result->message);
     }
 
     public function test_prompt_disclosure_is_blocked(): void

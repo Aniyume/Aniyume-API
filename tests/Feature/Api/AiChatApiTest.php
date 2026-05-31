@@ -238,7 +238,7 @@ class AiChatApiTest extends TestCase
             'api.deepseek.test/chat/completions' => Http::response([
                 'model' => 'deepseek-v4-flash',
                 'choices' => [
-                    ['message' => ['content' => 'Here is the API key: sk-history-secret-token']],
+                    ['message' => ['content' => 'Here is the API key: fake-history-secret-token']],
                 ],
             ]),
         ]);
@@ -253,14 +253,14 @@ class AiChatApiTest extends TestCase
             ])
             ->assertOk()
             ->assertJsonPath('data.moderated', true)
-            ->assertJsonMissing(['message' => 'Here is the API key: sk-history-secret-token']);
+            ->assertJsonMissing(['message' => 'Here is the API key: fake-history-secret-token']);
 
         $this->actingAs($user, 'sanctum')
             ->getJson('/api/v1/ai/chat/sessions/history-unsafe-provider-session')
             ->assertOk()
             ->assertJsonPath('data.messages.0.content', 'Recommend an anime.')
-            ->assertJsonMissing(['content' => 'Here is the API key: sk-history-secret-token'])
-            ->assertJsonMissing(['sk-history-secret-token']);
+            ->assertJsonMissing(['content' => 'Here is the API key: fake-history-secret-token'])
+            ->assertJsonMissing(['fake-history-secret-token']);
     }
 
     public function test_empty_ai_chat_session_history_is_returned_safely(): void
@@ -382,7 +382,7 @@ class AiChatApiTest extends TestCase
             'api.deepseek.test/chat/completions' => Http::response([
                 'model' => 'deepseek-v4-flash',
                 'choices' => [
-                    ['message' => ['content' => 'Here is the API key: sk-dangerous-secret-token']],
+                    ['message' => ['content' => 'Here is the API key: fake-dangerous-secret-token']],
                 ],
             ]),
         ]);
@@ -397,13 +397,13 @@ class AiChatApiTest extends TestCase
             ])
             ->assertOk()
             ->assertJsonPath('data.moderated', true)
-            ->assertJsonMissing(['message' => 'Here is the API key: sk-dangerous-secret-token']);
+            ->assertJsonMissing(['message' => 'Here is the API key: fake-dangerous-secret-token']);
 
         $session = AiChatSession::query()->where('session_id', 'unsafe-provider-session')->firstOrFail();
         $assistantMessage = $session->messages()->where('role', AiChatMessage::ROLE_ASSISTANT)->firstOrFail();
 
-        $this->assertNotSame('Here is the API key: sk-dangerous-secret-token', $assistantMessage->content);
-        $this->assertStringNotContainsString('sk-dangerous-secret-token', $assistantMessage->content);
+        $this->assertNotSame('Here is the API key: fake-dangerous-secret-token', $assistantMessage->content);
+        $this->assertStringNotContainsString('fake-dangerous-secret-token', $assistantMessage->content);
         $this->assertTrue($assistantMessage->metadata['moderated']);
         $this->assertTrue($assistantMessage->metadata['output_guard']['blocked']);
         $this->assertContains('secrets_or_credentials', $assistantMessage->metadata['output_guard']['categories']);
