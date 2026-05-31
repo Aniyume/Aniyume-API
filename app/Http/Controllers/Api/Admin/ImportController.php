@@ -60,6 +60,18 @@ class ImportController extends Controller
         $validated = $request->validated();
         $isInitialImport = $validated['type'] === 'initial';
 
+        $runningImport = ImportLog::where('status', 'running')
+            ->whereIn('import_type', ['initial', 'update'])
+            ->latest()
+            ->first();
+
+        if ($runningImport) {
+            return response()->json([
+                'message' => 'Anime import is already running',
+                'data' => (new AdminImportLogResource($runningImport))->resolve($request),
+            ], 409);
+        }
+
         $importLog = ImportLog::create([
             'import_type' => $validated['type'],
             'started_at' => now(),

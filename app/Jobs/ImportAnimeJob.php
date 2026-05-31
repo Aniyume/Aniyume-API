@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class ImportAnimeJob implements ShouldQueue
@@ -27,6 +28,18 @@ class ImportAnimeJob implements ShouldQueue
 
     public function handle(ShikimoriImportService $importService): void
     {
+        $lock = Cache::lock('imports:anime', 7200);
+
+        if (! $lock->get()) {
+            Log::warning('Anime import job skipped because another import is running', [
+                'page' => $this->page,
+                'import_log_id' => $this->importLogId,
+            ]);
+
+            return;
+        }
+
+        try {
         $importLog = ImportLog::find($this->importLogId);
 
         if (! $importLog) {
@@ -51,6 +64,16 @@ class ImportAnimeJob implements ShouldQueue
         if ($result['hasNextPage']) {
             self::dispatch($this->page + 1, $this->isInitialImport, $this->importLogId)
                 ->delay(now()->addSeconds(2));
+
+            return;
+        }
+
+        $importLog->update([
+            'status' => 'completed',
+            'finished_at' => now(),
+        ]);
+        } finally {
+            $lock->release();
         }
     }
 

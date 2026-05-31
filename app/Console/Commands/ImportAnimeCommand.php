@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Services\ShikimoriImportService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 
 class ImportAnimeCommand extends Command
 {
@@ -15,46 +16,59 @@ class ImportAnimeCommand extends Command
 
     public function handle(ShikimoriImportService $importService): int
     {
-        $isInitial = $this->option('initial') ?: false;
-        $startPage = (int) $this->option('start-page');
+        $lock = Cache::lock('imports:anime', 7200);
 
-        $this->info('🚀 Starting Shikimori anime import...');
-        $this->info('   Source: Shikimori (Russian titles, descriptions, genres)');
-        $this->info('   Mode: '.($isInitial ? 'Initial (skip existing)' : 'Update (overwrite existing)'));
-        if ($startPage > 1) {
-            $this->info("   Resuming from page: {$startPage}");
-        }
-        $this->newLine();
+        if (! $lock->get()) {
+            $this->warn('Anime import is already running. Skipping duplicate start.');
 
-        $log = $importService->importAll($isInitial, $startPage);
-
-        $this->newLine();
-
-        if ($log->status === 'completed') {
-            $this->info('✅ Import completed successfully!');
-        } elseif ($log->status === 'partial') {
-            $errors = json_decode($log->errors, true);
-            $this->warn('⚠️  Import partially completed (rate limited by Shikimori).');
-            $this->warn('   Stopped at page: '.($errors['stopped_at_page'] ?? '?'));
-            $this->info('   Resume: php artisan import:anime --start-page='.($errors['stopped_at_page'] ?? '?'));
-        } else {
-            $this->error('❌ Import failed: '.($log->errors ?? 'Unknown error'));
+            return self::FAILURE;
         }
 
-        $this->table(
-            ['Metric', 'Count'],
-            [
-                ['Processed', $log->total_processed ?? 0],
-                ['Created', $log->total_created ?? 0],
-                ['Updated', $log->total_updated ?? 0],
-                ['Skipped', $log->total_skipped ?? 0],
-            ]
-        );
+        try {
+            $isInitial = $this->option('initial') ?: false;
+            $startPage = (int) $this->option('start-page');
 
-        $totalAnime = \App\Models\Anime::count();
-        $this->newLine();
-        $this->info("📊 Total anime in database: {$totalAnime}");
+            $this->info('🚀 Starting Shikimori anime import...');
+            $this->info('   Source: Shikimori (Russian titles, descriptions, genres)');
+            $this->info('   Mode: '.($isInitial ? 'Initial (skip existing)' : 'Update (overwrite existing)'));
+            if ($startPage > 1) {
+                $this->info("   Resuming from page: {$startPage}");
+            }
+            $this->newLine();
 
-        return $log->status === 'failed' ? 1 : 0;
+            $log = $importService->importAll($isInitial, $startPage);
+
+            $this->newLine();
+
+            if ($log->status === 'completed') {
+                $this->info('✅ Import completed successfully!');
+            } elseif ($log->status === 'partial') {
+                $errors = json_decode($log->errors, true);
+                $this->warn('⚠️  Import partially completed (rate limited by Shikimori).');
+                $this->warn('   Stopped at page: '.($errors['stopped_at_page'] ?? '?'));
+                $this->info('   Resume: php artisan import:anime --start-page='.($errors['stopped_at_page'] ?? '?'));
+            } else {
+                $this->error('❌ Import failed: '.($log->errors ?? 'Unknown error'));
+            }
+
+            $this->table(
+                ['Metric', 'Count'],
+                [
+                    ['Processed', $log->total_processed ?? 0],
+                    ['Created', $log->total_created ?? 0],
+                    ['Anime added', $log->anime_created ?? 0],
+                    ['Updated', $log->total_updated ?? 0],
+                    ['Skipped', $log->total_skipped ?? 0],
+                ]
+            );
+
+            $totalAnime = \App\Models\Anime::count();
+            $this->newLine();
+            $this->info("📊 Total anime in database: {$totalAnime}");
+
+            return $log->status === 'failed' ? self::FAILURE : self::SUCCESS;
+        } finally {
+            $lock->release();
+        }
     }
 }

@@ -20,6 +20,14 @@ class BannerService
      */
     public function getBanner(Anime $anime): array
     {
+        if (! empty($anime->cover_url)) {
+            return [
+                'banner' => $anime->cover_url,
+                'cover' => $anime->poster_url,
+                'source' => $anime->cover_source,
+            ];
+        }
+
         $cacheKey = "anime_banner_{$anime->id}";
 
         return Cache::remember($cacheKey, now()->addDays(3), function () use ($anime) {

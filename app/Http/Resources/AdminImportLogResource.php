@@ -22,6 +22,14 @@ class AdminImportLogResource extends JsonResource
             'total_created' => (int) $this->total_created,
             'total_updated' => (int) $this->total_updated,
             'total_skipped' => (int) $this->total_skipped,
+            'anime_created' => (int) ($this->anime_created ?? 0),
+            'episodes_created' => (int) ($this->episodes_created ?? 0),
+            'banners_updated' => (int) ($this->banners_updated ?? 0),
+            'content_counts' => [
+                'anime' => (int) ($this->anime_created ?? 0),
+                'episodes' => (int) ($this->episodes_created ?? 0),
+                'banners' => (int) ($this->banners_updated ?? 0),
+            ],
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

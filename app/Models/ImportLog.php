@@ -17,6 +17,9 @@ class ImportLog extends Model
         'total_created',
         'total_updated',
         'total_skipped',
+        'anime_created',
+        'episodes_created',
+        'banners_updated',
         'errors',
         'status',
     ];

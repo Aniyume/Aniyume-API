@@ -242,6 +242,7 @@ class ShikimoriImportService
         } else {
             $anime = Anime::create($animeData);
             $importLog->increment('total_created');
+            $importLog->increment('anime_created');
         }
 
         // AI Description Generator for missing descriptions

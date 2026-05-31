@@ -11,6 +11,7 @@ use App\Http\Resources\AdminAnimeResource;
 use App\Models\Anime;
 use App\Models\AuditLog;
 use App\Models\BlacklistedAnime;
+use App\Models\ImportLog;
 use App\Services\AnimeBannerEnrichmentService;
 use App\Services\AuditService;
 use Illuminate\Http\JsonResponse;
@@ -163,6 +164,18 @@ class AnimeController extends Controller
             'only_missing' => ['sometimes', 'boolean'],
             'force' => ['sometimes', 'boolean'],
         ]);
+
+        $runningImport = ImportLog::where('status', 'running')
+            ->where('import_type', 'banners')
+            ->latest()
+            ->first();
+
+        if ($runningImport) {
+            return response()->json([
+                'message' => 'Banner enrichment is already running',
+                'data' => (new \App\Http\Resources\AdminImportLogResource($runningImport))->resolve($request),
+            ], 409);
+        }
 
         Artisan::queue('anime:enrich-banners', [
             '--limit' => (int) ($validated['limit'] ?? 100),
