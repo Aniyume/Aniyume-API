@@ -20,8 +20,13 @@ class SyncWatchProgressAction
             ]
         );
 
+        $progress = (int) $data['progress'];
+        if ($progress === 0 && (int) $watchHistory->progress > 0) {
+            $progress = (int) $watchHistory->progress;
+        }
+
         $watchHistory->increment('watch_time', $data['delta_time'], [
-            'progress' => $data['progress'],
+            'progress' => $progress,
         ]);
 
         return $watchHistory->refresh();
