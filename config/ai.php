@@ -1,10 +1,10 @@
 <?php
 
 return [
-    'provider' => env('AI_PROVIDER', 'stub'),
-    'base_url' => env('AI_BASE_URL', 'https://api.deepseek.com'),
-    'api_key' => env('AI_API_KEY'),
-    'model' => env('AI_MODEL', 'deepseek-v4-flash'),
+    'provider' => env('AI_PROVIDER', (env('AI_API_KEY') || env('DEEPSEEK_API_KEY')) ? 'deepseek' : 'stub'),
+    'base_url' => env('AI_BASE_URL', env('DEEPSEEK_BASE_URL', 'https://api.deepseek.com')),
+    'api_key' => env('AI_API_KEY') ?: env('DEEPSEEK_API_KEY'),
+    'model' => env('AI_MODEL', env('DEEPSEEK_MODEL', 'deepseek-chat')),
     'timeout' => (int) env('AI_TIMEOUT', 30),
     'max_output_tokens' => (int) env('AI_MAX_OUTPUT_TOKENS', 1200),
     'temperature' => (float) env('AI_TEMPERATURE', 0.1),

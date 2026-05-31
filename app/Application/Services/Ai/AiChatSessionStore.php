@@ -107,9 +107,15 @@ final class AiChatSessionStore
                 'metadata' => $safeMetadata,
             ]);
 
-            $session->forceFill([
+            $updates = [
                 'last_message_at' => now(),
-            ])->save();
+            ];
+
+            if ($role === AiChatMessage::ROLE_USER && blank($session->title)) {
+                $updates['title'] = $this->titleFromMessage($content);
+            }
+
+            $session->forceFill($updates)->save();
 
             return $message;
         });
@@ -142,5 +148,17 @@ final class AiChatSessionStore
     private function safeMetadata(array $metadata): array
     {
         return array_filter($metadata, static fn (mixed $value): bool => $value !== null);
+    }
+
+    private function titleFromMessage(string $message): string
+    {
+        $title = trim(preg_replace('/\s+/u', ' ', strip_tags($message)) ?? '');
+        $title = preg_replace('/^[\p{P}\p{S}\s]+|[\p{P}\p{S}\s]+$/u', '', $title) ?? $title;
+
+        if ($title === '') {
+            return 'Новый чат';
+        }
+
+        return Str::limit($title, 60, '…');
     }
 }

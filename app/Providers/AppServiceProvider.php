@@ -20,7 +20,11 @@ class AppServiceProvider extends ServiceProvider
             $provider = strtolower((string) config('ai.provider', 'stub'));
             $apiKey = trim((string) config('ai.api_key', ''));
 
-            if ($provider === 'deepseek' && $apiKey !== '') {
+            if (in_array($provider, ['deepseek', 'deepseek-chat'], true) && $apiKey !== '') {
+                return $app->make(DeepSeekGateway::class);
+            }
+
+            if ($provider === 'stub' && $apiKey !== '') {
                 return $app->make(DeepSeekGateway::class);
             }
 
