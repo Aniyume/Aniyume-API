@@ -18,6 +18,11 @@ class AnimeBannerEnrichmentService
             ->all();
     }
 
+    public function bestCandidate(Anime $anime): ?array
+    {
+        return $this->candidates($anime)[0] ?? null;
+    }
+
     public function apply(Anime $anime, string $url, string $source = 'anilist', bool $force = false): Anime
     {
         if ($anime->cover_locked && ! $force) {

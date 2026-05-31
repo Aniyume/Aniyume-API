@@ -16,6 +16,7 @@ use App\Services\AuditService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -153,6 +154,30 @@ class AnimeController extends Controller
     public function bannerCandidates(Request $request, Anime $anime, AnimeBannerEnrichmentService $service): JsonResponse
     {
         return response()->json(['data' => $service->candidates($anime)]);
+    }
+
+    public function enrichBanners(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'limit' => ['sometimes', 'integer', 'min:1', 'max:500'],
+            'only_missing' => ['sometimes', 'boolean'],
+            'force' => ['sometimes', 'boolean'],
+        ]);
+
+        Artisan::queue('anime:enrich-banners', [
+            '--limit' => (int) ($validated['limit'] ?? 100),
+            '--only-missing' => (bool) ($validated['only_missing'] ?? true),
+            '--force' => (bool) ($validated['force'] ?? false),
+        ]);
+
+        app(AuditService::class)->log($request, 'queue_anime_banner_enrichment', 'Queued bulk anime banner enrichment');
+
+        return response()->json([
+            'data' => [
+                'message' => 'Banner enrichment queued',
+                'limit' => (int) ($validated['limit'] ?? 100),
+            ],
+        ], 202);
     }
 
     public function applyBanner(Request $request, Anime $anime, AnimeBannerEnrichmentService $service): JsonResponse

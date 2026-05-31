@@ -81,6 +81,7 @@ Route::prefix('v1')->group(function () {
             Route::delete('/anime/{anime}/poster', [AdminAnimeController::class, 'deletePoster']);
             Route::post('/anime/{anime}/cover', [AdminAnimeController::class, 'uploadCover']);
             Route::delete('/anime/{anime}/cover', [AdminAnimeController::class, 'deleteCover']);
+            Route::post('/anime/banners/enrich', [AdminAnimeController::class, 'enrichBanners']);
             Route::get('/anime/{anime}/banner-candidates', [AdminAnimeController::class, 'bannerCandidates']);
             Route::post('/anime/{anime}/banner/apply', [AdminAnimeController::class, 'applyBanner']);
             Route::patch('/anime/{anime}/cover-lock', [AdminAnimeController::class, 'lockCover']);

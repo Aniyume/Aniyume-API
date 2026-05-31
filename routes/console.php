@@ -8,11 +8,14 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// Ежедневный запуск маппинга новых аниме из Shikimori в 3:00
-Schedule::command('import:anime')->dailyAt('03:00');
+// Ежечасный запуск маппинга новых аниме из Shikimori
+Schedule::command('import:anime')->hourlyAt(5)->withoutOverlapping();
 
 // Ежечасный поиск новых серий у онгоингов
-Schedule::command('import:episodes --limit=200')->hourly();
+Schedule::command('import:episodes --limit=200')->hourlyAt(20)->withoutOverlapping();
+
+// Ежечасное улучшение отсутствующих баннеров
+Schedule::command('anime:enrich-banners --only-missing --limit=100')->hourlyAt(35)->withoutOverlapping();
 
 // Синхронизация ближайших онгоингов, legacy schedule перенесён из app/Console/Kernel.php
-Schedule::command('episodes:sync-ongoing --days=1')->everySixHours();
+Schedule::command('episodes:sync-ongoing --days=1')->everySixHours()->withoutOverlapping();
