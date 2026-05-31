@@ -244,31 +244,85 @@ parameters:
 			message: '#^Relation ''user'' is not found in App\\Models\\AuditLog model\.$#'
 			identifier: larastan.relationExistence
 			count: 1
-			path: app/Http/Controllers/Admin/AuditLogController.php
-
-		-
-			message: '#^Relation ''anime'' is not found in App\\Models\\Comment model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Http/Controllers/Admin/CommentModerationController.php
+			path: app/Http/Controllers/Api/Admin/AuditLogController.php
 
 		-
 			message: '#^Relation ''user'' is not found in App\\Models\\Comment model\.$#'
 			identifier: larastan.relationExistence
 			count: 1
-			path: app/Http/Controllers/Admin/CommentModerationController.php
+			path: app/Http/Controllers/Api/Admin/CommentController.php
 
 		-
-			message: '#^Relation ''anime'' is not found in App\\Models\\Episode model\.$#'
+			message: '#^Relation ''admin'' is not found in App\\Models\\ContactMessage model\.$#'
 			identifier: larastan.relationExistence
-			count: 2
-			path: app/Http/Controllers/Admin/EpisodeManagementController.php
+			count: 1
+			path: app/Http/Controllers/Api/Admin/ContactMessageController.php
+
+		-
+			message: '#^Relation ''user'' is not found in App\\Models\\ContactMessage model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/Api/Admin/ContactMessageController.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Anime\:\:\$count\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Controllers/Api/Admin/DashboardController.php
+
+		-
+			message: '#^Relation ''anime'' is not found in App\\Models\\Episode model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Http/Controllers/Api/Admin/EpisodeController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Rating\:\:\$bucket\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/Admin/RatingController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Rating\:\:\$count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/Admin/RatingController.php
+
+		-
+			message: '#^Relation ''anime'' is not found in App\\Models\\Rating model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/Api/Admin/RatingController.php
+
+		-
+			message: '#^Relation ''user'' is not found in App\\Models\\Rating model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/Api/Admin/RatingController.php
+
+		-
+			message: '#^Relation ''admin'' is not found in App\\Models\\Report model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/Api/Admin/ReportController.php
+
+		-
+			message: '#^Relation ''reporter'' is not found in App\\Models\\Report model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/Api/Admin/ReportController.php
+
+		-
+			message: '#^Relation ''target'' is not found in App\\Models\\Report model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/Api/Admin/ReportController.php
+
+		-
+			message: '#^Relation ''roles'' is not found in App\\Models\\User model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Http/Controllers/Api/Admin/UserController.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Anime\:\:\$shikimori_id\.$#'
@@ -451,6 +505,12 @@ parameters:
 			path: app/Http/Middleware/SecurityShield.php
 
 		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAnimeResource\:\:\$cover_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAnimeResource.php
+
+		-
 			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAnimeResource\:\:\$created_at\.$#'
 			identifier: property.notFound
 			count: 1
@@ -547,6 +607,312 @@ parameters:
 			path: app/Http/Resources/AdminAnimeResource.php
 
 		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAuditLogResource\:\:\$action\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAuditLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAuditLogResource\:\:\$after\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAuditLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAuditLogResource\:\:\$before\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAuditLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAuditLogResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAuditLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAuditLogResource\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAuditLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAuditLogResource\:\:\$entity_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/AdminAuditLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAuditLogResource\:\:\$entity_type\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/AdminAuditLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAuditLogResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAuditLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAuditLogResource\:\:\$ip_address\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAuditLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAuditLogResource\:\:\$metadata\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAuditLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAuditLogResource\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAuditLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminAuditLogResource\:\:\$user_agent\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminAuditLogResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminCommentResource\:\:\$anime\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminCommentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminCommentResource\:\:\$comment\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminCommentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminCommentResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminCommentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminCommentResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminCommentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminCommentResource\:\:\$is_approved\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Resources/AdminCommentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminCommentResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminCommentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminCommentResource\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminCommentResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminContactMessageResource\:\:\$admin\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminContactMessageResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminContactMessageResource\:\:\$admin_note\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminContactMessageResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminContactMessageResource\:\:\$category\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminContactMessageResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminContactMessageResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminContactMessageResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminContactMessageResource\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminContactMessageResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminContactMessageResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminContactMessageResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminContactMessageResource\:\:\$ip_address\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminContactMessageResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminContactMessageResource\:\:\$message\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminContactMessageResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminContactMessageResource\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminContactMessageResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminContactMessageResource\:\:\$resolved_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminContactMessageResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminContactMessageResource\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminContactMessageResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminContactMessageResource\:\:\$subject\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminContactMessageResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminContactMessageResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminContactMessageResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminContactMessageResource\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminContactMessageResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminContactMessageResource\:\:\$user_agent\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminContactMessageResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminEpisodeResource\:\:\$aired_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminEpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminEpisodeResource\:\:\$anime\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminEpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminEpisodeResource\:\:\$anime_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminEpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminEpisodeResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminEpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminEpisodeResource\:\:\$duration\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminEpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminEpisodeResource\:\:\$episode_number\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminEpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminEpisodeResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminEpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminEpisodeResource\:\:\$player_iframe\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminEpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminEpisodeResource\:\:\$player_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminEpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminEpisodeResource\:\:\$quality\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminEpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminEpisodeResource\:\:\$release_date\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminEpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminEpisodeResource\:\:\$season_number\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminEpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminEpisodeResource\:\:\$source\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminEpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminEpisodeResource\:\:\$thumbnail_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminEpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminEpisodeResource\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminEpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminEpisodeResource\:\:\$translator\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminEpisodeResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminEpisodeResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminEpisodeResource.php
+
+		-
 			message: '#^Access to an undefined property App\\Http\\Resources\\AdminImportLogResource\:\:\$created_at\.$#'
 			identifier: property.notFound
 			count: 1
@@ -619,6 +985,192 @@ parameters:
 			path: app/Http/Resources/AdminImportLogResource.php
 
 		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminRatingResource\:\:\$anime\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminRatingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminRatingResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminRatingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminRatingResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminRatingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminRatingResource\:\:\$rating\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminRatingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminRatingResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminRatingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminRatingResource\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminRatingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminReportResource\:\:\$admin\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminReportResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminReportResource\:\:\$category\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminReportResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminReportResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminReportResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminReportResource\:\:\$details\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminReportResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminReportResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminReportResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminReportResource\:\:\$reason\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminReportResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminReportResource\:\:\$reporter\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminReportResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminReportResource\:\:\$resolution_note\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminReportResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminReportResource\:\:\$resolved_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminReportResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminReportResource\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminReportResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminReportResource\:\:\$target\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminReportResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminReportResource\:\:\$target_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminReportResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminReportResource\:\:\$target_type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminReportResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminReportResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminReportResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\AdminReportResource\:\:relationLoaded\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/AdminReportResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminSettingResource\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminSettingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminSettingResource\:\:\$group\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminSettingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminSettingResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminSettingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminSettingResource\:\:\$is_encrypted\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminSettingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminSettingResource\:\:\$is_public\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminSettingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminSettingResource\:\:\$key\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminSettingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminSettingResource\:\:\$type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminSettingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminSettingResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminSettingResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminSettingResource\:\:\$value\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminSettingResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\AdminSettingResource\:\:typedValue\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/AdminSettingResource.php
+
+		-
 			message: '#^Access to an undefined property App\\Http\\Resources\\AdminTagResource\:\:\$created_at\.$#'
 			identifier: property.notFound
 			count: 1
@@ -668,6 +1220,12 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property App\\Http\\Resources\\AdminUserResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/AdminUserResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\AdminUserResource\:\:\$last_login_at\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Resources/AdminUserResource.php
@@ -1283,3 +1841,21 @@ parameters:
 			identifier: larastan.noEnvCallsOutsideOfConfig
 			count: 1
 			path: app/Services/VideoCdnService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$content\.$#'
+			identifier: property.notFound
+			count: 3
+			path: tests/Feature/Api/AiChatApiTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$metadata\.$#'
+			identifier: property.notFound
+			count: 6
+			path: tests/Feature/Api/AiChatApiTest.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: tests/Feature/ExampleTest.php
