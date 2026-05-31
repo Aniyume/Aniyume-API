@@ -16,6 +16,7 @@ class ImportAnimeJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $timeout = 300;
+
     public int $tries = 3;
 
     public function __construct(
@@ -28,20 +29,22 @@ class ImportAnimeJob implements ShouldQueue
     {
         $importLog = ImportLog::find($this->importLogId);
 
-        if (!$importLog) {
+        if (! $importLog) {
             Log::error('ImportLog not found', ['id' => $this->importLogId]);
+
             return;
         }
 
         $result = $importService->importPage($this->page, $this->isInitialImport, $importLog);
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             Log::error('Import page failed', [
                 'page' => $this->page,
                 'error' => $result['error'] ?? 'Unknown error',
             ]);
-            
+
             $this->fail(new \Exception($result['error'] ?? 'Import failed'));
+
             return;
         }
 
@@ -59,7 +62,7 @@ class ImportAnimeJob implements ShouldQueue
         ]);
 
         $importLog = ImportLog::find($this->importLogId);
-        
+
         if ($importLog) {
             $errors = json_decode($importLog->errors, true) ?? [];
             $errors[] = [

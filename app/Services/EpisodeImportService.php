@@ -9,18 +9,27 @@ use Illuminate\Support\Facades\Log;
 class EpisodeImportService
 {
     public int $processed = 0;
+
     public int $created = 0;
+
     public int $updated = 0;
+
     public int $skipped = 0;
+
     public int $errors = 0;
 
     protected float $startTime;
+
     protected bool $anilibriaEnabled = true;
+
     protected bool $kodikEnabled = true;
+
     protected bool $onlyMissing = false;
 
     protected VideoCdnService $videoCdnService;
+
     protected AnilibriaService $anilibriaService;
+
     protected KodikService $kodikService;
 
     public function __construct(
@@ -36,7 +45,7 @@ class EpisodeImportService
     public function setAvailableSources(bool $anilibria, bool $kodik): void
     {
         $this->anilibriaEnabled = $anilibria;
-        $this->kodikEnabled     = $kodik;
+        $this->kodikEnabled = $kodik;
     }
 
     public function setOnlyMissing(bool $onlyMissing): void
@@ -46,6 +55,7 @@ class EpisodeImportService
 
     /**
      * Reset (delete) episodes from the database.
+     *
      * @return int Number of deleted episodes
      */
     public function resetEpisodes(?string $source = null): int
@@ -56,6 +66,7 @@ class EpisodeImportService
 
         $count = Episode::count();
         Episode::truncate();
+
         return $count;
     }
 
@@ -66,6 +77,7 @@ class EpisodeImportService
             if ($this->onlyMissing && $anime->episodes()->exists()) {
                 $this->skipped++;
                 $this->processed++;
+
                 return;
             }
 
@@ -89,7 +101,7 @@ class EpisodeImportService
                 $kodikData = $anime->shikimori_id
                     ? $this->kodikService->searchByShikimoriId($anime->shikimori_id)
                     : $this->kodikService->searchByTitle($anime->title);
-                if (!empty($kodikData)) {
+                if (! empty($kodikData)) {
                     // To prevent franchise mish-mash (e.g. Naruto mixed with Boruto or Shippuden),
                     // we must enforce that all processed Kodik translations belong to the exact same anime entity.
                     $targetShikimoriId = $kodikData[0]['shikimori_id'] ?? null;
@@ -102,7 +114,7 @@ class EpisodeImportService
 
                         $isSameAnime = false;
                         if ($targetShikimoriId && $currentShiki) {
-                            $isSameAnime = ((string)$currentShiki === (string)$targetShikimoriId);
+                            $isSameAnime = ((string) $currentShiki === (string) $targetShikimoriId);
                         } else {
                             $isSameAnime = ($currentTitle === $targetTitle);
                         }
@@ -174,12 +186,14 @@ class EpisodeImportService
     {
         if ($anime->shikimori_id) {
             $episodes = $this->videoCdnService->getEpisodesByShikimoriId($anime->shikimori_id);
-            if (!empty($episodes)) return $episodes;
+            if (! empty($episodes)) {
+                return $episodes;
+            }
         }
 
         return $this->videoCdnService->getEpisodesByTitle($anime->title);
     }
-    
+
     protected function formatKodikEpisodes(array $animeData): array
     {
         $episodes = [];
@@ -187,15 +201,15 @@ class EpisodeImportService
 
         foreach ($seasons as $seasonNumber => $seasonData) {
             $episodesData = $seasonData['episodes'] ?? [];
-            
+
             foreach ($episodesData as $episodeNumber => $link) {
                 // Ensure HTTPS explicitly, as Next.js iframe requires it
                 if (str_starts_with($link, '//')) {
-                    $link = 'https:' . $link;
+                    $link = 'https:'.$link;
                 }
-                
+
                 $link = $this->kodikService->buildPlayerUrl($link);
-                
+
                 $episodes[] = [
                     'episode_number' => (int) $episodeNumber,
                     'season_number' => (int) $seasonNumber,
@@ -211,14 +225,14 @@ class EpisodeImportService
                 ];
             }
         }
-        
+
         // Sometimes kodik returns a movie with single link:
         if (empty($episodes) && isset($animeData['link'])) {
-            $link = str_starts_with($animeData['link'], '//') ? 'https:' . $animeData['link'] : $animeData['link'];
+            $link = str_starts_with($animeData['link'], '//') ? 'https:'.$animeData['link'] : $animeData['link'];
             $episodes[] = [
                 'episode_number' => 1,
                 'season_number' => 1,
-                'title' => $animeData['material_data']['title'] ?? "Фильм",
+                'title' => $animeData['material_data']['title'] ?? 'Фильм',
                 'player_iframe' => "<iframe src=\"{$link}\" frameborder=\"0\" allowfullscreen></iframe>",
                 'player_url' => $link,
                 'external_id' => $animeData['id'] ?? null,
@@ -242,7 +256,7 @@ class EpisodeImportService
                 // Use robust matching: source + episode_number + translator
                 $existingQuery = Episode::where('anime_id', $anime->id)
                     ->where('episode_number', $data['episode_number']);
-                    
+
                 if (isset($data['translator'])) {
                     $existingQuery->where('translator', $data['translator']);
                 } elseif (isset($data['translation_name'])) {
@@ -283,6 +297,7 @@ class EpisodeImportService
     }
 }
 
-function cloneKodikTranslator($t) {
+function cloneKodikTranslator($t)
+{
     return $t['title'] ?? 'Kodik';
 }

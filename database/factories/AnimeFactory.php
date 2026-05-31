@@ -19,7 +19,7 @@ class AnimeFactory extends Factory
 
         return [
             'title' => $title,
-            'slug' => Str::slug($title) . '-' . $this->faker->unique()->numberBetween(1000, 9999),
+            'slug' => Str::slug($title).'-'.$this->faker->unique()->numberBetween(1000, 9999),
             'description' => $this->faker->paragraph(),
             'poster_url' => $this->faker->imageUrl(300, 420),
             'rating' => $this->faker->randomFloat(1, 1, 10),

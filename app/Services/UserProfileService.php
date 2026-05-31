@@ -18,7 +18,7 @@ class UserProfileService
                 'avatar' => $user->avatar,
                 'bio' => $user->bio,
                 'custom_status' => $user->custom_status,
-                'is_premium' => (bool)$user->is_premium,
+                'is_premium' => (bool) $user->is_premium,
                 'created_at' => $user->created_at,
             ],
             'stats' => $this->getAnimeStats($user->id),
@@ -34,7 +34,7 @@ class UserProfileService
                 'favorites' => $user->favorites()->count(),
                 'ratings' => $user->ratings()->count(),
                 'watch_history' => $user->watchHistory()->count(),
-                 'comments' => DB::table('comments')->where('user_id', $user->id)->count(),
+                'comments' => DB::table('comments')->where('user_id', $user->id)->count(),
             ],
         ];
     }
@@ -64,20 +64,20 @@ class UserProfileService
             ->count();
     }
 
-private function getWatchTime(int $userId): array
-{
-    $totalSeconds = WatchHistory::where('user_id', $userId)->sum('watch_time') ?? 0;
-    $days = floor($totalSeconds / 86400);
-    $hours = floor(($totalSeconds % 86400) / 3600);
-    $minutes = floor(($totalSeconds % 3600) / 60);
+    private function getWatchTime(int $userId): array
+    {
+        $totalSeconds = WatchHistory::where('user_id', $userId)->sum('watch_time') ?? 0;
+        $days = floor($totalSeconds / 86400);
+        $hours = floor(($totalSeconds % 86400) / 3600);
+        $minutes = floor(($totalSeconds % 3600) / 60);
 
-    return [
-        'total_seconds' => $totalSeconds,
-        'days' => $days,
-        'hours' => $hours,
-        'minutes' => $minutes,
-    ];
-}
+        return [
+            'total_seconds' => $totalSeconds,
+            'days' => $days,
+            'hours' => $hours,
+            'minutes' => $minutes,
+        ];
+    }
 
     private function getWatchDynamics(int $userId, int $days): array
     {
@@ -130,12 +130,14 @@ private function getWatchTime(int $userId): array
     public function updateProfile(User $user, array $data): User
     {
         $user->update(array_filter($data, fn ($value) => $value !== null));
+
         return $user->fresh();
     }
 
-public function updateAvatar(User $user, string $avatarPath): User
-{
-    $user->update(['avatar' => $avatarPath]);
-    return $user->fresh();
-}
+    public function updateAvatar(User $user, string $avatarPath): User
+    {
+        $user->update(['avatar' => $avatarPath]);
+
+        return $user->fresh();
+    }
 }

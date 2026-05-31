@@ -20,8 +20,8 @@ class SyncRoomStateAction
         }
 
         $room->update([
-            'current_time'   => $data['current_time'],
-            'is_playing'     => $data['is_playing'],
+            'current_time' => $data['current_time'],
+            'is_playing' => $data['is_playing'],
             'episode_number' => $data['episode_number'],
         ]);
 

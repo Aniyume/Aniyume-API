@@ -22,12 +22,12 @@ class WatchPartyRoom extends Model
     ];
 
     protected $casts = [
-        'is_active'       => 'boolean',
-        'is_private'      => 'boolean',
-        'is_playing'      => 'boolean',
-        'current_time'    => 'float',
+        'is_active' => 'boolean',
+        'is_private' => 'boolean',
+        'is_playing' => 'boolean',
+        'current_time' => 'float',
         'max_participants' => 'integer',
-        'episode_number'  => 'integer',
+        'episode_number' => 'integer',
     ];
 
     public function anime(): BelongsTo

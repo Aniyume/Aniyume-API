@@ -10,8 +10,11 @@ class Report extends Model
     use HasFactory;
 
     public const STATUS_PENDING = 'pending';
+
     public const STATUS_REVIEWED = 'reviewed';
+
     public const STATUS_RESOLVED = 'resolved';
+
     public const STATUS_REJECTED = 'rejected';
 
     protected $fillable = [

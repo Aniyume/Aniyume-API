@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Services\ShikimoriImportService;
+use Illuminate\Console\Command;
 
 class ImportAnimeCommand extends Command
 {
@@ -20,7 +20,7 @@ class ImportAnimeCommand extends Command
 
         $this->info('🚀 Starting Shikimori anime import...');
         $this->info('   Source: Shikimori (Russian titles, descriptions, genres)');
-        $this->info('   Mode: ' . ($isInitial ? 'Initial (skip existing)' : 'Update (overwrite existing)'));
+        $this->info('   Mode: '.($isInitial ? 'Initial (skip existing)' : 'Update (overwrite existing)'));
         if ($startPage > 1) {
             $this->info("   Resuming from page: {$startPage}");
         }
@@ -35,10 +35,10 @@ class ImportAnimeCommand extends Command
         } elseif ($log->status === 'partial') {
             $errors = json_decode($log->errors, true);
             $this->warn('⚠️  Import partially completed (rate limited by Shikimori).');
-            $this->warn("   Stopped at page: " . ($errors['stopped_at_page'] ?? '?'));
-            $this->info("   Resume: php artisan import:anime --start-page=" . ($errors['stopped_at_page'] ?? '?'));
+            $this->warn('   Stopped at page: '.($errors['stopped_at_page'] ?? '?'));
+            $this->info('   Resume: php artisan import:anime --start-page='.($errors['stopped_at_page'] ?? '?'));
         } else {
-            $this->error("❌ Import failed: " . ($log->errors ?? 'Unknown error'));
+            $this->error('❌ Import failed: '.($log->errors ?? 'Unknown error'));
         }
 
         $this->table(

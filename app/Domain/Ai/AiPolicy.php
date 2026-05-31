@@ -5,10 +5,10 @@ namespace App\Domain\Ai;
 final readonly class AiPolicy
 {
     /**
-     * @param list<string> $canAnswer
-     * @param list<string> $cannotAnswer
-     * @param list<string> $availableData
-     * @param list<string> $domainBoundaries
+     * @param  list<string>  $canAnswer
+     * @param  list<string>  $cannotAnswer
+     * @param  list<string>  $availableData
+     * @param  list<string>  $domainBoundaries
      */
     public function __construct(
         public AiCapabilityProfile $capabilities,
@@ -16,8 +16,7 @@ final readonly class AiPolicy
         public array $cannotAnswer,
         public array $availableData,
         public array $domainBoundaries,
-    ) {
-    }
+    ) {}
 
     public function role(): AiRole
     {

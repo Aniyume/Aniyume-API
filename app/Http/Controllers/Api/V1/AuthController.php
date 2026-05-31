@@ -103,6 +103,7 @@ class AuthController extends Controller
      * Текущий пользователь
      *
      * Возвращает данные авторизованного пользователя.
+     *
      * @authenticated
      */
     public function me(Request $request)
@@ -123,6 +124,7 @@ class AuthController extends Controller
      * Выход
      *
      * Удаляет текущий токен доступа.
+     *
      * @authenticated
      */
     public function logout(Request $request)

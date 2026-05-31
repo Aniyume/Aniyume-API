@@ -4,8 +4,8 @@ namespace Tests\Feature\Api;
 
 use App\Models\Friendship;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
@@ -17,7 +17,7 @@ class FriendshipApiTest extends TestCase
     {
         parent::setUp();
 
-        if (!Schema::hasColumn('users', 'is_online')) {
+        if (! Schema::hasColumn('users', 'is_online')) {
             Schema::table('users', function (Blueprint $table) {
                 $table->boolean('is_online')->default(false);
             });

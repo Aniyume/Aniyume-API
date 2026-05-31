@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use App\Models\Anime;
-use App\Models\Tag;
-use App\Models\ImportLog;
 use App\Models\BlacklistedAnime;
+use App\Models\ImportLog;
+use App\Models\Tag;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -13,7 +13,9 @@ use Illuminate\Support\Str;
 class ShikimoriImportService
 {
     protected string $apiUrl = 'https://shikimori.io/api/graphql';
+
     protected int $perPage = 50;
+
     protected string $storageUrl = 'https://shikimori.io';
 
     public function importAll(bool $isInitialImport = true, int $startPage = 1): ImportLog
@@ -32,18 +34,19 @@ class ShikimoriImportService
             while ($hasNextPage) {
                 $result = $this->importPage($currentPage, $isInitialImport, $importLog);
 
-                if (!$result['success']) {
+                if (! $result['success']) {
                     $consecutiveErrors++;
 
                     // If rate limited (403) — wait and retry up to 3 times
                     if ($consecutiveErrors <= 3 && str_contains($result['error'] ?? '', '403')) {
                         Log::warning("Shikimori rate limit hit on page {$currentPage}, waiting 5s... (attempt {$consecutiveErrors}/3)");
                         sleep(5);
+
                         continue; // retry same page
                     }
 
                     // After 3 retries or non-rate-limit error — save what we have
-                    Log::warning("Shikimori import stopped at page {$currentPage}: " . ($result['error'] ?? 'Unknown'));
+                    Log::warning("Shikimori import stopped at page {$currentPage}: ".($result['error'] ?? 'Unknown'));
                     $importLog->update([
                         'finished_at' => now(),
                         'status' => 'partial',
@@ -53,6 +56,7 @@ class ShikimoriImportService
                             'hint' => "Resume with: php artisan import:anime --start-page={$currentPage}",
                         ]),
                     ]);
+
                     return $importLog;
                 }
 
@@ -89,7 +93,7 @@ class ShikimoriImportService
         try {
             $response = $this->fetchAnimeFromShikimori($page);
 
-            if (!$response['success']) {
+            if (! $response['success']) {
                 return $response;
             }
 
@@ -113,7 +117,7 @@ class ShikimoriImportService
 
             return [
                 'success' => false,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ];
         }
     }
@@ -175,7 +179,7 @@ class ShikimoriImportService
             if ($response->failed()) {
                 return [
                     'success' => false,
-                    'error' => 'Shikimori GraphQL request failed: ' . $response->status(),
+                    'error' => 'Shikimori GraphQL request failed: '.$response->status(),
                 ];
             }
 
@@ -184,7 +188,7 @@ class ShikimoriImportService
             if (isset($data['errors'])) {
                 return [
                     'success' => false,
-                    'error' => 'Shikimori API returned errors: ' . json_encode($data['errors']),
+                    'error' => 'Shikimori API returned errors: '.json_encode($data['errors']),
                 ];
             }
 
@@ -196,7 +200,7 @@ class ShikimoriImportService
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'error' => 'HTTP request exception: ' . $e->getMessage(),
+                'error' => 'HTTP request exception: '.$e->getMessage(),
             ];
         }
     }
@@ -212,6 +216,7 @@ class ShikimoriImportService
 
         if ($isBlacklisted) {
             $importLog->increment('total_skipped');
+
             return;
         }
 
@@ -221,6 +226,7 @@ class ShikimoriImportService
 
         if ($existing && $isInitialImport) {
             $importLog->increment('total_skipped');
+
             return;
         }
 
@@ -250,27 +256,30 @@ class ShikimoriImportService
 
     protected function cleanDescription(?string $html): ?string
     {
-        if (!$html) return null;
+        if (! $html) {
+            return null;
+        }
         // Shikimori descriptions might contain BBCode or HTML. GraphQL usually returns HTML or plain text.
         // Strip basic HTML/BBCode attributes and tags to have a clean text
         $text = strip_tags($html);
-        $text = preg_replace("/\[.*?\]/", "", $text);
+        $text = preg_replace("/\[.*?\]/", '', $text);
+
         return trim($text) ?: null;
     }
 
     protected function mapShikimoriToAnime(array $mediaData): array
     {
-        $title = !empty($mediaData['russian']) ? $mediaData['russian'] : $mediaData['name'];
-        
+        $title = ! empty($mediaData['russian']) ? $mediaData['russian'] : $mediaData['name'];
+
         $baseSlug = Str::slug($title);
         $slug = $this->generateUniqueSlug($baseSlug, $mediaData['id']);
 
         $posterUrl = null;
-        if (!empty($mediaData['poster']['originalUrl'])) {
+        if (! empty($mediaData['poster']['originalUrl'])) {
             $posterUrl = $mediaData['poster']['originalUrl'];
             // Normalize URLs from Shikimori if they are relative
             if (Str::startsWith($posterUrl, '/')) {
-                $posterUrl = $this->storageUrl . $posterUrl;
+                $posterUrl = $this->storageUrl.$posterUrl;
             }
         }
 
@@ -305,14 +314,14 @@ class ShikimoriImportService
         if (empty($baseSlug)) {
             $baseSlug = "anime-{$externalId}";
         }
-        
+
         $slug = $baseSlug;
         $counter = 2;
 
         while (Anime::where('slug', $slug)
             ->where('external_id', '!=', $externalId)
             ->exists()) {
-            $slug = $baseSlug . '-' . $counter;
+            $slug = $baseSlug.'-'.$counter;
             $counter++;
         }
 
@@ -321,7 +330,7 @@ class ShikimoriImportService
 
     protected function parseDate(?array $date): ?string
     {
-        if (!$date || empty($date['year'])) {
+        if (! $date || empty($date['year'])) {
             return null;
         }
 
@@ -334,7 +343,7 @@ class ShikimoriImportService
 
     protected function mapStatus(?string $status): string
     {
-        return match(strtolower($status ?? '')) {
+        return match (strtolower($status ?? '')) {
             'released' => 'finished',
             'ongoing' => 'ongoing',
             'anons' => 'planned',
@@ -345,7 +354,7 @@ class ShikimoriImportService
 
     protected function mapFormat(?string $format): string
     {
-        return match(strtolower($format ?? '')) {
+        return match (strtolower($format ?? '')) {
             'tv', 'tv_13', 'tv_24', 'tv_48' => 'tv',
             'movie' => 'movie',
             'ova' => 'ova',
@@ -365,8 +374,10 @@ class ShikimoriImportService
         $tagIds = [];
 
         foreach ($mediaData['genres'] as $genre) {
-            $tagName = !empty($genre['russian']) ? $genre['russian'] : $genre['name'];
-            if (!$tagName) continue;
+            $tagName = ! empty($genre['russian']) ? $genre['russian'] : $genre['name'];
+            if (! $tagName) {
+                continue;
+            }
 
             $tag = Tag::firstOrCreate(
                 ['slug' => Str::slug($tagName)],

@@ -25,8 +25,7 @@ class FriendshipController extends Controller
         private readonly ResolveFriendshipStatusQuery $friendshipStatus,
         private readonly SearchUsersForFriendshipQuery $searchUsers,
         private readonly CountIncomingFriendRequestsQuery $incomingFriendRequests,
-    ) {
-    }
+    ) {}
 
     // GET /friends — список принятых друзей
     public function index(Request $request): JsonResponse

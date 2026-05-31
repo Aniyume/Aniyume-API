@@ -6,13 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\AdminAnimeResource;
 use App\Http\Resources\AdminImportLogResource;
 use App\Models\Anime;
+use App\Models\AuditLog;
+use App\Models\Comment;
 use App\Models\Episode;
 use App\Models\ImportLog;
+use App\Models\Report;
 use App\Models\Tag;
 use App\Models\User;
-use App\Models\Comment;
-use App\Models\AuditLog;
-use App\Models\Report;
 use Illuminate\Http\JsonResponse;
 
 class DashboardController extends Controller

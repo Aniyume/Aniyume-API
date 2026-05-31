@@ -30,10 +30,10 @@ class JoinRoomAction
         $room->load(['anime', 'host', 'activeParticipants.user']);
 
         return [
-            'room'  => $this->formatRoom($room),
+            'room' => $this->formatRoom($room),
             'state' => [
-                'current_time'   => $room->current_time,
-                'is_playing'     => $room->is_playing,
+                'current_time' => $room->current_time,
+                'is_playing' => $room->is_playing,
                 'episode_number' => $room->episode_number,
             ],
         ];

@@ -2,13 +2,14 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class KodikService
 {
     private string $baseUrl;
+
     private ?string $apiToken;
 
     /**
@@ -22,9 +23,9 @@ class KodikService
 
     public function __construct()
     {
-        $this->baseUrl  = rtrim(config('services.kodik.base_url', 'https://kodikapi.com'), '/');
+        $this->baseUrl = rtrim(config('services.kodik.base_url', 'https://kodikapi.com'), '/');
         $this->apiToken = config('services.kodik.token', '');
-        
+
         if (empty($this->apiToken)) {
             $this->apiToken = $this->fetchDynamicToken();
         }
@@ -32,16 +33,16 @@ class KodikService
 
     public function searchByShikimoriId(?int $shikimoriId): array
     {
-        if (!$shikimoriId) {
+        if (! $shikimoriId) {
             return [];
         }
 
         $cacheKey = "kodik_anime_{$shikimoriId}";
-        
+
         return Cache::remember($cacheKey, 3600, function () use ($shikimoriId) {
             $params = [
-                'shikimori_id'       => $shikimoriId,
-                'with_episodes'      => true,
+                'shikimori_id' => $shikimoriId,
+                'with_episodes' => true,
                 'with_material_data' => true,
             ];
 
@@ -50,6 +51,7 @@ class KodikService
             }
 
             $response = $this->requestWithFallback('/search', $params);
+
             return $response ?? [];
         });
     }
@@ -60,7 +62,7 @@ class KodikService
      */
     public function searchAllTranslations(?int $shikimoriId): array
     {
-        if (!$shikimoriId) {
+        if (! $shikimoriId) {
             return [];
         }
 
@@ -68,8 +70,8 @@ class KodikService
 
         return Cache::remember($cacheKey, 3600, function () use ($shikimoriId) {
             $params = [
-                'shikimori_id'       => $shikimoriId,
-                'with_episodes'      => true,
+                'shikimori_id' => $shikimoriId,
+                'with_episodes' => true,
                 'with_episodes_data' => true,
                 'with_material_data' => true,
             ];
@@ -85,7 +87,7 @@ class KodikService
     public function getEpisodes(string $kodikId): array
     {
         $data = $this->searchByKodikId($kodikId);
-        
+
         if (empty($data)) {
             return [];
         }
@@ -96,14 +98,14 @@ class KodikService
 
         foreach ($seasons as $seasonNumber => $seasonData) {
             $episodesData = $seasonData['episodes'] ?? [];
-            
+
             foreach ($episodesData as $episodeNumber => $link) {
                 // Remove protocol so we can reliably add https
                 $link = str_replace(['http:', 'https:'], '', $link);
                 if (str_starts_with($link, '//')) {
-                    $link = 'https:' . $link;
+                    $link = 'https:'.$link;
                 }
-                
+
                 // Add hide_premium and only_episode flags
                 $link = $this->buildPlayerUrl($link);
 
@@ -131,14 +133,14 @@ class KodikService
     {
         $parsedUrl = parse_url($url);
         $query = [];
-        
+
         if (isset($parsedUrl['query'])) {
             parse_str($parsedUrl['query'], $query);
         }
 
         // Если указать этот параметр, кнопка "Следующая серия" пропадет внутри плеера
         $query['only_episode'] = 'true';
-        
+
         // Скрывает блок Kodik "Премиум" если у нас есть корректный токен
         // На самом токене должна быть активирована услуга "Белый список (без рекламы)"
         if (config('services.kodik.hide_ads', false)) {
@@ -146,12 +148,12 @@ class KodikService
         }
 
         $newQuery = http_build_query($query);
-        
-        $scheme = isset($parsedUrl['scheme']) ? $parsedUrl['scheme'] . '://' : 'https://';
+
+        $scheme = isset($parsedUrl['scheme']) ? $parsedUrl['scheme'].'://' : 'https://';
         $host = $parsedUrl['host'] ?? '';
         $path = $parsedUrl['path'] ?? '';
-        
-        return $scheme . $host . $path . '?' . $newQuery;
+
+        return $scheme.$host.$path.'?'.$newQuery;
     }
 
     /**
@@ -174,15 +176,17 @@ class KodikService
             if (isset($episodes[$episodeNumber])) {
                 $link = $episodes[$episodeNumber];
                 if (str_starts_with($link, '//')) {
-                    $link = 'https:' . $link;
+                    $link = 'https:'.$link;
                 }
+
                 return $this->buildPlayerUrl($link);
             }
         }
 
         // For movies — single link
         if (isset($anime['link']) && $episodeNumber === 1) {
-            $link = str_starts_with($anime['link'], '//') ? 'https:' . $anime['link'] : $anime['link'];
+            $link = str_starts_with($anime['link'], '//') ? 'https:'.$anime['link'] : $anime['link'];
+
             return $this->buildPlayerUrl($link);
         }
 
@@ -220,9 +224,10 @@ class KodikService
 
         $results = $this->requestWithFallback('/search', $params) ?? [];
 
-        usort($results, function($a, $b) {
+        usort($results, function ($a, $b) {
             $aEpisodes = $this->countEpisodes($a);
             $bEpisodes = $this->countEpisodes($b);
+
             return $bEpisodes <=> $aEpisodes;
         });
 
@@ -247,11 +252,13 @@ class KodikService
                 }
             } catch (\Throwable $e) {
                 Log::debug("Kodik request failed for domain {$domain}: {$e->getMessage()}");
+
                 continue;
             }
         }
 
         Log::warning("Kodik: all domains failed for {$path}", ['params' => array_diff_key($params, ['token' => ''])]);
+
         return null;
     }
 
@@ -259,11 +266,11 @@ class KodikService
     {
         $count = 0;
         $seasons = $anime['seasons'] ?? [];
-        
+
         foreach ($seasons as $season) {
             $count += count($season['episodes'] ?? []);
         }
-        
+
         return $count;
     }
 
@@ -281,12 +288,13 @@ class KodikService
 
                 if ($response->successful()) {
                     if (preg_match('/token="([^"]+)"/', $response->body(), $matches)) {
-                        Log::info("Successfully fetched dynamic Kodik token.");
+                        Log::info('Successfully fetched dynamic Kodik token.');
+
                         return $matches[1];
                     }
                 }
             } catch (\Throwable $e) {
-                Log::warning("Failed to fetch dynamic Kodik token: " . $e->getMessage());
+                Log::warning('Failed to fetch dynamic Kodik token: '.$e->getMessage());
             }
 
             return null;

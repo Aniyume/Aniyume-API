@@ -39,7 +39,7 @@ class ReportController extends Controller
             ->where('target_id', $target->getKey())
             ->where(function ($query) use ($request) {
                 $query->where('reporter_id', $request->user()?->id)
-                    ->orWhere(function ($query) use ($request) {
+                    ->orWhere(function ($query) {
                         $query->whereNull('reporter_id')->where('created_at', '>=', now()->subMinutes(30));
                     });
             })

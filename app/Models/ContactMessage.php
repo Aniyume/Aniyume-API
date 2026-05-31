@@ -10,8 +10,11 @@ class ContactMessage extends Model
     use HasFactory;
 
     public const STATUS_NEW = 'new';
+
     public const STATUS_REVIEWED = 'reviewed';
+
     public const STATUS_RESOLVED = 'resolved';
+
     public const STATUS_ARCHIVED = 'archived';
 
     protected $fillable = [

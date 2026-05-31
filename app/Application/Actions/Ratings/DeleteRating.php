@@ -9,8 +9,7 @@ class DeleteRating
 {
     public function __construct(
         private readonly RecalculateAnimeRating $recalculateAnimeRating,
-    ) {
-    }
+    ) {}
 
     public function handle(Rating $rating): void
     {

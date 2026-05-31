@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class UserStatisticsService
 {
@@ -89,14 +89,14 @@ class UserStatisticsService
         return (int) ($total ?? 0);
     }
 
- private function getTotalWatchTime(int $userId): int
-{
-    $total = DB::table('watch_history')
-        ->where('user_id', $userId)
-        ->sum('watch_time');
+    private function getTotalWatchTime(int $userId): int
+    {
+        $total = DB::table('watch_history')
+            ->where('user_id', $userId)
+            ->sum('watch_time');
 
-    return (int) ($total ?? 0);
-}
+        return (int) ($total ?? 0);
+    }
 
     private function formatWatchTime(int $totalSeconds): array
     {

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\Api\Admin\Concerns\BuildsPaginationMeta;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreAdminTagRequest;
 use App\Http\Requests\Admin\UpdateAdminTagRequest;
 use App\Http\Resources\AdminTagResource;

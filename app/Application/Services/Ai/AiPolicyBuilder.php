@@ -8,9 +8,7 @@ use App\Domain\Ai\PersonalDataScope;
 
 final readonly class AiPolicyBuilder
 {
-    public function __construct(private AiCapabilityMatrix $capabilityMatrix)
-    {
-    }
+    public function __construct(private AiCapabilityMatrix $capabilityMatrix) {}
 
     public function build(AiRole $role): AiPolicy
     {
@@ -39,7 +37,7 @@ final readonly class AiPolicyBuilder
     }
 
     /**
-     * @param list<string> $topics
+     * @param  list<string>  $topics
      * @return list<string>
      */
     private function canAnswer(array $topics, bool $allowsAdminData): array

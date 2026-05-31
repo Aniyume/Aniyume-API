@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('users')) {
+        if (! Schema::hasTable('users')) {
             return;
         }
 
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'is_banned')) {
+            if (! Schema::hasColumn('users', 'is_banned')) {
                 $table->boolean('is_banned')->default(false);
             }
-            if (!Schema::hasColumn('users', 'ban_reason')) {
+            if (! Schema::hasColumn('users', 'ban_reason')) {
                 $table->string('ban_reason')->nullable();
             }
         });
@@ -30,7 +30,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (!Schema::hasTable('users')) {
+        if (! Schema::hasTable('users')) {
             return;
         }
 
@@ -42,7 +42,7 @@ return new class extends Migration
             if (Schema::hasColumn('users', 'ban_reason')) {
                 $columnsToDrop[] = 'ban_reason';
             }
-            if (!empty($columnsToDrop)) {
+            if (! empty($columnsToDrop)) {
                 $table->dropColumn($columnsToDrop);
             }
         });

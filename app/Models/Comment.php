@@ -30,4 +30,3 @@ class Comment extends Model
         return $this->belongsTo(Anime::class);
     }
 }
-    

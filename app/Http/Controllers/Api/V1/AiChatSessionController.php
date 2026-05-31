@@ -12,8 +12,7 @@ class AiChatSessionController extends Controller
 {
     public function __construct(
         private readonly AiChatSessionStore $sessionStore,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request): JsonResponse
     {

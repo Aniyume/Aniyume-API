@@ -22,6 +22,6 @@ class GetMessagesQuery
             ->get()
             ->reverse()
             ->values()
-            ->map(fn(WatchPartyMessage $message) => $this->formatMessage($message));
+            ->map(fn (WatchPartyMessage $message) => $this->formatMessage($message));
     }
 }

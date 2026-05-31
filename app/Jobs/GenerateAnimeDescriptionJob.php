@@ -16,6 +16,7 @@ class GenerateAnimeDescriptionJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 3;
+
     public $backoff = [60, 120, 300]; // Задержка между попытками (секунды)
 
     protected Anime $anime;
@@ -35,7 +36,7 @@ class GenerateAnimeDescriptionJob implements ShouldQueue
     {
         // Повторная проверка, возможно описание уже дописано вручную
         $this->anime->refresh();
-        if (!empty($this->anime->description) && strlen($this->anime->description) > 20) {
+        if (! empty($this->anime->description) && strlen($this->anime->description) > 20) {
             return;
         }
 

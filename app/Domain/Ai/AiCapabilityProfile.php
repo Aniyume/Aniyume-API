@@ -5,8 +5,8 @@ namespace App\Domain\Ai;
 final readonly class AiCapabilityProfile
 {
     /**
-     * @param list<string> $allowedTopics
-     * @param list<string> $allowedTools
+     * @param  list<string>  $allowedTopics
+     * @param  list<string>  $allowedTools
      */
     public function __construct(
         public AiRole $role,
@@ -18,8 +18,7 @@ final readonly class AiCapabilityProfile
         public bool $allowsAdminData,
         public bool $allowsSystemData,
         public bool $allowsOutOfDomain,
-    ) {
-    }
+    ) {}
 
     public function allowsTopic(string $topic): bool
     {

@@ -9,11 +9,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('anime_user', function (Blueprint $table) {
-            if (!Schema::hasColumn('anime_user', 'episodes_watched')) {
+            if (! Schema::hasColumn('anime_user', 'episodes_watched')) {
                 $table->unsignedInteger('episodes_watched')->default(0);
             }
 
-            if (!Schema::hasColumn('anime_user', 'last_watched_at')) {
+            if (! Schema::hasColumn('anime_user', 'last_watched_at')) {
                 $table->timestamp('last_watched_at')->nullable();
             }
         });

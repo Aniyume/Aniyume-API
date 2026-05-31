@@ -8,9 +8,7 @@ use App\Models\User;
 
 class ListFriendRequestsQuery
 {
-    public function __construct(private readonly FriendshipUserFormatter $formatter)
-    {
-    }
+    public function __construct(private readonly FriendshipUserFormatter $formatter) {}
 
     public function getFor(User $user): array
     {

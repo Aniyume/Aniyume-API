@@ -9,8 +9,7 @@ class UpsertRating
 {
     public function __construct(
         private readonly RecalculateAnimeRating $recalculateAnimeRating,
-    ) {
-    }
+    ) {}
 
     public function handle(int $userId, int $animeId, float $ratingValue): Rating
     {

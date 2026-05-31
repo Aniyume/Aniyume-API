@@ -4,6 +4,4 @@ namespace App\Domain\Ai;
 
 use RuntimeException;
 
-class AiToolAccessDeniedException extends RuntimeException
-{
-}
+class AiToolAccessDeniedException extends RuntimeException {}

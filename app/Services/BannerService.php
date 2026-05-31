@@ -3,19 +3,19 @@
 namespace App\Services;
 
 use App\Models\Anime;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class BannerService
 {
     protected string $apiUrl = 'https://graphql.anilist.co';
+
     protected static array $requestBuffer = [];
 
     /**
      * Get banner and cover URLs for a given anime.
      *
-     * @param Anime $anime
      * @return array{banner: ?string, cover: ?string}
      */
     public function getBanner(Anime $anime): array
@@ -33,11 +33,11 @@ class BannerService
     protected function fetchFromAnilist(Anime $anime): array
     {
         $idMal = $anime->shikimori_id ? (int) $anime->shikimori_id : null;
-        $idAniList = ($anime->external_source === 'anilist' && $anime->external_id) 
-            ? (int) $anime->external_id 
+        $idAniList = ($anime->external_source === 'anilist' && $anime->external_id)
+            ? (int) $anime->external_id
             : null;
 
-        if (!$idMal && !$idAniList) {
+        if (! $idMal && ! $idAniList) {
             return ['banner' => null, 'cover' => null];
         }
 
@@ -48,8 +48,12 @@ class BannerService
         }
 
         $variables = ['type' => 'ANIME'];
-        if ($idMal) $variables['idMal'] = $idMal;
-        if ($idAniList) $variables['id'] = $idAniList;
+        if ($idMal) {
+            $variables['idMal'] = $idMal;
+        }
+        if ($idAniList) {
+            $variables['id'] = $idAniList;
+        }
 
         if (empty($variables['idMal']) && empty($variables['id'])) {
             return ['banner' => null, 'cover' => null];
@@ -75,6 +79,7 @@ class BannerService
             if ($response->failed()) {
                 // Negative caching for 4 hours on API failure
                 Cache::put("anime_banner_{$anime->id}", ['banner' => null, 'cover' => null], now()->addHours(4));
+
                 return ['banner' => null, 'cover' => null];
             }
 
@@ -87,12 +92,14 @@ class BannerService
             ];
 
             self::$requestBuffer[$dedupKey] = $result;
+
             return $result;
 
         } catch (\Exception $e) {
             Log::error("BannerService: Failed to fetch banner for Anime #{$anime->id}", [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return ['banner' => null, 'cover' => null];
         }
     }

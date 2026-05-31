@@ -8,8 +8,8 @@ use App\Models\Anime;
 use App\Models\Episode;
 use App\Services\BannerService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 /**
  * @group Публичные данные
@@ -55,7 +55,7 @@ class AnimeController extends Controller
                 $q->where('year', $request->year);
             })
             ->when($request->filled('search'), function ($q) use ($request) {
-                $search = '%' . mb_strtolower((string) $request->search) . '%';
+                $search = '%'.mb_strtolower((string) $request->search).'%';
 
                 $q->where(function ($subQ) use ($search) {
                     $subQ->whereRaw('LOWER(title) LIKE ?', [$search])
@@ -72,11 +72,11 @@ class AnimeController extends Controller
         }
 
         $sort = $request->sort;
-        if (!$sort || $sort === 'smart') {
+        if (! $sort || $sort === 'smart') {
             // Улучшенная умная сортировка
             // 1. Приоритет тем, у кого есть серии в базе
             $query->orderByRaw('CASE WHEN (SELECT count(*) FROM episodes WHERE episodes.anime_id = anime.id) > 0 THEN 0 ELSE 1 END');
-            
+
             // 2. Деприоритет тега "Детское" (чтобы китайские мультики не лезли в начало)
             $query->orderByRaw('CASE WHEN EXISTS (
                 SELECT 1 FROM anime_tag 
@@ -89,9 +89,9 @@ class AnimeController extends Controller
 
             // 4. Сначала свежие годы, но в рамках одного года — популярные
             $query->orderBy('year', 'DESC')
-                  ->orderBy('popularity', 'DESC')
-                  ->orderBy('rating', 'DESC')
-                  ->orderBy('id', 'DESC');
+                ->orderBy('popularity', 'DESC')
+                ->orderBy('rating', 'DESC')
+                ->orderBy('id', 'DESC');
         } else {
             $sortMap = [
                 'rating' => ['rating', 'DESC'],
@@ -101,7 +101,7 @@ class AnimeController extends Controller
             ];
 
             $s = $sortMap[$sort] ?? ['id', 'ASC'];
-            $query->orderByRaw($s[0] . ' ' . $s[1] . ' NULLS LAST');
+            $query->orderByRaw($s[0].' '.$s[1].' NULLS LAST');
         }
 
         $perPage = (int) $request->integer('per_page', 20);
@@ -117,14 +117,14 @@ class AnimeController extends Controller
      *
      * @urlParam anime integer ID аниме. Example: 3
      */
-public function show(Anime $anime)
-{
-    $anime->load(['tags']);
-    $maxEpisode = Episode::query()->where('anime_id', '=', $anime->id)->max('episode_number');
-    $anime->episodes_count = $maxEpisode ?: 0;
+    public function show(Anime $anime)
+    {
+        $anime->load(['tags']);
+        $maxEpisode = Episode::query()->where('anime_id', '=', $anime->id)->max('episode_number');
+        $anime->episodes_count = $maxEpisode ?: 0;
 
-    return new AnimeResource($anime);
-}
+        return new AnimeResource($anime);
+    }
 
     /**
      * Статистика сообщества
@@ -154,7 +154,9 @@ public function show(Anime $anime)
      * Возвращает связанные (сиквелы/приквелы) и похожие по жанрам аниме.
      *
      * @group Публичные данные
+     *
      * @urlParam anime integer ID аниме. Example: 3
+     *
      * @response { "has_official_related": true, "related": [...], "similar": [...] }
      */
     public function getRecommendations(Anime $anime)
@@ -171,14 +173,14 @@ public function show(Anime $anime)
 
                 if ($response->successful()) {
                     $relatedData = collect($response->json())
-                        ->filter(fn($item) => !empty($item['anime']))
+                        ->filter(fn ($item) => ! empty($item['anime']))
                         ->values();
 
                     $shikimoriIds = $relatedData
-                        ->map(fn($item) => (int) $item['anime']['id'])
+                        ->map(fn ($item) => (int) $item['anime']['id'])
                         ->toArray();
 
-                    if (!empty($shikimoriIds)) {
+                    if (! empty($shikimoriIds)) {
                         $relationType = [];
                         foreach ($relatedData as $item) {
                             $relationType[(int) $item['anime']['id']] = $item['relation'] ?? null;
@@ -190,17 +192,17 @@ public function show(Anime $anime)
 
                         $related = $foundAnime->map(function ($a) use ($relationType) {
                             return [
-                                'id'            => $a->id,
-                                'title'         => $a->title,
-                                'poster_url'    => $a->poster_url,
-                                'type'          => $a->type,
-                                'rating'        => $a->rating,
-                                'year'          => $a->year,
+                                'id' => $a->id,
+                                'title' => $a->title,
+                                'poster_url' => $a->poster_url,
+                                'type' => $a->type,
+                                'rating' => $a->rating,
+                                'year' => $a->year,
                                 'relation_type' => $relationType[(int) $a->shikimori_id] ?? null,
                             ];
                         })->toArray();
 
-                        if (!empty($related)) {
+                        if (! empty($related)) {
                             $hasOfficialRelated = true;
                         }
                     }
@@ -221,14 +223,14 @@ public function show(Anime $anime)
 
         // 4. Similar by tags
         $similar = [];
-        if (!empty($tagIds)) {
+        if (! empty($tagIds)) {
             $similar = $this->getSimilarByTags($tagIds, $excludeIds, 5, 0);
         }
 
         // 5. Fallback: if related is empty, fill both from tags
         if (empty($related)) {
             $hasOfficialRelated = false;
-            if (!empty($tagIds)) {
+            if (! empty($tagIds)) {
                 $allByTags = $this->getSimilarByTags($tagIds, [$anime->id], 10, 0);
                 $related = array_slice($allByTags, 0, 5);
                 $similar = array_slice($allByTags, 5, 5);
@@ -264,13 +266,13 @@ public function show(Anime $anime)
 
         return Anime::query()->whereIn('id', $animeRows->all(), 'and', false)
             ->get()
-            ->map(fn($a) => [
-                'id'            => $a->id,
-                'title'         => $a->title,
-                'poster_url'    => $a->poster_url,
-                'type'          => $a->type,
-                'rating'        => $a->rating,
-                'year'          => $a->year,
+            ->map(fn ($a) => [
+                'id' => $a->id,
+                'title' => $a->title,
+                'poster_url' => $a->poster_url,
+                'type' => $a->type,
+                'rating' => $a->rating,
+                'year' => $a->year,
                 'relation_type' => null,
             ])
             ->toArray();

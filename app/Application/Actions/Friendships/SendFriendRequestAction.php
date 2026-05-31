@@ -8,9 +8,7 @@ use App\Models\User;
 
 class SendFriendRequestAction
 {
-    public function __construct(private readonly FriendshipLookup $friendships)
-    {
-    }
+    public function __construct(private readonly FriendshipLookup $friendships) {}
 
     public function execute(User $user, int $targetUserId): array
     {
@@ -42,9 +40,9 @@ class SendFriendRequestAction
         }
 
         Friendship::create([
-            'user_id'   => $user->id,
+            'user_id' => $user->id,
             'friend_id' => $targetUserId,
-            'status'    => 'pending',
+            'status' => 'pending',
         ]);
 
         return [

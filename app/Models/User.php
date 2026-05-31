@@ -67,13 +67,12 @@ class User extends Authenticatable
         return $this->hasMany(WatchHistory::class);
     }
 
-public function animeList()
-{
-    return $this->belongsToMany(Anime::class, 'anime_user')
-        ->withPivot(['status', 'episodes_watched'])
-        ->withTimestamps();
-}
-
+    public function animeList()
+    {
+        return $this->belongsToMany(Anime::class, 'anime_user')
+            ->withPivot(['status', 'episodes_watched'])
+            ->withTimestamps();
+    }
 
     public function friends()
     {

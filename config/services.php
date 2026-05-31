@@ -34,15 +34,15 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-'kodik' => [
+    'kodik' => [
         'base_url' => env('KODIK_BASE_URL', 'https://kodikapi.com'),
-        'token'    => env('KODIK_API_TOKEN', ''),
+        'token' => env('KODIK_API_TOKEN', ''),
         'hide_ads' => env('KODIK_HIDE_ADS', false),
     ],
 
     'anilibria' => [
         'base_url' => env('ANILIBRIA_BASE_URL', 'https://anilibria.top/api/v1'),
-        'cdn_url'  => env('ANILIBRIA_CDN_URL', 'https://cache-rfn.libria.fun'),
+        'cdn_url' => env('ANILIBRIA_CDN_URL', 'https://cache-rfn.libria.fun'),
     ],
 
 ];

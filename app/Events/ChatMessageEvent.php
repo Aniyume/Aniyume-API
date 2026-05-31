@@ -14,17 +14,17 @@ class ChatMessageEvent implements ShouldBroadcastNow
 
     public function __construct(
         public readonly string $roomCode,
-        public readonly int    $userId,
+        public readonly int $userId,
         public readonly string $userName,
         public readonly string $userAvatar,
         public readonly string $message,
-        public readonly int    $messageId,
+        public readonly int $messageId,
     ) {}
 
     public function broadcastOn(): array
     {
         return [
-            new PresenceChannel('watch-party.' . $this->roomCode),
+            new PresenceChannel('watch-party.'.$this->roomCode),
         ];
     }
 
@@ -36,12 +36,12 @@ class ChatMessageEvent implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
-            'id'         => $this->messageId,
-            'user_id'    => $this->userId,
-            'user_name'  => $this->userName,
+            'id' => $this->messageId,
+            'user_id' => $this->userId,
+            'user_name' => $this->userName,
             'user_avatar' => $this->userAvatar,
-            'message'    => $this->message,
-            'type'       => 'message',
+            'message' => $this->message,
+            'type' => 'message',
             'created_at' => now()->toISOString(),
         ];
     }

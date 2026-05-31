@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\WatchPartyRoom;
 use App\Models\WatchPartyParticipant;
+use App\Models\WatchPartyRoom;
 use Illuminate\Support\Facades\Broadcast;
 
 // Системный канал уведомлений Sanctum
@@ -21,7 +21,7 @@ Broadcast::channel('watch-party.{code}', function ($user, $code) {
         ->where('is_active', true)
         ->first();
 
-    if (!$room) {
+    if (! $room) {
         return false;
     }
 
@@ -30,14 +30,14 @@ Broadcast::channel('watch-party.{code}', function ($user, $code) {
         ->where('is_active', true)
         ->exists();
 
-    if (!$isParticipant) {
+    if (! $isParticipant) {
         return false;
     }
 
     return [
-        'id'       => $user->id,
-        'name'     => $user->name,
-        'avatar'   => $user->avatar ? '/api-storage/avatars/' . $user->avatar : null,
-        'is_host'  => $room->host_user_id === $user->id,
+        'id' => $user->id,
+        'name' => $user->name,
+        'avatar' => $user->avatar ? '/api-storage/avatars/'.$user->avatar : null,
+        'is_host' => $room->host_user_id === $user->id,
     ];
 });

@@ -19,7 +19,7 @@ class RoomClosedEvent implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new PresenceChannel('watch-party.' . $this->roomCode),
+            new PresenceChannel('watch-party.'.$this->roomCode),
         ];
     }
 

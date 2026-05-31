@@ -15,7 +15,7 @@ class StoreRatingRequest extends FormRequest
     {
         return [
             'anime_id' => 'required|integer|exists:anime,id',
-           'rating' => 'required|numeric|min:1|max:5',
+            'rating' => 'required|numeric|min:1|max:5',
         ];
     }
 }

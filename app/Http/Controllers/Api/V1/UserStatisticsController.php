@@ -24,13 +24,14 @@ class UserStatisticsController extends Controller
      * Общая статистика пользователя
      *
      * Возвращает количество просмотров, время и динамику.
+     *
      * @urlParam userId integer ID пользователя (если не указан - текущий). Example: 2
      */
     public function getStatistics(Request $request, $userId = null): JsonResponse
     {
         $targetUserId = $userId ?? $request->user()?->id;
 
-        if (!$targetUserId) {
+        if (! $targetUserId) {
             return response()->json(['message' => 'User ID not provided'], 400);
         }
 
@@ -41,6 +42,7 @@ class UserStatisticsController extends Controller
 
     /**
      * Сводка по эпизодам
+     *
      * @authenticated
      */
     public function getEpisodesSummary(Request $request): UserEpisodesStatisticsResource

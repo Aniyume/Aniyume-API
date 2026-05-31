@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 
 /**
  * @group Профиль пользователя
+ *
  * @authenticated
  */
 class UserProfileController extends Controller
@@ -23,11 +24,13 @@ class UserProfileController extends Controller
     {
         $user = $request->user();
         $profile = $this->profileService->getFullProfile($user);
+
         return response()->json($profile);
     }
 
     /**
      * Обновить профиль
+     *
      * @bodyParam name string Имя. Example: Ivan
      * @bodyParam bio string О себе. Example: Люблю меха и сенены.
      * @bodyParam custom_status string Статус. Example: Смотрю One Piece
@@ -46,13 +49,14 @@ class UserProfileController extends Controller
                 'avatar' => $updated->avatar,
                 'bio' => $updated->bio,
                 'custom_status' => $updated->custom_status,
-                'is_premium' => (bool)$updated->is_premium,
+                'is_premium' => (bool) $updated->is_premium,
             ],
         ], 200);
     }
 
     /**
      * Загрузить аватар
+     *
      * @bodyParam avatar file required Изображение (jpg, png, webp).
      */
     public function uploadAvatar(Request $request): JsonResponse
@@ -61,7 +65,7 @@ class UserProfileController extends Controller
             'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
-       if ($request->hasFile('avatar')) {
+        if ($request->hasFile('avatar')) {
             $path = $request->file('avatar')->store('avatars', 'public');
             $user = $this->profileService->updateAvatar($request->user(), $path);
 
@@ -70,6 +74,7 @@ class UserProfileController extends Controller
                 'avatar' => $user->avatar,
             ], 200);
         }
+
         return response()->json(['message' => 'No file provided'], 400);
     }
 }

@@ -37,7 +37,7 @@ class AnimeResource extends JsonResource
 
     private function formatDate($date): ?string
     {
-        if (!$date) {
+        if (! $date) {
             return null;
         }
 

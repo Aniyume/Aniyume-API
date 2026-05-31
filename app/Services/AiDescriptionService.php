@@ -10,7 +10,7 @@ class AiDescriptionService
     /**
      * Генерирует описание для аниме с помощью Google Gemini API
      *
-     * @param string $animeTitle Название аниме
+     * @param  string  $animeTitle  Название аниме
      * @return string|null Сгенерированное описание или null в случае ошибки
      */
     public function generateDescription(string $animeTitle): ?string
@@ -18,7 +18,8 @@ class AiDescriptionService
         $apiKey = config('services.gemini.key') ?? env('GEMINI_API_KEY');
 
         if (empty($apiKey)) {
-            Log::warning("AI Generator: GEMINI_API_KEY is not set in .env");
+            Log::warning('AI Generator: GEMINI_API_KEY is not set in .env');
+
             return null;
         }
 
@@ -33,29 +34,29 @@ class AiDescriptionService
                     'contents' => [
                         [
                             'parts' => [
-                                ['text' => $prompt]
-                            ]
-                        ]
+                                ['text' => $prompt],
+                            ],
+                        ],
                     ],
                     'generationConfig' => [
                         'temperature' => 0.7,
                         'maxOutputTokens' => 800,
-                    ]
+                    ],
                 ]);
 
             if ($response->successful()) {
                 $data = $response->json();
                 $text = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
-                
+
                 if ($text) {
                     return trim($text);
                 }
             } else {
-                Log::error("Gemini API Error for '{$animeTitle}': " . $response->body());
+                Log::error("Gemini API Error for '{$animeTitle}': ".$response->body());
             }
 
         } catch (\Exception $e) {
-            Log::error("Gemini API Exception for '{$animeTitle}': " . $e->getMessage());
+            Log::error("Gemini API Exception for '{$animeTitle}': ".$e->getMessage());
         }
 
         return null;

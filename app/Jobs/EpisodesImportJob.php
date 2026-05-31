@@ -16,6 +16,7 @@ class EpisodesImportJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $timeout = 300;
+
     public int $tries = 2;
 
     public function __construct(
@@ -27,7 +28,7 @@ class EpisodesImportJob implements ShouldQueue
     {
         $anime = Anime::query()->find($this->animeId);
 
-        if (!$anime) {
+        if (! $anime) {
             Log::warning('Episodes import skipped: anime not found', [
                 'anime_id' => $this->animeId,
             ]);

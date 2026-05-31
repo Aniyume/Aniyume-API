@@ -27,12 +27,13 @@ class ResetEpisodes extends Command
 
         $this->newLine();
         $this->info('📊 Current episode statistics:');
-        $this->table(['Source', 'Count'], collect($bySource)->map(fn($c, $s) => [$s, $c])->values()->toArray());
+        $this->table(['Source', 'Count'], collect($bySource)->map(fn ($c, $s) => [$s, $c])->values()->toArray());
         $this->info("Total: {$totalEpisodes} episodes");
         $this->newLine();
 
         if ($totalEpisodes === 0) {
             $this->warn('⚠️  No episodes found in the database. Nothing to reset.');
+
             return 0;
         }
 
@@ -47,14 +48,16 @@ class ResetEpisodes extends Command
 
             if ($count === 0) {
                 $this->warn("⚠️  No episodes found with source '{$source}'.");
+
                 return 0;
             }
         }
 
         // Confirmation
-        if (!$this->option('force')) {
-            if (!$this->confirm("🗑️  Are you sure you want to delete {$label}?", false)) {
+        if (! $this->option('force')) {
+            if (! $this->confirm("🗑️  Are you sure you want to delete {$label}?", false)) {
                 $this->info('❌ Operation cancelled.');
+
                 return 0;
             }
         }
@@ -72,7 +75,7 @@ class ResetEpisodes extends Command
         $this->info("✅ Deleted {$deleted} episodes.");
 
         // Reset anilibria_id on anime if clearing anilibria or all sources
-        if (!$source || $source === 'anilibria') {
+        if (! $source || $source === 'anilibria') {
             $resetCount = Anime::whereNotNull('anilibria_id')->update(['anilibria_id' => null]);
             $this->info("🔄 Reset anilibria_id on {$resetCount} anime records.");
         }

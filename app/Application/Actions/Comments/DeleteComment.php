@@ -10,8 +10,7 @@ class DeleteComment
 {
     public function __construct(
         private readonly AnimeCommentsCount $commentsCount,
-    ) {
-    }
+    ) {}
 
     public function handle(Comment $comment): void
     {

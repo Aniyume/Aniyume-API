@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
 use App\Http\Resources\Api\V1\CommentResource;
-use App\Models\Comment;
 use App\Models\Anime;
+use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -43,10 +43,12 @@ class CommentsController extends Controller
             DB::commit();
 
             $comment->load(['user', 'anime']);
+
             return new CommentResource($comment);
 
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'message' => 'Failed to add comment',
             ], 500);
@@ -64,6 +66,7 @@ class CommentsController extends Controller
         ]);
 
         $comment->load(['user', 'anime']);
+
         return new CommentResource($comment);
     }
 
@@ -86,11 +89,12 @@ class CommentsController extends Controller
             DB::commit();
 
             return response()->json([
-                'message' => 'Comment deleted successfully'
+                'message' => 'Comment deleted successfully',
             ], 200);
 
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'message' => 'Failed to delete comment',
             ], 500);

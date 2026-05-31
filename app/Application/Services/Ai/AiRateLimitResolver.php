@@ -6,9 +6,7 @@ use App\Models\User;
 
 final class AiRateLimitResolver
 {
-    public function __construct(private readonly AiRoleResolver $roleResolver)
-    {
-    }
+    public function __construct(private readonly AiRoleResolver $roleResolver) {}
 
     /**
      * @return array{role: string, limit: int, key: string}

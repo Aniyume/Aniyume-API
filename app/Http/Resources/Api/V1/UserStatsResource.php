@@ -39,7 +39,7 @@ class UserStatsResource extends JsonResource
             ->orderBy('watched_at', 'desc')
             ->limit(5)
             ->get()
-            ->map(fn($item) => [
+            ->map(fn ($item) => [
                 'anime' => [
                     'id' => $item->anime->id,
                     'title' => $item->anime->title,
@@ -59,7 +59,7 @@ class UserStatsResource extends JsonResource
             ->latest()
             ->limit(10)
             ->get()
-            ->map(fn($item) => [
+            ->map(fn ($item) => [
                 'id' => $item->anime->id,
                 'title' => $item->anime->title,
                 'slug' => $item->anime->slug,
@@ -90,7 +90,7 @@ class UserStatsResource extends JsonResource
             ->latest()
             ->limit(5)
             ->get()
-            ->map(fn($item) => [
+            ->map(fn ($item) => [
                 'anime' => [
                     'id' => $item->anime->id,
                     'title' => $item->anime->title,

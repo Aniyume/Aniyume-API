@@ -6,13 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\AdminSettingResource;
 use App\Models\AuditLog;
 use App\Models\Setting;
+use App\Services\AuditService;
 use App\Services\SettingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
-use App\Services\AuditService;
 
 class SettingController extends Controller
 {
@@ -95,6 +94,7 @@ class SettingController extends Controller
     {
         try {
             Cache::put('admin.diagnostics.cache', 'ok', 10);
+
             return Cache::get('admin.diagnostics.cache') === 'ok';
         } catch (\Throwable) {
             return false;

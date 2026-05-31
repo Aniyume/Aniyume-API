@@ -10,8 +10,7 @@ class CreateComment
 {
     public function __construct(
         private readonly AnimeCommentsCount $commentsCount,
-    ) {
-    }
+    ) {}
 
     public function handle(int $userId, int $animeId, string $text): Comment
     {

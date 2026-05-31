@@ -8,12 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (!Schema::hasTable('watch_history')) {
+        if (! Schema::hasTable('watch_history')) {
             return;
         }
 
         Schema::table('watch_history', function (Blueprint $table) {
-            if (!Schema::hasColumn('watch_history', 'watch_time')) {
+            if (! Schema::hasColumn('watch_history', 'watch_time')) {
                 $table->unsignedInteger('watch_time')->default(0)->after('progress');
             }
         });
@@ -21,7 +21,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        if (!Schema::hasTable('watch_history')) {
+        if (! Schema::hasTable('watch_history')) {
             return;
         }
 

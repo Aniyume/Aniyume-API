@@ -2,13 +2,14 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\AuditLog;
 use App\Models\User;
+use Illuminate\Console\Command;
 
 class CheckAuditLogs extends Command
 {
     protected $signature = 'audit:check {user_id?}';
+
     protected $description = 'Check audit logs for a user or show recent logs';
 
     public function handle()
@@ -17,8 +18,9 @@ class CheckAuditLogs extends Command
 
         if ($userId) {
             $user = User::find($userId);
-            if (!$user) {
+            if (! $user) {
                 $this->error("User with ID $userId not found");
+
                 return 1;
             }
 
@@ -30,7 +32,7 @@ class CheckAuditLogs extends Command
                 ->limit(10)
                 ->get();
         } else {
-            $this->info("Recent audit logs (all users)");
+            $this->info('Recent audit logs (all users)');
             $this->newLine();
 
             $logs = AuditLog::with('user')
@@ -41,6 +43,7 @@ class CheckAuditLogs extends Command
 
         if ($logs->isEmpty()) {
             $this->warn('No audit logs found');
+
             return 0;
         }
 

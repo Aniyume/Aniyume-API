@@ -18,7 +18,7 @@ class EpisodeFactory extends Factory
         return [
             'anime_id' => Anime::factory(),
             'episode_number' => $this->faker->unique()->numberBetween(1, 1000),
-            'title' => 'Episode ' . $this->faker->numberBetween(1, 1000),
+            'title' => 'Episode '.$this->faker->numberBetween(1, 1000),
             'player_url' => $this->faker->url(),
             'external_id' => (string) $this->faker->unique()->numberBetween(100000, 999999),
             'external_source' => 'factory',

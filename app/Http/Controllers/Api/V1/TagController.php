@@ -15,6 +15,7 @@ class TagController extends Controller
      * Список тегов
      *
      * Возвращает список всех жанров и категорий аниме.
+     *
      * @queryParam search string Поиск по названию тега. Example: Action
      */
     public function index(Request $request)
@@ -40,5 +41,4 @@ class TagController extends Controller
             'total' => $tags->count(),
         ]);
     }
-
 }

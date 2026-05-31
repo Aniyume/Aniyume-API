@@ -17,24 +17,26 @@ class FillMissingDescriptionsCommand extends Command
     protected $description = 'Заполнить описания аниме из Shikimori и Anilist API (батчами)';
 
     private int $updated = 0;
-    private int $failed  = 0;
+
+    private int $failed = 0;
 
     public function handle(): int
     {
-        $limit  = (int) $this->option('limit');
+        $limit = (int) $this->option('limit');
         $dryRun = $this->option('dry-run');
         $source = $this->option('source');
 
         $baseQuery = Anime::where(function ($q) {
             $q->whereNull('description')
-              ->orWhere('description', '')
-              ->orWhereRaw('LENGTH(description) < 20');
+                ->orWhere('description', '')
+                ->orWhereRaw('LENGTH(description) < 20');
         })->orderBy('id');
 
         $total = (clone $baseQuery)->count();
 
         if ($total === 0) {
             $this->info('Аниме без описания не найдено.');
+
             return self::SUCCESS;
         }
 
@@ -42,27 +44,32 @@ class FillMissingDescriptionsCommand extends Command
 
         if ($dryRun) {
             $q = clone $baseQuery;
-            if ($limit > 0) $q->limit($limit);
+            if ($limit > 0) {
+                $q->limit($limit);
+            }
             $this->table(
                 ['ID', 'Title', 'shikimori_id', 'external_source', 'external_id'],
                 $q->get(['id', 'title', 'external_id', 'external_source', 'shikimori_id'])
-                  ->map(fn($a) => [$a->id, $a->title, $a->shikimori_id, $a->external_source, $a->external_id])
+                    ->map(fn ($a) => [$a->id, $a->title, $a->shikimori_id, $a->external_source, $a->external_id])
             );
             $this->warn('[dry-run] Ничего не обновлено.');
+
             return self::SUCCESS;
         }
 
         // ── Shikimori (GraphQL батчами по 50) ────────────────────────────────
         if (in_array($source, ['all', 'shikimori'])) {
             $q = Anime::where(function ($q) {
-                    $q->whereNull('description')
-                      ->orWhere('description', '')
-                      ->orWhereRaw('LENGTH(description) < 20');
-                })
+                $q->whereNull('description')
+                    ->orWhere('description', '')
+                    ->orWhereRaw('LENGTH(description) < 20');
+            })
                 ->whereNotNull('shikimori_id')
                 ->orderBy('id');
 
-            if ($limit > 0) $q->limit($limit);
+            if ($limit > 0) {
+                $q->limit($limit);
+            }
 
             $shikiAnimes = $q->get(['id', 'shikimori_id']);
 
@@ -97,15 +104,17 @@ class FillMissingDescriptionsCommand extends Command
         // ── Anilist (GraphQL батчами по 50) ──────────────────────────────────
         if (in_array($source, ['all', 'anilist'])) {
             $q = Anime::where(function ($q) {
-                    $q->whereNull('description')
-                      ->orWhere('description', '')
-                      ->orWhereRaw('LENGTH(description) < 20');
-                })
+                $q->whereNull('description')
+                    ->orWhere('description', '')
+                    ->orWhereRaw('LENGTH(description) < 20');
+            })
                 ->where('external_source', 'anilist')
                 ->whereNotNull('external_id')
                 ->orderBy('id');
 
-            if ($limit > 0) $q->limit($limit);
+            if ($limit > 0) {
+                $q->limit($limit);
+            }
 
             $anilistAnimes = $q->get(['id', 'external_id']);
 
@@ -115,7 +124,7 @@ class FillMissingDescriptionsCommand extends Command
                 $bar->start();
 
                 foreach ($anilistAnimes->chunk(50) as $chunk) {
-                    $ids = $chunk->pluck('external_id')->map(fn($id) => (int) $id)->all();
+                    $ids = $chunk->pluck('external_id')->map(fn ($id) => (int) $id)->all();
                     $descriptions = $this->fetchAnilistDescriptions($ids);
 
                     foreach ($chunk as $anime) {
@@ -138,6 +147,7 @@ class FillMissingDescriptionsCommand extends Command
         }
 
         $this->info("Готово. Обновлено: {$this->updated}, не найдено описания: {$this->failed}");
+
         return self::SUCCESS;
     }
 
@@ -145,7 +155,7 @@ class FillMissingDescriptionsCommand extends Command
 
     /**
      * @param  string[]  $ids
-     * @return array<string, string>  [shikimori_id => description]
+     * @return array<string, string> [shikimori_id => description]
      */
     private function fetchShikimoriDescriptions(array $ids): array
     {
@@ -164,15 +174,16 @@ class FillMissingDescriptionsCommand extends Command
             $response = Http::timeout(15)
                 ->withHeaders([
                     'User-Agent' => 'Aniyume/1.0',
-                    'Accept'     => 'application/json',
+                    'Accept' => 'application/json',
                 ])
                 ->post('https://shikimori.io/api/graphql', [
-                    'query'     => $query,
+                    'query' => $query,
                     'variables' => ['ids' => $idsStr, 'limit' => count($ids)],
                 ]);
 
-            if (!$response->successful()) {
-                Log::warning("FillDescriptions: Shikimori batch failed: " . $response->status());
+            if (! $response->successful()) {
+                Log::warning('FillDescriptions: Shikimori batch failed: '.$response->status());
+
                 return [];
             }
 
@@ -189,7 +200,8 @@ class FillMissingDescriptionsCommand extends Command
             return $result;
 
         } catch (\Exception $e) {
-            Log::warning("FillDescriptions: Shikimori batch error: " . $e->getMessage());
+            Log::warning('FillDescriptions: Shikimori batch error: '.$e->getMessage());
+
             return [];
         }
     }
@@ -198,7 +210,7 @@ class FillMissingDescriptionsCommand extends Command
 
     /**
      * @param  int[]  $ids
-     * @return array<int, string>  [anilist_id => description]
+     * @return array<int, string> [anilist_id => description]
      */
     private function fetchAnilistDescriptions(array $ids): array
     {
@@ -216,12 +228,13 @@ class FillMissingDescriptionsCommand extends Command
         try {
             $response = Http::timeout(15)
                 ->post('https://graphql.anilist.co', [
-                    'query'     => $query,
+                    'query' => $query,
                     'variables' => ['ids' => $ids],
                 ]);
 
-            if (!$response->successful()) {
-                Log::warning("FillDescriptions: Anilist batch failed: " . $response->status());
+            if (! $response->successful()) {
+                Log::warning('FillDescriptions: Anilist batch failed: '.$response->status());
+
                 return [];
             }
 
@@ -238,7 +251,8 @@ class FillMissingDescriptionsCommand extends Command
             return $result;
 
         } catch (\Exception $e) {
-            Log::warning("FillDescriptions: Anilist batch error: " . $e->getMessage());
+            Log::warning('FillDescriptions: Anilist batch error: '.$e->getMessage());
+
             return [];
         }
     }

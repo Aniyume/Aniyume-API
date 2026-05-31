@@ -18,25 +18,29 @@ class BulkImportAnilibriaCommand extends Command
 
     protected $description = 'Bulk-import Anilibria episodes: fetch all releases by ID, match to local anime, store episodes';
 
-    private int $fetched   = 0;
-    private int $matched   = 0;
-    private int $created   = 0;
-    private int $skipped   = 0;
-    private int $errors    = 0;
+    private int $fetched = 0;
+
+    private int $matched = 0;
+
+    private int $created = 0;
+
+    private int $skipped = 0;
+
+    private int $errors = 0;
 
     public function handle(): int
     {
-        $idFrom    = (int) $this->option('id-from');
-        $idTo      = (int) $this->option('id-to');
+        $idFrom = (int) $this->option('id-from');
+        $idTo = (int) $this->option('id-to');
         $batchSize = (int) $this->option('batch');
-        $noCache   = $this->option('no-cache');
+        $noCache = $this->option('no-cache');
 
         $this->info("Fetching Anilibria releases ID {$idFrom}–{$idTo} in batches of {$batchSize}...");
 
         // Build a local title index from our anime DB for fast matching
         $this->info('Building local anime title index...');
         $animeIndex = $this->buildAnimeIndex();
-        $this->line('  Index size: ' . count($animeIndex) . ' entries');
+        $this->line('  Index size: '.count($animeIndex).' entries');
 
         $ids = range($idFrom, $idTo);
         $chunks = array_chunk($ids, $batchSize);
@@ -54,9 +58,9 @@ class BulkImportAnilibriaCommand extends Command
 
             foreach ($releases as $release) {
                 $this->processRelease($release, $animeIndex, $noCache);
-                $bar->setMessage((string) $this->fetched,  'fetched');
-                $bar->setMessage((string) $this->matched,  'matched');
-                $bar->setMessage((string) $this->created,  'created');
+                $bar->setMessage((string) $this->fetched, 'fetched');
+                $bar->setMessage((string) $this->matched, 'matched');
+                $bar->setMessage((string) $this->created, 'created');
             }
 
             $bar->advance();
@@ -77,9 +81,9 @@ class BulkImportAnilibriaCommand extends Command
         );
 
         // Final coverage report
-        $total    = Anime::count();
-        $withEp   = Anime::whereHas('episodes')->count();
-        $this->info("Coverage: {$withEp}/{$total} (" . round($withEp / $total * 100) . "%)");
+        $total = Anime::count();
+        $withEp = Anime::whereHas('episodes')->count();
+        $this->info("Coverage: {$withEp}/{$total} (".round($withEp / $total * 100).'%)');
 
         return self::SUCCESS;
     }
@@ -106,6 +110,7 @@ class BulkImportAnilibriaCommand extends Command
             foreach ($responses as $id => $response) {
                 if ($response instanceof \Throwable) {
                     $this->errors++;
+
                     continue;
                 }
                 if ($response->successful()) {
@@ -115,7 +120,7 @@ class BulkImportAnilibriaCommand extends Command
             }
         } catch (\Throwable $e) {
             $this->errors++;
-            Log::error('BulkImport batch error: ' . $e->getMessage());
+            Log::error('BulkImport batch error: '.$e->getMessage());
         }
 
         return $releases;
@@ -149,25 +154,25 @@ class BulkImportAnilibriaCommand extends Command
     private function processRelease(array $release, array &$animeIndex, bool $noCache): void
     {
         $releaseId = $release['id'] ?? null;
-        if (!$releaseId) {
+        if (! $releaseId) {
             return;
         }
 
         // Find matching anime
         $animeId = $this->findMatch($release, $animeIndex);
-        if (!$animeId) {
+        if (! $animeId) {
             return;
         }
 
         $this->matched++;
 
         $anime = Anime::find($animeId);
-        if (!$anime) {
+        if (! $anime) {
             return;
         }
 
         // Save the anilibria_id for future use
-        if (!$anime->anilibria_id) {
+        if (! $anime->anilibria_id) {
             $anime->update(['anilibria_id' => $releaseId]);
         }
 
@@ -178,7 +183,7 @@ class BulkImportAnilibriaCommand extends Command
 
         foreach ($episodes as $ep) {
             $url = $ep['hls_1080'] ?? $ep['hls_720'] ?? $ep['hls_480'] ?? null;
-            if (!$url) {
+            if (! $url) {
                 continue;
             }
 
@@ -189,37 +194,38 @@ class BulkImportAnilibriaCommand extends Command
                 ->where('source', 'anilibria')
                 ->first();
 
-            if ($existing && !$noCache) {
+            if ($existing && ! $noCache) {
                 $this->skipped++;
+
                 continue;
             }
 
             $opening = $ep['opening'] ?? [];
-            $ending  = $ep['ending']  ?? [];
-            $skips   = null;
-            if (!empty($opening['start']) || !empty($ending['start'])) {
+            $ending = $ep['ending'] ?? [];
+            $skips = null;
+            if (! empty($opening['start']) || ! empty($ending['start'])) {
                 $skips = [
                     'opening' => [$opening['start'] ?? 0, $opening['stop'] ?? 0],
-                    'ending'  => [$ending['start']  ?? 0, $ending['stop']  ?? 0],
+                    'ending' => [$ending['start'] ?? 0, $ending['stop'] ?? 0],
                 ];
             }
 
             $data = [
-                'anime_id'            => $animeId,
-                'episode_number'      => $num,
-                'season_number'       => 1,
-                'title'               => $ep['name'] ?? $ep['name_english'] ?? "Серия {$num}",
-                'player_url'          => $url,
-                'duration'            => isset($ep['duration']) ? (int) $ep['duration'] : null,
-                'external_id'         => (string) $releaseId,
+                'anime_id' => $animeId,
+                'episode_number' => $num,
+                'season_number' => 1,
+                'title' => $ep['name'] ?? $ep['name_english'] ?? "Серия {$num}",
+                'player_url' => $url,
+                'duration' => isset($ep['duration']) ? (int) $ep['duration'] : null,
+                'external_id' => (string) $releaseId,
                 'external_episode_id' => $ep['id'] ?? null,
-                'source'              => 'anilibria',
-                'translator'          => 'AniLibria',
-                'translation_type'    => 'dub',
-                'quality'             => '1080p',
-                'priority'            => 10,
-                'skip_times'          => $skips,
-                'aired_at'            => $ep['updated_at'] ?? null,
+                'source' => 'anilibria',
+                'translator' => 'AniLibria',
+                'translation_type' => 'dub',
+                'quality' => '1080p',
+                'priority' => 10,
+                'skip_times' => $skips,
+                'aired_at' => $ep['updated_at'] ?? null,
             ];
 
             try {
@@ -233,8 +239,8 @@ class BulkImportAnilibriaCommand extends Command
                 $this->errors++;
                 Log::error('BulkImport episode store error', [
                     'anime_id' => $animeId,
-                    'ep'       => $num,
-                    'error'    => $e->getMessage(),
+                    'ep' => $num,
+                    'error' => $e->getMessage(),
                 ]);
             }
         }
@@ -247,8 +253,8 @@ class BulkImportAnilibriaCommand extends Command
     {
         $names = $release['name'] ?? [];
         $candidates = array_filter([
-            $names['main']        ?? null,
-            $names['english']     ?? null,
+            $names['main'] ?? null,
+            $names['english'] ?? null,
             $names['alternative'] ?? null,
         ]);
 
@@ -276,6 +282,7 @@ class BulkImportAnilibriaCommand extends Command
         $s = mb_strtolower($s);
         $s = preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $s);
         $s = preg_replace('/\s+/', ' ', $s);
+
         return trim($s);
     }
 }

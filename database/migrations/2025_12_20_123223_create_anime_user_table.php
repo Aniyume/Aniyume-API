@@ -8,15 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (!Schema::hasTable('anime_user')) {
+        if (! Schema::hasTable('anime_user')) {
             return;
         }
 
         Schema::table('anime_user', function (Blueprint $table) {
-            if (!Schema::hasColumn('anime_user', 'episodes_watched')) {
+            if (! Schema::hasColumn('anime_user', 'episodes_watched')) {
                 $table->integer('episodes_watched')->default(0)->after('status');
             }
-            if (!Schema::hasColumn('anime_user', 'last_watched_at')) {
+            if (! Schema::hasColumn('anime_user', 'last_watched_at')) {
                 $table->timestamp('last_watched_at')->nullable()->after('episodes_watched');
             }
         });
@@ -83,7 +83,7 @@ return new class extends Migration
                 if (Schema::hasColumn('anime_user', 'last_watched_at')) {
                     $columnsToDrop[] = 'last_watched_at';
                 }
-                if (!empty($columnsToDrop)) {
+                if (! empty($columnsToDrop)) {
                     $table->dropColumn($columnsToDrop);
                 }
             });

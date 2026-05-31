@@ -2,7 +2,6 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -15,16 +14,16 @@ class PlayerSyncEvent implements ShouldBroadcastNow
 
     public function __construct(
         public readonly string $roomCode,
-        public readonly float  $currentTime,
-        public readonly bool   $isPlaying,
-        public readonly int    $episodeNumber,
-        public readonly int    $hostUserId,
+        public readonly float $currentTime,
+        public readonly bool $isPlaying,
+        public readonly int $episodeNumber,
+        public readonly int $hostUserId,
     ) {}
 
     public function broadcastOn(): array
     {
         return [
-            new PresenceChannel('watch-party.' . $this->roomCode),
+            new PresenceChannel('watch-party.'.$this->roomCode),
         ];
     }
 
@@ -36,11 +35,11 @@ class PlayerSyncEvent implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
-            'current_time'    => $this->currentTime,
-            'is_playing'      => $this->isPlaying,
-            'episode_number'  => $this->episodeNumber,
-            'host_user_id'    => $this->hostUserId,
-            'timestamp'       => now()->toISOString(),
+            'current_time' => $this->currentTime,
+            'is_playing' => $this->isPlaying,
+            'episode_number' => $this->episodeNumber,
+            'host_user_id' => $this->hostUserId,
+            'timestamp' => now()->toISOString(),
         ];
     }
 }

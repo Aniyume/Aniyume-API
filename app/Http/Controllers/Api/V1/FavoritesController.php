@@ -4,18 +4,19 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Favorite;
-use App\Models\Anime;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
  * @group Избранное
+ *
  * @authenticated
  */
 class FavoritesController extends Controller
 {
     /**
      * Список избранного
+     *
      * @queryParam per_page integer Количество на страницу. Example: 20
      */
     public function index(Request $request): JsonResponse
@@ -52,6 +53,7 @@ class FavoritesController extends Controller
 
     /**
      * Добавить в избранное
+     *
      * @bodyParam anime_id integer required ID аниме. Example: 3
      */
     public function store(Request $request): JsonResponse
@@ -86,6 +88,7 @@ class FavoritesController extends Controller
 
     /**
      * Удалить из избранного
+     *
      * @urlParam animeId integer ID аниме. Example: 3
      */
     public function destroy(Request $request, int $animeId): JsonResponse
@@ -108,6 +111,7 @@ class FavoritesController extends Controller
 
     /**
      * Проверить наличие в избранном
+     *
      * @urlParam animeId integer ID аниме. Example: 3
      */
     public function checkFavorite(Request $request, int $animeId): JsonResponse

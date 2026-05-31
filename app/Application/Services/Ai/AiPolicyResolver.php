@@ -11,8 +11,7 @@ class AiPolicyResolver
     public function __construct(
         private readonly AiPolicyBuilder $policyBuilder,
         private readonly AiRoleResolver $roleResolver,
-    ) {
-    }
+    ) {}
 
     public function resolveFor(User $user): AiUserPolicy
     {

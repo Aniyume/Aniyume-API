@@ -1,21 +1,22 @@
 <?php
 
-use Knuckles\Scribe\Extracting\Strategies;
 use Knuckles\Scribe\Config\Defaults;
-use Knuckles\Scribe\Config\AuthIn;
-use function Knuckles\Scribe\Config\{removeStrategies, configureStrategy};
+use Knuckles\Scribe\Extracting\Strategies;
+
+use function Knuckles\Scribe\Config\configureStrategy;
+use function Knuckles\Scribe\Config\removeStrategies;
 
 // Only the most common configs are shown. See the https://scribe.knuckles.wtf/laravel/reference/config for all.
 
 return [
     // The HTML <title> for the generated documentation.
-    'title' => config('app.name') . ' API Documentation',
+    'title' => config('app.name').' API Documentation',
 
     // A short description of your API. Will be included in the docs webpage, Postman collection and OpenAPI spec.
     'description' => '',
 
     // Text to place in the "Introduction" section, right after the `description`. Markdown and HTML are supported.
-    'intro_text' => <<<INTRO
+    'intro_text' => <<<'INTRO'
         This documentation aims to provide all the information you need to work with our API.
 
         <aside>As you scroll, you'll see code examples for working with the API in different programming languages in the dark area to the right (or as part of the content on mobile).
@@ -24,7 +25,7 @@ return [
 
     // The base URL displayed in the docs.
     // If you're using `laravel` type, you can set this to a dynamic string, like '{{ config("app.tenant_url") }}' to get a dynamic base URL.
-    'base_url' => config("app.url"),
+    'base_url' => config('app.url'),
 
     // Routes to include in the docs
     'routes' => [
@@ -43,10 +44,10 @@ return [
             ],
 
             // Exclude these routes even if they matched the rules above.
-           'exclude' => [
-    'api/documentation',
-    'api/oauth2-callback',
-],
+            'exclude' => [
+                'api/documentation',
+                'api/oauth2-callback',
+            ],
         ],
     ],
 
@@ -83,7 +84,7 @@ return [
     ],
 
     'external' => [
-        'html_attributes' => []
+        'html_attributes' => [],
     ],
 
     'try_it_out' => [
@@ -92,8 +93,7 @@ return [
         'enabled' => true,
 
         // The base URL to use in the API tester. Leave as null to be the same as the displayed URL (`scribe.base_url`).
-       'base_url' => env('SCRIBE_TRY_IT_OUT_BASE_URL', config('app.url')),
-
+        'base_url' => env('SCRIBE_TRY_IT_OUT_BASE_URL', config('app.url')),
 
         // [Laravel Sanctum] Fetch a CSRF token before each request, and add it as an X-XSRF-TOKEN header.
         'use_csrf' => (bool) env('SCRIBE_TRY_IT_OUT_USE_CSRF', false),
@@ -103,15 +103,15 @@ return [
     ],
 
     // How is your API authenticated? This information will be used in the displayed docs, generated examples and response calls.
-  'auth' => [
-    'enabled' => true,
-    'default' => false, // Чтобы не требовать токен для публичных запросов
-    'in' => 'bearer',
-    'name' => 'Authorization',
-    'use_value' => env('SCRIBE_AUTH_KEY'),
-    'placeholder' => '{YOUR_AUTH_TOKEN}',
-    'extra_info' => 'Получите токен через Login или Register и вставьте его сюда.',
-],
+    'auth' => [
+        'enabled' => true,
+        'default' => false, // Чтобы не требовать токен для публичных запросов
+        'in' => 'bearer',
+        'name' => 'Authorization',
+        'use_value' => env('SCRIBE_AUTH_KEY'),
+        'placeholder' => '{YOUR_AUTH_TOKEN}',
+        'extra_info' => 'Получите токен через Login или Register и вставьте его сюда.',
+    ],
 
     // Example requests for each endpoint will be shown in each of these languages.
     // Supported options are: bash, javascript, php, python
@@ -156,19 +156,19 @@ return [
     ],
 
     'groups' => [
-    'default' => 'Endpoints',
-    'order' => [
-        'Публичные данные',
-        'Эпизоды',
-        'Авторизация',
-        'Профиль пользователя',
-        'Список аниме пользователя',
-        'История просмотров',
-        'Комментарии',
-        'Рейтинги',
-        'Статистика',
+        'default' => 'Endpoints',
+        'order' => [
+            'Публичные данные',
+            'Эпизоды',
+            'Авторизация',
+            'Профиль пользователя',
+            'Список аниме пользователя',
+            'История просмотров',
+            'Комментарии',
+            'Рейтинги',
+            'Статистика',
+        ],
     ],
-],
 
     // Custom logo path. This will be used as the value of the src attribute for the <img> tag,
     // so make sure it points to an accessible URL or path. Set to false to not use a logo.
@@ -232,7 +232,7 @@ return [
         ),
         'responseFields' => [
             ...Defaults::RESPONSE_FIELDS_STRATEGIES,
-        ]
+        ],
     ],
 
     // For response calls, API resource responses and transformer responses,

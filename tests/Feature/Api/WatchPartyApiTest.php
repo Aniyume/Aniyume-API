@@ -4,7 +4,6 @@ namespace Tests\Feature\Api;
 
 use App\Models\Anime;
 use App\Models\User;
-use App\Models\WatchPartyMessage;
 use App\Models\WatchPartyParticipant;
 use App\Models\WatchPartyRoom;
 use Illuminate\Foundation\Testing\RefreshDatabase;

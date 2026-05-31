@@ -9,9 +9,7 @@ use Throwable;
 
 class AiAuditLogger
 {
-    public function __construct(private readonly AiAuditContextSanitizer $sanitizer)
-    {
-    }
+    public function __construct(private readonly AiAuditContextSanitizer $sanitizer) {}
 
     /**
      * @param  array<string, mixed>  $context
@@ -37,5 +35,4 @@ class AiAuditLogger
             // Audit logging must never expose internals to the AI endpoint caller.
         }
     }
-
 }

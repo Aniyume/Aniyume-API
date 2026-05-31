@@ -13,8 +13,7 @@ class AiChatService
         private readonly AiPolicyBuilder $policyBuilder,
         private readonly AiPolicyResolver $policyResolver,
         private readonly AiPolicyGuard $policyGuard,
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $arguments

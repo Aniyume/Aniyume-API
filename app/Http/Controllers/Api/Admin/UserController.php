@@ -7,10 +7,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\AdminUserResource;
 use App\Models\AuditLog;
 use App\Models\User;
+use App\Services\AuditService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use App\Services\AuditService;
 
 class UserController extends Controller
 {

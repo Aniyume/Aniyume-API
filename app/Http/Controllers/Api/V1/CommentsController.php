@@ -22,6 +22,7 @@ class CommentsController extends Controller
 {
     /**
      * Список комментариев к аниме
+     *
      * @urlParam anime integer ID аниме. Example: 3
      */
     public function index(Anime $anime)
@@ -37,7 +38,9 @@ class CommentsController extends Controller
 
     /**
      * Оставить комментарий
+     *
      * @authenticated
+     *
      * @bodyParam anime_id integer required ID аниме. Example: 3
      * @bodyParam comment string required Текст комментария (3-1000 симв). Example: Очень крутая серия!
      */
@@ -58,8 +61,11 @@ class CommentsController extends Controller
 
     /**
      * Редактировать комментарий
+     *
      * @authenticated
+     *
      * @urlParam id integer ID комментария. Example: 4
+     *
      * @bodyParam comment string required Новый текст комментария. Example: Изменил свое мнение, 10/10!
      */
     public function update(UpdateCommentRequest $request, $id, UpdateComment $updateComment)
@@ -77,13 +83,17 @@ class CommentsController extends Controller
 
     /**
      * Удалить комментарий
+     *
      * @authenticated
+     *
      * @urlParam id integer ID комментария. Example: 4
      */
     public function destroy(Request $request, $id, DeleteComment $deleteComment)
     {
         $comment = Comment::find($id);
-        if (!$comment) return response()->json(['message' => 'Not found'], 404);
+        if (! $comment) {
+            return response()->json(['message' => 'Not found'], 404);
+        }
 
         if ($comment->user_id !== $request->user()->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
@@ -100,6 +110,7 @@ class CommentsController extends Controller
 
     /**
      * Мои комментарии
+     *
      * @authenticated
      */
     public function userComments(Request $request)
@@ -108,6 +119,7 @@ class CommentsController extends Controller
             ->where('user_id', $request->user()->id)
             ->orderBy('created_at', 'desc')
             ->get();
+
         return CommentResource::collection($comments);
     }
 }

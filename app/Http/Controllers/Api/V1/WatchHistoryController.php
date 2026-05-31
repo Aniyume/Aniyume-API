@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 
 /**
  * @group История просмотров
+ *
  * @authenticated
  */
 class WatchHistoryController extends Controller
@@ -18,8 +19,7 @@ class WatchHistoryController extends Controller
     public function __construct(
         private readonly WatchHistoryQuery $watchHistoryQuery,
         private readonly SyncWatchProgressAction $syncWatchProgress,
-    ) {
-    }
+    ) {}
 
     /**
      * Список истории
@@ -41,6 +41,7 @@ class WatchHistoryController extends Controller
 
     /**
      * Сохранить прогресс просмотра
+     *
      * @bodyParam episode_id integer required ID эпизода. Example: 550
      * @bodyParam progress integer required Время в секундах. Example: 120
      * @bodyParam completed boolean Флаг завершения. Example: false
@@ -61,6 +62,7 @@ class WatchHistoryController extends Controller
 
     /**
      * Детали записи истории
+     *
      * @urlParam id integer ID записи в истории. Example: 10
      */
     public function show(Request $request, $id): JsonResponse
@@ -84,6 +86,7 @@ class WatchHistoryController extends Controller
 
     /**
      * История по конкретному аниме
+     *
      * @urlParam animeId integer ID аниме. Example: 3
      */
     public function getByAnime(Request $request, $animeId): JsonResponse
@@ -113,13 +116,14 @@ class WatchHistoryController extends Controller
 
     /**
      * Последний просмотренный эпизод аниме
+     *
      * @urlParam animeId integer ID аниме. Example: 3
      */
     public function getLastWatchedEpisode(Request $request, $animeId): JsonResponse
     {
         $lastWatched = $this->watchHistoryQuery->lastWatchedForAnime($request->user()->id, (int) $animeId);
 
-        if (!$lastWatched) {
+        if (! $lastWatched) {
             return response()->json([
                 'anime_id' => $animeId,
                 'last_episode' => null,

@@ -36,6 +36,7 @@ class ResetAnime extends Command
 
         if ($animeCount === 0) {
             $this->warn('⚠️  No anime found in the database. Nothing to reset.');
+
             return 0;
         }
 
@@ -46,10 +47,11 @@ class ResetAnime extends Command
             : "ALL anime ({$animeCount}), episodes ({$episodeCount}), tags ({$tagCount}), AND all user-related data (favorites, ratings, comments, watch history, anime lists).";
 
         // Confirmation
-        if (!$this->option('force')) {
+        if (! $this->option('force')) {
             $this->warn("🗑️  This will delete: {$label}");
-            if (!$this->confirm('Are you sure?', false)) {
+            if (! $this->confirm('Are you sure?', false)) {
                 $this->info('❌ Operation cancelled.');
+
                 return 0;
             }
         }
@@ -61,15 +63,15 @@ class ResetAnime extends Command
 
         try {
             // 1. Delete episodes
-            $this->line("  Deleting episodes...");
+            $this->line('  Deleting episodes...');
             Episode::truncate();
 
             // 2. Delete pivot tables
-            $this->line("  Deleting anime-tag relations...");
+            $this->line('  Deleting anime-tag relations...');
             \DB::table('anime_tag')->truncate();
 
-            if (!$keepUsers) {
-                $this->line("  Deleting user anime data...");
+            if (! $keepUsers) {
+                $this->line('  Deleting user anime data...');
 
                 // Delete user-related anime data
                 if (Schema::hasTable('anime_user')) {
@@ -90,16 +92,16 @@ class ResetAnime extends Command
             }
 
             // 3. Delete anime
-            $this->line("  Deleting anime...");
+            $this->line('  Deleting anime...');
             Anime::truncate();
 
             // 4. Delete tags
-            $this->line("  Deleting tags...");
+            $this->line('  Deleting tags...');
             Tag::truncate();
 
             // 5. Clear import logs
             if (Schema::hasTable('import_logs')) {
-                $this->line("  Clearing import logs...");
+                $this->line('  Clearing import logs...');
                 \DB::table('import_logs')->truncate();
             }
 

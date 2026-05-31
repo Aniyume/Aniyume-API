@@ -8,9 +8,7 @@ use App\Models\User;
 
 class AdminDashboardSummaryTool implements AiTool
 {
-    public function __construct(private readonly AiSafeDataProvider $dataProvider)
-    {
-    }
+    public function __construct(private readonly AiSafeDataProvider $dataProvider) {}
 
     public function name(): string
     {

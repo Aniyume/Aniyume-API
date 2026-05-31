@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
+use App\Models\Anime;
 use App\Services\AnilibriaService;
 use App\Services\EpisodeImportService;
-use App\Models\Anime;
+use Illuminate\Console\Command;
 
 class SyncOngoingCommand extends Command
 {
@@ -34,28 +34,31 @@ class SyncOngoingCommand extends Command
         $updates = $anilibriaService->fetchUpdates($days);
 
         if (empty($updates)) {
-            $this->info("No updates found.");
+            $this->info('No updates found.');
+
             return;
         }
 
-        $this->info("Found " . count($updates) . " updated titles. Processing...");
+        $this->info('Found '.count($updates).' updated titles. Processing...');
 
         $bar = $this->output->createProgressBar(count($updates));
         $bar->start();
 
         foreach ($updates as $update) {
             $anilibriaId = $update['id'] ?? null;
-            if (!$anilibriaId) continue;
+            if (! $anilibriaId) {
+                continue;
+            }
 
             // Find anime in database
             $anime = Anime::where('anilibria_id', $anilibriaId)->first();
-            
+
             // Try to match by shikimori_id if anilibria_id is missing but we have it from update
-            if (!$anime && !empty($update['player']['shikimori_id'])) {
-                 $anime = Anime::where('shikimori_id', $update['player']['shikimori_id'])->first();
-                 if ($anime) {
-                     $anime->update(['anilibria_id' => $anilibriaId]);
-                 }
+            if (! $anime && ! empty($update['player']['shikimori_id'])) {
+                $anime = Anime::where('shikimori_id', $update['player']['shikimori_id'])->first();
+                if ($anime) {
+                    $anime->update(['anilibria_id' => $anilibriaId]);
+                }
             }
 
             if ($anime) {
@@ -68,8 +71,8 @@ class SyncOngoingCommand extends Command
 
         $bar->finish();
         $this->newLine(2);
-        
-        $this->info("Sync completed!");
+
+        $this->info('Sync completed!');
         $this->table(
             ['Metric', 'Value'],
             [

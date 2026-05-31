@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('anime_user', function (Blueprint $table) {
-            if (!Schema::hasColumn('anime_user', 'episodes_watched')) {
+            if (! Schema::hasColumn('anime_user', 'episodes_watched')) {
                 $table->integer('episodes_watched')->default(0)->after('status');
             }
         });

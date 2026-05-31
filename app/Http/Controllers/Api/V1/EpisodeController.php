@@ -36,7 +36,6 @@ class EpisodeController extends Controller
     {
         $query = Episode::query();
         /** @var mixed $query */
-
         $translators = $query->whereNotNull('translator')
             ->select('translator', 'translation_type')
             ->distinct()
@@ -53,6 +52,7 @@ class EpisodeController extends Controller
     public function show($id)
     {
         $episode = Episode::findOrFail($id);
+
         return response()->json($episode);
     }
 
@@ -60,6 +60,7 @@ class EpisodeController extends Controller
      * Ссылка на плеер
      *
      * Возвращает URL плеера и iframe для вставки.
+     *
      * @urlParam id integer ID эпизода. Example: 1
      */
     public function getPlayer($id)
@@ -107,10 +108,10 @@ class EpisodeController extends Controller
 
     /**
      * Источники плеера для конкретного эпизода
-     * 
+     *
      * Возвращает все доступные источники (Anilibria, Kodik).
      * Если в БД нет эпизодов — пытается найти через Kodik в реальном времени.
-     * 
+     *
      * @urlParam anime integer ID аниме. Example: 3
      * @urlParam episode integer Номер эпизода. Example: 1
      */
@@ -118,7 +119,6 @@ class EpisodeController extends Controller
     {
         $query = Episode::query();
         /** @var mixed $query */
-
         $episodes = $query->where('anime_id', '=', $anime->id, 'and')
             ->where('episode_number', '=', $episodeNumber, 'and')
             ->orderByDesc('priority')
@@ -126,7 +126,7 @@ class EpisodeController extends Controller
 
         $sources = $episodes->map(function ($ep) {
             $isHls = str_ends_with($ep->player_url ?? '', '.m3u8') || $ep->source === 'anilibria';
-            
+
             // Better label format: "AniLibria" instead of "anilibria (AniLibria)"
             $label = $ep->translator ?: ucfirst($ep->source ?? 'Unknown');
             if ($ep->source === 'kodik' && $ep->translator && $ep->translator !== 'Kodik') {
@@ -153,7 +153,7 @@ class EpisodeController extends Controller
             try {
                 $kodikService = app(KodikService::class);
                 $iframeUrl = $kodikService->buildEpisodeIframeUrl(
-                    (int) $anime->shikimori_id, 
+                    (int) $anime->shikimori_id,
                     $episodeNumber
                 );
 
@@ -174,7 +174,7 @@ class EpisodeController extends Controller
                 }
             } catch (\Throwable $e) {
                 // Silently fail — Kodik might be down
-                Log::debug('Kodik live fallback failed: ' . $e->getMessage());
+                Log::debug('Kodik live fallback failed: '.$e->getMessage());
             }
         }
 
@@ -186,7 +186,7 @@ class EpisodeController extends Controller
             'data' => [
                 'episode_number' => $episodeNumber,
                 'sources' => $sources,
-            ]
+            ],
         ]);
     }
 }

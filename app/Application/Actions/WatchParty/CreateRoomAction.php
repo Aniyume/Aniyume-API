@@ -18,25 +18,25 @@ class CreateRoomAction
             ->update(['is_active' => false]);
 
         $room = WatchPartyRoom::create([
-            'code'             => WatchPartyRoom::generateCode(),
-            'anime_id'         => $data['anime_id'],
-            'episode_number'   => $data['episode_number'],
-            'host_user_id'     => $user->id,
+            'code' => WatchPartyRoom::generateCode(),
+            'anime_id' => $data['anime_id'],
+            'episode_number' => $data['episode_number'],
+            'host_user_id' => $user->id,
             'max_participants' => $data['max_participants'] ?? 10,
-            'is_private'       => $data['is_private'] ?? false,
-            'is_playing'       => false,
-            'current_time'     => 0,
+            'is_private' => $data['is_private'] ?? false,
+            'is_playing' => false,
+            'current_time' => 0,
         ]);
 
         WatchPartyParticipant::create([
-            'room_id'   => $room->id,
-            'user_id'   => $user->id,
+            'room_id' => $room->id,
+            'user_id' => $user->id,
             'is_active' => true,
         ]);
 
         return [
-            'room'     => $this->formatRoom($room),
-            'join_url' => '/watch-party/' . $room->code,
+            'room' => $this->formatRoom($room),
+            'join_url' => '/watch-party/'.$room->code,
         ];
     }
 }

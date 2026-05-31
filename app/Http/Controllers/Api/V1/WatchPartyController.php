@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Domain\Moderation\ModerationMode;
 use App\Application\Actions\WatchParty\CloseRoomAction;
 use App\Application\Actions\WatchParty\CreateRoomAction;
 use App\Application\Actions\WatchParty\InviteFriendAction;
@@ -13,6 +12,7 @@ use App\Application\Actions\WatchParty\SyncRoomStateAction;
 use App\Application\Queries\WatchParty\FindActiveRoomQuery;
 use App\Application\Queries\WatchParty\GetMessagesQuery;
 use App\Application\Services\WatchParty\FormatsWatchPartyResponses;
+use App\Domain\Moderation\ModerationMode;
 use App\Http\Controllers\Controller;
 use App\Http\Rules\PassesModeration;
 use Illuminate\Http\JsonResponse;
@@ -25,10 +25,10 @@ class WatchPartyController extends Controller
     public function create(Request $request, CreateRoomAction $action): JsonResponse
     {
         $data = $request->validate([
-            'anime_id'         => 'required|exists:anime,id',
-            'episode_number'   => 'required|integer|min:1',
+            'anime_id' => 'required|exists:anime,id',
+            'episode_number' => 'required|integer|min:1',
             'max_participants' => 'integer|min:2|max:20',
-            'is_private'       => 'boolean',
+            'is_private' => 'boolean',
         ]);
 
         return response()->json($action->execute($request->user(), $data), 201);
@@ -54,8 +54,8 @@ class WatchPartyController extends Controller
     public function sync(Request $request, string $code, SyncRoomStateAction $action): JsonResponse
     {
         $data = $request->validate([
-            'current_time'   => 'required|numeric|min:0',
-            'is_playing'     => 'required|boolean',
+            'current_time' => 'required|numeric|min:0',
+            'is_playing' => 'required|boolean',
             'episode_number' => 'required|integer|min:1',
         ]);
 

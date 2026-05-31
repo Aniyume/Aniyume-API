@@ -2,15 +2,13 @@
 
 namespace App\Infrastructure\Ai\Tools;
 
-use App\Domain\Ai\AiTool;
 use App\Application\Services\Ai\AiSafeDataProvider;
+use App\Domain\Ai\AiTool;
 use App\Models\User;
 
 class SearchAnimeTool implements AiTool
 {
-    public function __construct(private readonly AiSafeDataProvider $dataProvider)
-    {
-    }
+    public function __construct(private readonly AiSafeDataProvider $dataProvider) {}
 
     public function name(): string
     {

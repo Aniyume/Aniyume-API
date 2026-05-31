@@ -8,7 +8,7 @@ use Illuminate\Validation\ValidationException;
 final class AiPolicyGuard
 {
     /**
-     * @param array<string, mixed> $pageContext
+     * @param  array<string, mixed>  $pageContext
      */
     public function assertMessageAllowed(AiUserPolicy $policy, string $message, array $pageContext = [], ?string $toolName = null): void
     {
@@ -24,7 +24,7 @@ final class AiPolicyGuard
     }
 
     /**
-     * @param array<string, mixed> $pageContext
+     * @param  array<string, mixed>  $pageContext
      */
     private function firstViolation(AiUserPolicy $policy, string $message, array $pageContext, ?string $toolName): ?string
     {
@@ -102,7 +102,7 @@ final class AiPolicyGuard
     }
 
     /**
-     * @param array<string, mixed> $pageContext
+     * @param  array<string, mixed>  $pageContext
      */
     private function isAniYumeDomainMessage(string $message, array $pageContext, ?string $toolName): bool
     {

@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Anime;
 use App\Models\Episode;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 class CoverageReportCommand extends Command
@@ -28,15 +28,15 @@ class CoverageReportCommand extends Command
      */
     public function handle()
     {
-        $this->info("Calculating episode coverage...");
+        $this->info('Calculating episode coverage...');
 
         $totalAnime = Anime::count();
-        
+
         $animeWithAnilibria = Anime::whereNotNull('anilibria_id')->count();
-        
+
         // Find how many unique anime have at least 1 episode
         $animeWithEpisodes = Episode::select('anime_id')->distinct('anime_id')->count();
-        
+
         // Count episodes by source
         $sources = Episode::select('source', DB::raw('count(*) as count'))
             ->groupBy('source')
@@ -57,8 +57,8 @@ class CoverageReportCommand extends Command
         );
 
         $this->newLine();
-        $this->info("Episodes by Source:");
-        
+        $this->info('Episodes by Source:');
+
         $sourceRows = [];
         $totalEpisodes = array_sum($sources);
         foreach ($sources as $source => $count) {
@@ -66,7 +66,7 @@ class CoverageReportCommand extends Command
             $percent = $totalEpisodes > 0 ? round(($count / $totalEpisodes) * 100, 2) : 0;
             $sourceRows[] = [$sourceName, $count, "{$percent}%"];
         }
-        
+
         $this->table(['Source', 'Episodes Count', '% of Total Episodes'], $sourceRows);
         $this->info("Total Episodes: {$totalEpisodes}");
     }

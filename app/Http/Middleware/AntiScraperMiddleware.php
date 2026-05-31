@@ -16,7 +16,7 @@ class AntiScraperMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $fingerprint = $request->header('X-Fingerprint-ID') ?: $request->ip();
-        
+
         // Optional comma-separated admin fingerprints to bypass Anti-Scraper limits.
         $adminFingerprints = $this->csv('ANTI_SCRAPER_ADMIN_FINGERPRINTS');
         if (in_array($fingerprint, $adminFingerprints, true)) {
@@ -25,9 +25,9 @@ class AntiScraperMiddleware
 
         $trustKey = "trust_score_{$fingerprint}";
         $trustTtl = now()->addDays((int) env('ANTI_SCRAPER_TRUST_TTL_DAYS', 7));
-        
+
         // Initialize trust score to 100 if not exists
-        if (!\Illuminate\Support\Facades\Cache::has($trustKey)) {
+        if (! \Illuminate\Support\Facades\Cache::has($trustKey)) {
             $trustScore = (int) env('ANTI_SCRAPER_INITIAL_TRUST_SCORE', 100);
             \Illuminate\Support\Facades\Cache::put($trustKey, $trustScore, $trustTtl);
         } else {
@@ -35,7 +35,7 @@ class AntiScraperMiddleware
         }
 
         // Honeypot check
-        if ($request->has('bot_check') && !empty($request->input('bot_check'))) {
+        if ($request->has('bot_check') && ! empty($request->input('bot_check'))) {
             // Gotcha, bot filled the honeypot
             $trustScore = 0;
             \Illuminate\Support\Facades\Cache::put($trustKey, $trustScore, $trustTtl);
@@ -51,13 +51,13 @@ class AntiScraperMiddleware
 
             return response()->json([
                 'message' => 'Too Many Requests or suspicious activity detected.',
-                'error' => 'Rate limit exceeded'
+                'error' => 'Rate limit exceeded',
             ], 429);
         }
 
         // Rate limiting check per fingerprint (e.g., 100 reqs / min)
         $rateLimitKey = "rate_limit_{$fingerprint}";
-        
+
         // Use increment if supported, otherwise manually
         if (\Illuminate\Support\Facades\Cache::has($rateLimitKey)) {
             $requestsCount = \Illuminate\Support\Facades\Cache::increment($rateLimitKey);
@@ -70,7 +70,7 @@ class AntiScraperMiddleware
             // Decrease trust score by 5 for every spam burst
             $trustScore = max(0, $trustScore - 5);
             \Illuminate\Support\Facades\Cache::put($trustKey, $trustScore, $trustTtl);
-            
+
             return response()->json([
                 'message' => 'Too Many Requests.',
             ], 429);
@@ -83,7 +83,7 @@ class AntiScraperMiddleware
         }
 
         $response = $next($request);
-        
+
         if ((bool) env('ANTI_SCRAPER_EXPOSE_TRUST_SCORE', false)) {
             $response->headers->set('X-Trust-Score', (string) $trustScore);
         }

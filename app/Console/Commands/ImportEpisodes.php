@@ -34,7 +34,7 @@ class ImportEpisodes extends Command
         $service->setOnlyMissing($onlyMissing);
 
         $this->info('🚀 Starting episodes import...');
-        $this->info("   Sources: " . ($source === 'all' ? 'Anilibria → Kodik → VideoCDN' : $source));
+        $this->info('   Sources: '.($source === 'all' ? 'Anilibria → Kodik → VideoCDN' : $source));
         if ($onlyMissing) {
             $this->info('   Mode: only anime without episodes');
         }
@@ -42,10 +42,11 @@ class ImportEpisodes extends Command
         $totalInDb = Anime::count();
         $total = $limit ? min($limit, $totalInDb) : $totalInDb;
         $this->newLine();
-        $this->info("📊 Anime in database: {$totalInDb}" . ($limit ? ", will process: {$total}" : ""));
+        $this->info("📊 Anime in database: {$totalInDb}".($limit ? ", will process: {$total}" : ''));
 
         if ($total === 0) {
             $this->error('No anime found!');
+
             return 1;
         }
 

@@ -2,11 +2,9 @@
 
 namespace Tests\Feature\Api;
 
-use App\Models\Anime;
-use App\Models\AuditLog;
-use App\Models\BlacklistedAnime;
-use App\Models\ImportLog;
 use App\Jobs\ImportAnimeJob;
+use App\Models\Anime;
+use App\Models\ImportLog;
 use App\Models\Role;
 use App\Models\Tag;
 use App\Models\User;

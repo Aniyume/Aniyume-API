@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 
 /**
  * @group Рейтинги
+ *
  * @authenticated
  */
 class RatingsController extends Controller
@@ -40,6 +41,7 @@ class RatingsController extends Controller
 
     /**
      * Поставить оценку
+     *
      * @bodyParam anime_id integer required ID аниме. Example: 3
      * @bodyParam rating number required Оценка (1-5). Example: 4.5
      */
@@ -63,6 +65,7 @@ class RatingsController extends Controller
 
     /**
      * Удалить оценку
+     *
      * @urlParam rating integer ID оценки. Example: 2
      */
     public function destroy(Request $request, Rating $rating, DeleteRating $deleteRating): JsonResponse
@@ -82,6 +85,7 @@ class RatingsController extends Controller
 
     /**
      * Моя оценка конкретного аниме
+     *
      * @urlParam animeId integer ID аниме. Example: 3
      */
     public function getUserRating(Request $request, $animeId): JsonResponse

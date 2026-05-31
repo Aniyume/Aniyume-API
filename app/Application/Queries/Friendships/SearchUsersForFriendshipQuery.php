@@ -9,9 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class SearchUsersForFriendshipQuery
 {
-    public function __construct(private readonly FriendshipUserFormatter $formatter)
-    {
-    }
+    public function __construct(private readonly FriendshipUserFormatter $formatter) {}
 
     public function search(User $user, string $query): Collection
     {
@@ -20,8 +18,8 @@ class SearchUsersForFriendshipQuery
             ->limit(20)
             ->when(
                 DB::connection()->getDriverName() === 'pgsql',
-                fn ($builder) => $builder->where('name', 'ilike', '%' . $query . '%'),
-                fn ($builder) => $builder->whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($query) . '%']),
+                fn ($builder) => $builder->where('name', 'ilike', '%'.$query.'%'),
+                fn ($builder) => $builder->whereRaw('LOWER(name) LIKE ?', ['%'.mb_strtolower($query).'%']),
             )
             ->get();
 
