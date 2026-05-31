@@ -15,6 +15,7 @@ class AdminAnimeResource extends JsonResource
             'slug' => $this->slug,
             'description' => $this->description,
             'poster_url' => $this->poster_url,
+            'cover_url' => $this->cover_url,
             'rating' => $this->rating !== null ? (float) $this->rating : null,
             'status' => $this->status,
             'type' => $this->type,
@@ -23,6 +24,8 @@ class AdminAnimeResource extends JsonResource
             'external_id' => $this->external_id,
             'external_source' => $this->external_source,
             'episodes_count' => $this->episodes_count ?? $this->number_of_episodes,
+            'comments_count' => $this->comments_count ?? null,
+            'ratings_count' => $this->ratings_count ?? null,
             'number_of_episodes' => $this->number_of_episodes,
             'tags' => $this->whenLoaded('tags', fn () => $this->tags->map(fn ($tag) => [
                 'id' => $tag->id,

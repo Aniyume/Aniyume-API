@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\Admin\Concerns\BuildsPaginationMeta;
 use App\Http\Requests\Admin\StoreAdminTagRequest;
 use App\Http\Requests\Admin\UpdateAdminTagRequest;
 use App\Http\Resources\AdminTagResource;
@@ -14,6 +15,42 @@ use Illuminate\Support\Str;
 
 class TagController extends Controller
 {
+    use BuildsPaginationMeta;
+
+    public function index(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'page' => ['sometimes', 'integer', 'min:1'],
+            'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
+            'search' => ['sometimes', 'string', 'max:255'],
+        ]);
+
+        $query = Tag::query()
+            ->withCount('anime')
+            ->when($validated['search'] ?? null, function ($query, string $search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('slug', 'like', "%{$search}%");
+            })
+            ->orderBy('name');
+
+        $paginator = $query->paginate($validated['per_page'] ?? 50)->withQueryString();
+
+        return response()->json([
+            'data' => AdminTagResource::collection($paginator->getCollection())->resolve($request),
+            'links' => $this->paginationLinks($paginator),
+            'meta' => $this->paginationMeta($paginator),
+        ]);
+    }
+
+    public function show(Request $request, Tag $tag): JsonResponse
+    {
+        $tag->loadCount('anime');
+
+        return response()->json([
+            'data' => (new AdminTagResource($tag))->resolve($request),
+        ]);
+    }
+
     public function store(StoreAdminTagRequest $request): JsonResponse
     {
         $validated = $request->validated();

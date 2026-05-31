@@ -13,6 +13,9 @@ use App\Models\AuditLog;
 use App\Models\BlacklistedAnime;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
+use App\Services\AuditService;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -51,6 +54,16 @@ class AnimeController extends Controller
         ]);
     }
 
+    public function show(Request $request, Anime $anime): JsonResponse
+    {
+        $anime->load('tags');
+        $anime->loadCount(['episodes', 'comments', 'ratings']);
+
+        return response()->json([
+            'data' => (new AdminAnimeResource($anime))->resolve($request),
+        ]);
+    }
+
     public function store(StoreAdminAnimeRequest $request): JsonResponse
     {
         $validated = $request->validated();
@@ -66,7 +79,7 @@ class AnimeController extends Controller
             $anime->tags()->sync($tagIds);
         }
 
-        $this->audit($request, 'create_anime', "Created anime: {$anime->title}");
+        app(AuditService::class)->log($request, 'create_anime', "Created anime: {$anime->title}", $anime, null, $anime->fresh()->toArray());
 
         return response()->json([
             'data' => (new AdminAnimeResource($anime->load('tags')->loadCount('episodes')))->resolve($request),
@@ -83,13 +96,14 @@ class AnimeController extends Controller
             $attributes['slug'] = Str::slug($attributes['title']);
         }
 
+        $before = $anime->getOriginal();
         $anime->update($attributes);
 
         if (array_key_exists('tags', $validated)) {
             $anime->tags()->sync($tagIds ?? []);
         }
 
-        $this->audit($request, 'update_anime', "Updated anime: {$anime->title}");
+        app(AuditService::class)->log($request, 'update_anime', "Updated anime: {$anime->title}", $anime, $before, $anime->fresh()->toArray(), ['changed' => array_keys($attributes)]);
 
         return response()->json([
             'data' => (new AdminAnimeResource($anime->refresh()->load('tags')->loadCount('episodes')))->resolve($request),
@@ -110,9 +124,78 @@ class AnimeController extends Controller
 
         $anime->delete();
 
-        $this->audit($request, 'delete_anime', "Deleted anime: {$title} (ID: {$id}) and added to blacklist");
+        app(AuditService::class)->log($request, 'delete_anime', "Deleted anime: {$title} (ID: {$id}) and added to blacklist", null, ['id' => $id, 'title' => $title], null);
 
         return response()->json(null, 204);
+    }
+
+    public function uploadPoster(Request $request, Anime $anime): JsonResponse
+    {
+        return $this->uploadImage($request, $anime, 'poster', 'poster_url', 'anime/posters');
+    }
+
+    public function deletePoster(Request $request, Anime $anime): JsonResponse
+    {
+        return $this->deleteImage($request, $anime, 'poster', 'poster_url');
+    }
+
+    public function uploadCover(Request $request, Anime $anime): JsonResponse
+    {
+        return $this->uploadImage($request, $anime, 'cover', 'cover_url', 'anime/covers');
+    }
+
+    public function deleteCover(Request $request, Anime $anime): JsonResponse
+    {
+        return $this->deleteImage($request, $anime, 'cover', 'cover_url');
+    }
+
+    private function uploadImage(Request $request, Anime $anime, string $kind, string $column, string $directory): JsonResponse
+    {
+        $validated = $request->validate([
+            'image' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+        ]);
+
+        $oldUrl = $anime->{$column};
+        /** @var UploadedFile $image */
+        $image = $validated['image'];
+        $path = $image->store($directory, 'public');
+        $anime->update([$column => url(Storage::url($path))]);
+        $this->deleteLocalPublicUrl($oldUrl);
+        app(AuditService::class)->log($request, "upload_anime_{$kind}", "Uploaded {$kind} for anime {$anime->title} (ID {$anime->id})", $anime, [$column => $oldUrl], [$column => $anime->{$column}]);
+
+        return response()->json([
+            'data' => (new AdminAnimeResource($anime->refresh()->load('tags')))->resolve($request),
+        ]);
+    }
+
+    private function deleteImage(Request $request, Anime $anime, string $kind, string $column): JsonResponse
+    {
+        $oldUrl = $anime->{$column};
+        $anime->update([$column => null]);
+        $this->deleteLocalPublicUrl($oldUrl);
+        app(AuditService::class)->log($request, "delete_anime_{$kind}", "Deleted {$kind} for anime {$anime->title} (ID {$anime->id})", $anime, [$column => $oldUrl], [$column => null]);
+
+        return response()->json([
+            'data' => (new AdminAnimeResource($anime->refresh()->load('tags')))->resolve($request),
+        ]);
+    }
+
+    private function deleteLocalPublicUrl(?string $url): void
+    {
+        if (! $url) {
+            return;
+        }
+
+        $storagePrefix = '/storage/';
+        $position = strpos($url, $storagePrefix);
+        if ($position === false) {
+            return;
+        }
+
+        $path = substr($url, $position + strlen($storagePrefix));
+        if ($path) {
+            Storage::disk('public')->delete($path);
+        }
     }
 
     private function audit(Request $request, string $action, string $description): void

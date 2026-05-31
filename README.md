@@ -23,6 +23,7 @@
 - [Технологический стек](#технологический-стек)
 - [Установка и запуск](#установка-и-запуск)
 - [Проверки и полезные команды](#проверки-и-полезные-команды)
+- [CI/CD branch model](#cicd-branch-model)
 - [Endpoint baseline](#endpoint-baseline)
 - [Документация](#документация)
 - [Deployment notes](#deployment-notes)
@@ -248,6 +249,40 @@ Baseline docs для команды:
 ---
 
 ## Deployment notes
+
+### CI/CD branch model
+
+Backend CI ориентирован на новую branch model:
+
+- `dev` — основная интеграционная ветка backend. При push в `dev` и PR в `dev`/`release` запускается `.github/workflows/backend-quality.yml`: `composer validate`, `composer install`, Laravel test suite, PHPStan/Larastan, Pint в test mode и smoke build backend Docker image.
+- `release` — ветка подготовки релиза. При PR в `release` workflow `.github/workflows/release-deploy-skeleton.yml` запускает quality checks и проверочную сборку production-like Docker image без публикации. При push в `release` после quality checks собирается и публикуется GHCR image `ghcr.io/<owner>/<repo>` с тегами `release-<sha>` и `release-latest`.
+
+### Release Docker image flow
+
+Release pipeline не делает прямой production deploy. Его задача — получить проверенный immutable image, который затем может быть вручную или отдельным approved workflow раскатан в production/staging runtime.
+
+Текущая схема:
+
+```text
+PR -> release: composer validate/install, tests, PHPStan/Larastan, Pint, Docker build only
+push -> release: те же checks, Docker build, push в GHCR
+```
+
+Публикация использует стандартный `GITHUB_TOKEN` с минимальными permissions workflow/job:
+
+- `contents: read` для checkout;
+- `packages: write` только в job, который публикует image в GHCR.
+
+Ожидаемые теги image:
+
+- `ghcr.io/<owner>/<repo>:release-<full-git-sha>` — immutable tag для конкретного коммита;
+- `ghcr.io/<owner>/<repo>:release-latest` — указатель на последний successful push в `release`.
+
+Для успешной публикации GHCR package repository должен разрешать GitHub Actions запись package через `GITHUB_TOKEN`. Если package visibility/permissions ограничены на уровне org/repo, нужно выдать этому repository право write на package или заменить auth на отдельный registry secret/PAT.
+
+Production deploy пока намеренно не включён: нужно заранее настроить GitHub Environment `production`, определить target runtime/registry и добавить необходимые secrets. Старый Azure workflow оставлен только для ручного `workflow_dispatch` как legacy/reference и больше не является целевой стратегией dev/release.
+
+---
 
 Перед production/staging deployment проверить минимум:
 

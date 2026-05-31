@@ -167,7 +167,7 @@ public function show(Anime $anime)
             try {
                 $response = Http::timeout(5)
                     ->withHeaders(['User-Agent' => 'Aniyume/1.0'])
-                    ->get("https://shikimori.one/api/animes/{$anime->shikimori_id}/related");
+                    ->get("https://shikimori.io/api/animes/{$anime->shikimori_id}/related");
 
                 if ($response->successful()) {
                     $relatedData = collect($response->json())

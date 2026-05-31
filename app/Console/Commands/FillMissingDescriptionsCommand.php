@@ -166,7 +166,7 @@ class FillMissingDescriptionsCommand extends Command
                     'User-Agent' => 'Aniyume/1.0',
                     'Accept'     => 'application/json',
                 ])
-                ->post('https://shikimori.one/api/graphql', [
+                ->post('https://shikimori.io/api/graphql', [
                     'query'     => $query,
                     'variables' => ['ids' => $idsStr, 'limit' => count($ids)],
                 ]);

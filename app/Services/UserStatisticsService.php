@@ -170,8 +170,11 @@ class UserStatisticsService
                 'watch_history.watched_at',
             ])
             ->orderBy('watch_history.watched_at', 'desc')
-            ->limit($limit)
-            ->get();
+            ->limit(100)
+            ->get()
+            ->unique('anime_id')
+            ->take($limit)
+            ->values();
 
         return $watched ? $watched->toArray() : [];
     }

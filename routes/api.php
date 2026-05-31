@@ -1,19 +1,28 @@
 <?php
 
 use App\Http\Controllers\Api\Admin\AnimeController as AdminAnimeController;
+use App\Http\Controllers\Api\Admin\AuditLogController as AdminAuditLogController;
 use App\Http\Controllers\Api\Admin\AuthMeController as AdminAuthMeController;
+use App\Http\Controllers\Api\Admin\CommentController as AdminCommentController;
 use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Api\Admin\EpisodeController as AdminEpisodeController;
 use App\Http\Controllers\Api\Admin\ImportController as AdminImportController;
+use App\Http\Controllers\Api\Admin\ReportController as AdminReportController;
+use App\Http\Controllers\Api\Admin\RatingController as AdminRatingController;
+use App\Http\Controllers\Api\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Api\Admin\TagController as AdminTagController;
+use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\V1\AiChatController;
 use App\Http\Controllers\Api\V1\AiChatSessionController;
 use App\Http\Controllers\Api\V1\AnimeController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CommentsController;
+use App\Http\Controllers\Api\V1\ContactMessageController;
 use App\Http\Controllers\Api\V1\EpisodeController;
 use App\Http\Controllers\Api\V1\FavoritesController;
 use App\Http\Controllers\Api\V1\FriendshipController;
 use App\Http\Controllers\Api\V1\RatingsController;
+use App\Http\Controllers\Api\V1\ReportController as PublicReportController;
 use App\Http\Controllers\Api\V1\ScheduleController;
 use App\Http\Controllers\Api\V1\TagController;
 use App\Http\Controllers\Api\V1\UserAnimeListController;
@@ -56,6 +65,7 @@ Route::prefix('v1')->group(function () {
 
     Route::post('/auth/register', [AuthController::class, 'register']);
     Route::post('/auth/login', [AuthController::class, 'login']);
+    Route::post('/contacts', [ContactMessageController::class, 'store']);
 
     Route::prefix('admin')
         ->middleware(['auth:sanctum', 'admin'])
@@ -63,12 +73,47 @@ Route::prefix('v1')->group(function () {
             Route::get('/auth/me', AdminAuthMeController::class);
             Route::get('/dashboard', AdminDashboardController::class);
             Route::get('/anime', [AdminAnimeController::class, 'index']);
+            Route::get('/anime/{anime}', [AdminAnimeController::class, 'show']);
             Route::post('/anime', [AdminAnimeController::class, 'store']);
             Route::match(['put', 'patch'], '/anime/{anime}', [AdminAnimeController::class, 'update']);
             Route::delete('/anime/{anime}', [AdminAnimeController::class, 'destroy']);
+            Route::post('/anime/{anime}/poster', [AdminAnimeController::class, 'uploadPoster']);
+            Route::delete('/anime/{anime}/poster', [AdminAnimeController::class, 'deletePoster']);
+            Route::post('/anime/{anime}/cover', [AdminAnimeController::class, 'uploadCover']);
+            Route::delete('/anime/{anime}/cover', [AdminAnimeController::class, 'deleteCover']);
+            Route::get('/tags', [AdminTagController::class, 'index']);
+            Route::get('/tags/{tag}', [AdminTagController::class, 'show']);
             Route::post('/tags', [AdminTagController::class, 'store']);
             Route::match(['put', 'patch'], '/tags/{tag}', [AdminTagController::class, 'update']);
             Route::delete('/tags/{tag}', [AdminTagController::class, 'destroy']);
+            Route::get('/users', [AdminUserController::class, 'index']);
+            Route::get('/users/{user}', [AdminUserController::class, 'show']);
+            Route::post('/users/{user}/ban', [AdminUserController::class, 'ban']);
+            Route::post('/users/{user}/unban', [AdminUserController::class, 'unban']);
+            Route::delete('/users/{user}', [AdminUserController::class, 'destroy']);
+            Route::get('/comments', [AdminCommentController::class, 'index']);
+            Route::post('/comments/{comment}/approve', [AdminCommentController::class, 'approve']);
+            Route::post('/comments/{comment}/reject', [AdminCommentController::class, 'reject']);
+            Route::delete('/comments/{comment}', [AdminCommentController::class, 'destroy']);
+            Route::get('/audit-logs', [AdminAuditLogController::class, 'index']);
+            Route::get('/episodes', [AdminEpisodeController::class, 'index']);
+            Route::get('/episodes/{episode}', [AdminEpisodeController::class, 'show']);
+            Route::match(['put', 'patch'], '/episodes/{episode}', [AdminEpisodeController::class, 'update']);
+            Route::delete('/episodes/{episode}', [AdminEpisodeController::class, 'destroy']);
+            Route::post('/episodes/import-all', [AdminEpisodeController::class, 'bulkImport']);
+            Route::post('/episodes/import/{anime}', [AdminEpisodeController::class, 'importForAnime']);
+            Route::get('/reports', [AdminReportController::class, 'index']);
+            Route::get('/reports/{report}', [AdminReportController::class, 'show']);
+            Route::patch('/reports/{report}/status', [AdminReportController::class, 'updateStatus']);
+            Route::delete('/reports/{report}', [AdminReportController::class, 'destroy']);
+            Route::get('/ratings', [AdminRatingController::class, 'index']);
+            Route::delete('/ratings/{rating}', [AdminRatingController::class, 'destroy']);
+            Route::get('/contacts', [\App\Http\Controllers\Api\Admin\ContactMessageController::class, 'index']);
+            Route::patch('/contacts/{contact}/status', [\App\Http\Controllers\Api\Admin\ContactMessageController::class, 'updateStatus']);
+            Route::delete('/contacts/{contact}', [\App\Http\Controllers\Api\Admin\ContactMessageController::class, 'destroy']);
+            Route::get('/settings', [AdminSettingController::class, 'index']);
+            Route::patch('/settings', [AdminSettingController::class, 'update']);
+            Route::get('/settings/diagnostics', [AdminSettingController::class, 'diagnostics']);
             Route::get('/imports/dashboard', [AdminImportController::class, 'dashboard']);
             Route::get('/imports/logs', [AdminImportController::class, 'logs']);
             Route::post('/imports/run', [AdminImportController::class, 'run']);
@@ -82,6 +127,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/ai/chat/sessions/{sessionId}', [AiChatSessionController::class, 'show']);
         Route::get('/my-comments', [CommentsController::class, 'userComments']);
         Route::apiResource('comments', CommentsController::class)->only(['store', 'update', 'destroy']);
+        Route::post('/reports', [PublicReportController::class, 'store']);
 
         Route::get('/profile/me', [UserProfileController::class, 'getFullProfile']);
         Route::put('/profile/me', [UserProfileController::class, 'update']);

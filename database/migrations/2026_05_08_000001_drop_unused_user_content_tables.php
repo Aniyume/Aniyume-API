@@ -42,7 +42,7 @@ return new class extends Migration
         Schema::create('collection_anime', function (Blueprint $table) {
             $table->id();
             $table->foreignId('collection_id')->constrained('user_collections')->onDelete('cascade');
-            $table->foreignId('anime_id')->constrained()->onDelete('cascade');
+            $table->foreignId('anime_id')->constrained('anime')->onDelete('cascade');
             $table->integer('order')->default(0);
             $table->timestamps();
 

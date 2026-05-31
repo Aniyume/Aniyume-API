@@ -1,3 +1,14 @@
+# Legacy Azure App Service workflow.
+#
+# This file is intentionally disabled for the dev/release branch model.
+# The target strategy is now:
+# - .github/workflows/backend-quality.yml for dev/release quality gates
+# - .github/workflows/release-deploy-skeleton.yml for release deployment preparation
+#
+# Re-enable or replace this workflow only after Azure is confirmed as the target runtime
+# and all required production secrets/environments are configured.
+#
+# Original generated notes:
 # This workflow will build and push a PHP application to an Azure Web App when a commit is pushed to your default branch.
 #
 # This workflow assumes you have already created the target Azure App Service web app.
@@ -20,12 +31,10 @@
 name: Build and deploy PHP app to Azure Web App
 
 on:
-  push:
-    branches: [ "main" ]
   workflow_dispatch:
 
 env:
- AZURE_WEBAPP_NAME: aniyume-api-prod
+  AZURE_WEBAPP_NAME: aniyume-api-prod
   AZURE_WEBAPP_PACKAGE_PATH: '.'
   PHP_VERSION: '8.3'          # set this to the PHP version to use
 
@@ -76,24 +85,17 @@ jobs:
           path: .
 
   deploy:
+    name: Legacy Azure deploy disabled
     permissions:
       contents: none
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'Development'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+      name: 'legacy-azure-disabled'
 
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: php-app
-
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: .
+      - name: Azure deployment is disabled
+        run: |
+          echo "Legacy Azure workflow is no longer the target dev/release strategy."
+          echo "No deployment is performed from this workflow."
+          echo "Use release-deploy-skeleton.yml as the basis for the approved deployment pipeline."

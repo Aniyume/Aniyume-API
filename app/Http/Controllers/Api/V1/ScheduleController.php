@@ -21,7 +21,7 @@ class ScheduleController extends Controller
         $schedule = Cache::remember('anime_schedule_v2', 3600, function () {
             try {
                 // Официальный календарь Shikimori
-                $response = Http::timeout(10)->get('https://shikimori.one/api/calendar');
+                $response = Http::timeout(10)->get('https://shikimori.io/api/calendar');
                 
                 if (!$response->successful()) {
                     return $this->fallbackSchedule();

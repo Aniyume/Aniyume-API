@@ -20,6 +20,11 @@ class User extends Authenticatable
         'custom_status',
         'is_online',
         'is_premium',
+        'is_active',
+        'is_banned',
+        'ban_reason',
+        'last_login_at',
+        'last_login_ip',
     ];
 
     protected $hidden = [
@@ -32,6 +37,9 @@ class User extends Authenticatable
         'password' => 'hashed',
         'is_online' => 'boolean',
         'is_premium' => 'boolean',
+        'is_active' => 'boolean',
+        'is_banned' => 'boolean',
+        'last_login_at' => 'datetime',
     ];
 
     public function roles()

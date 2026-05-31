@@ -1,0 +1,151 @@
+name: Backend Release Image
+
+on:
+  push:
+    branches: ["release"]
+  pull_request:
+    branches: ["release"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PHP_VERSION: '8.3'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  DOCKER_TARGET: prod-like
+
+jobs:
+  quality:
+    name: Release quality checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: mbstring, pdo, pdo_sqlite, sqlite3
+          coverage: none
+
+      - name: Validate composer.json
+        run: composer validate --strict --no-check-publish
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Prepare Laravel environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate --ansi
+          mkdir -p database
+          touch database/database.sqlite
+
+      - name: Run tests
+        run: php artisan test
+
+      - name: Run PHPStan/Larastan
+        run: composer analyse
+
+      - name: Run Pint
+        run: vendor/bin/pint --test
+
+  release-image:
+    name: Build release Docker image
+    runs-on: ubuntu-latest
+    needs: quality
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Normalize GHCR image name
+        run: echo "IMAGE_REF=${REGISTRY}/${IMAGE_NAME,,}" >> "$GITHUB_ENV"
+
+      - name: Prepare Docker image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_REF }}
+          tags: |
+            type=sha,prefix=release-,format=long
+            type=raw,value=release-latest,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/release' }}
+          labels: |
+            org.opencontainers.image.title=aniyume-api
+            org.opencontainers.image.description=AniYume Laravel backend release image
+
+      - name: Log in to GHCR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/release'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker image without publishing
+        if: github.event_name != 'push' || github.ref != 'refs/heads/release'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: ${{ env.DOCKER_TARGET }}
+          push: false
+          load: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and publish immutable release image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/release'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: ${{ env.DOCKER_TARGET }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Summarize release image
+        run: |
+          echo "### Backend release image" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Image name: \`${{ env.IMAGE_REF }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "Docker target: \`${{ env.DOCKER_TARGET }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Tags:" >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' '${{ steps.meta.outputs.tags }}' | sed 's/^/- `/' | sed 's/$/`/' >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref }}" = "refs/heads/release" ]; then
+            echo "Published to GHCR with GitHub Actions GITHUB_TOKEN." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "PR validation build only; no image was pushed." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  deploy-placeholder:
+    name: Production deploy placeholder
+    runs-on: ubuntu-latest
+    needs: release-image
+    environment: production
+    if: github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
+
+    steps:
+      - name: Deployment is not enabled yet
+        run: |
+          echo "Production deploy is intentionally disabled."
+          echo "This workflow only validates the release and publishes a GHCR image on push to release."
+          echo "Expected future secrets/placeholders: PROD_HOST, PROD_SSH_USER, PROD_SSH_KEY, PROD_ENV_FILE, registry credentials if not using GHCR/GITHUB_TOKEN."
+          echo "Replace this placeholder only after the production runtime and approval gates are defined."

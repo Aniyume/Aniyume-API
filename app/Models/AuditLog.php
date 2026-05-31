@@ -12,6 +12,11 @@ class AuditLog extends Model
         'user_id',
         'action',
         'description',
+        'entity_type',
+        'entity_id',
+        'before',
+        'after',
+        'metadata',
         'ip_address',
         'user_agent',
         'created_at',
@@ -19,10 +24,18 @@ class AuditLog extends Model
 
     protected $casts = [
         'created_at' => 'datetime',
+        'before' => 'array',
+        'after' => 'array',
+        'metadata' => 'array',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function entity()
+    {
+        return $this->morphTo(__FUNCTION__, 'entity_type', 'entity_id');
     }
 }

@@ -12,9 +12,9 @@ use Illuminate\Support\Str;
 
 class ShikimoriImportService
 {
-    protected string $apiUrl = 'https://shikimori.one/api/graphql';
+    protected string $apiUrl = 'https://shikimori.io/api/graphql';
     protected int $perPage = 50;
-    protected string $storageUrl = 'https://shikimori.one';
+    protected string $storageUrl = 'https://shikimori.io';
 
     public function importAll(bool $isInitialImport = true, int $startPage = 1): ImportLog
     {
@@ -219,11 +219,6 @@ class ShikimoriImportService
             ->where('external_id', $externalId)
             ->first();
 
-        // Also check if it exists by shikimori_id (from previous Anilist import)
-        if (!$existing) {
-            $existing = Anime::where('shikimori_id', $externalId)->first();
-        }
-
         if ($existing && $isInitialImport) {
             $importLog->increment('total_skipped');
             return;
@@ -298,7 +293,6 @@ class ShikimoriImportService
             'number_of_episodes' => $mediaData['episodes'] ?: ($mediaData['episodesAired'] ?: null),
             'duration' => $mediaData['duration'] ?? null,
             'external_id' => (string) $mediaData['id'],
-            'shikimori_id' => (string) $mediaData['id'],
             'external_source' => 'shikimori',
             'aired_from' => $airedFrom,
             'aired_to' => $airedTo,
@@ -317,7 +311,6 @@ class ShikimoriImportService
 
         while (Anime::where('slug', $slug)
             ->where('external_id', '!=', $externalId)
-            ->where('shikimori_id', '!=', $externalId)
             ->exists()) {
             $slug = $baseSlug . '-' . $counter;
             $counter++;
