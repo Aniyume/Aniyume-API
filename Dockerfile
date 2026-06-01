@@ -30,6 +30,8 @@ COPY . .
 
 RUN composer dump-autoload --optimize \
     && mkdir -p storage bootstrap/cache \
+    && mkdir -p storage/app/public \
+    && ln -sfn ../storage/app/public public/storage \
     && chmod -R ug+rwX storage bootstrap/cache
 
 EXPOSE 8000 8080
