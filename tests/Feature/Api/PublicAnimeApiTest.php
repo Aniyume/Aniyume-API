@@ -14,7 +14,7 @@ class PublicAnimeApiTest extends TestCase
 
     public function test_anime_list_returns_paginated_data(): void
     {
-        Anime::factory()->count(3)->create();
+        Anime::factory()->count(3)->has(Episode::factory())->create();
 
         $this->getJson('/api/v1/public/anime')
             ->assertOk()
@@ -29,7 +29,7 @@ class PublicAnimeApiTest extends TestCase
 
     public function test_anime_list_respects_per_page_limit(): void
     {
-        Anime::factory()->count(3)->create();
+        Anime::factory()->count(3)->has(Episode::factory())->create();
 
         $this->getJson('/api/v1/public/anime?per_page=1')
             ->assertOk()

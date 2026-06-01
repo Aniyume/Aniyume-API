@@ -32,14 +32,22 @@ class EpisodeImportService
 
     protected KodikService $kodikService;
 
+    protected EpisodeLookupMetadataService $metadataService;
+
+    protected ExternalPlayerService $externalPlayerService;
+
     public function __construct(
         VideoCdnService $videoCdnService,
         AnilibriaService $anilibriaService,
-        KodikService $kodikService
+        KodikService $kodikService,
+        EpisodeLookupMetadataService $metadataService,
+        ExternalPlayerService $externalPlayerService
     ) {
         $this->videoCdnService = $videoCdnService;
         $this->anilibriaService = $anilibriaService;
         $this->kodikService = $kodikService;
+        $this->metadataService = $metadataService;
+        $this->externalPlayerService = $externalPlayerService;
     }
 
     public function setAvailableSources(bool $anilibria, bool $kodik): void
@@ -82,13 +90,20 @@ class EpisodeImportService
             }
 
             $episodes = [];
+            $titleCandidates = $this->metadataService->titleCandidates($anime);
 
             // PRIORITY 1: Anilibria (No ads, HLS, internal player)
             if ($this->anilibriaEnabled) {
                 if ($anime->anilibria_id) {
                     $episodes = $this->anilibriaService->getEpisodes((int) $anime->anilibria_id);
                 } else {
-                    $found = $this->anilibriaService->findByTitle($anime->title, $anime->title_en);
+                    $found = null;
+                    foreach ($titleCandidates as $candidateTitle) {
+                        $found = $this->anilibriaService->findByTitle($candidateTitle, null);
+                        if ($found) {
+                            break;
+                        }
+                    }
                     if ($found) {
                         $anime->update(['anilibria_id' => $found['id']]);
                         $episodes = $this->anilibriaService->getEpisodes((int) $found['id']);
@@ -100,7 +115,12 @@ class EpisodeImportService
             if ($this->kodikEnabled && empty($episodes)) {
                 $kodikData = $anime->shikimori_id
                     ? $this->kodikService->searchByShikimoriId($anime->shikimori_id)
-                    : $this->kodikService->searchByTitle($anime->title);
+                    : $this->kodikService->searchByTitles($titleCandidates, $anime->year, $anime->type);
+
+                if (empty($kodikData) && $anime->shikimori_id) {
+                    $kodikData = $this->kodikService->searchByTitles($titleCandidates, $anime->year, $anime->type);
+                }
+
                 if (! empty($kodikData)) {
                     // To prevent franchise mish-mash (e.g. Naruto mixed with Boruto or Shippuden),
                     // we must enforce that all processed Kodik translations belong to the exact same anime entity.
@@ -130,6 +150,12 @@ class EpisodeImportService
             // PRIORITY 3: VideoCDN (Last resort)
             if (empty($episodes)) {
                 $episodes = $this->fetchFromVideoCdn($anime);
+            }
+
+            // PRIORITY 4: Configured iframe aggregators / no-name voiceovers.
+            // Disabled by default until URL templates are configured by admin.
+            if (empty($episodes)) {
+                $episodes = $this->externalPlayerService->getEpisodes($anime, $titleCandidates);
             }
 
             // Persistence
@@ -190,7 +216,7 @@ class EpisodeImportService
             }
         }
 
-        return $this->videoCdnService->getEpisodesByTitle($anime->title);
+        return $this->videoCdnService->getEpisodesByTitles($this->metadataService->titleCandidates($anime), $anime->year, $anime->type);
     }
 
     protected function formatKodikEpisodes(array $animeData): array

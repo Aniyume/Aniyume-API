@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Cache;
 
 class ImportEpisodesCommand extends Command
 {
-    protected $signature = 'import:episodes {--limit=100} {--offset=0} {--cursor : Automatically continue from the previous batch offset} {--source= : anilibria or kodik} {--only-missing : Skip anime that already have episodes} {--clean : Wipe completely existing episodes before import}';
+    protected $signature = 'import:episodes {--limit=100} {--offset=0} {--cursor : Automatically continue from the previous batch offset} {--source= : anilibria, kodik or videocdn} {--only-missing : Skip anime that already have episodes} {--clean : Wipe completely existing episodes before import}';
 
-    protected $description = 'Import episodes from Anilibria/Kodik for existing anime with batch support';
+    protected $description = 'Import episodes from Anilibria/Kodik/VideoCDN with metadata-assisted matching';
 
     public function handle(EpisodeImportService $importService)
     {
@@ -62,6 +62,9 @@ class ImportEpisodesCommand extends Command
             } elseif ($source === 'kodik') {
                 $importService->setAvailableSources(false, true);
                 $this->info('Source: Kodik only');
+            } elseif ($source === 'videocdn') {
+                $importService->setAvailableSources(false, false);
+                $this->info('Source: VideoCDN only');
             }
 
             if ($this->option('only-missing')) {

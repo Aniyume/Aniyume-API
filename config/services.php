@@ -50,4 +50,38 @@ return [
         'token' => env('TMDB_BEARER_TOKEN'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Optional external iframe players
+    |--------------------------------------------------------------------------
+    |
+    | These providers are disabled until a URL template is configured in .env.
+    | Templates can use: {shikimori_id}, {title}, {title_en}, {year}, {anime_id}.
+    | They are used as a last-resort fallback for players with built-in episode
+    | selectors / rare no-name voiceovers.
+    |
+    */
+    'external_players' => [
+        'alloha' => [
+            'template' => env('ALLOHA_PLAYER_URL_TEMPLATE'),
+            'translator' => env('ALLOHA_TRANSLATOR', 'Alloha'),
+        ],
+        'collaps' => [
+            'template' => env('COLLAPS_PLAYER_URL_TEMPLATE'),
+            'translator' => env('COLLAPS_TRANSLATOR', 'Collaps'),
+        ],
+        'ashdi' => [
+            'template' => env('ASHDI_PLAYER_URL_TEMPLATE'),
+            'translator' => env('ASHDI_TRANSLATOR', 'Ashdi'),
+        ],
+        'vibix' => [
+            'template' => env('VIBIX_PLAYER_URL_TEMPLATE'),
+            'translator' => env('VIBIX_TRANSLATOR', 'Vibix'),
+        ],
+        'hdvb' => [
+            'template' => env('HDVB_PLAYER_URL_TEMPLATE'),
+            'translator' => env('HDVB_TRANSLATOR', 'HDVB'),
+        ],
+    ],
+
 ];

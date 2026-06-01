@@ -36,25 +36,43 @@ class VideoCdnService
         return [];
     }
 
-    public function getEpisodesByTitle(string $title): array
+    public function getEpisodesByTitle(string $title, ?string $titleEn = null, ?int $year = null, ?string $type = null): array
+    {
+        return $this->getEpisodesByTitles(array_filter([$title, $titleEn]), $year, $type);
+    }
+
+    public function getEpisodesByTitles(array $titles, ?int $year = null, ?string $type = null): array
     {
         if (! $this->apiToken) {
             return [];
         }
 
-        $title = trim(preg_replace('/[^\p{L}\p{N}\s\-]/u', '', $title));
-
-        $endpoints = ['/anime-tv-series', '/animes'];
+        $titles = array_values(array_unique(array_filter($titles)));
+        $endpoints = $type === 'movie' ? ['/animes', '/anime-tv-series'] : ['/anime-tv-series', '/animes'];
+        $best = null;
+        $bestScore = PHP_INT_MIN;
 
         foreach ($endpoints as $endpoint) {
-            $data = $this->fetchFromApi($endpoint, ['title' => $title, 'limit' => 3]);
+            foreach ($titles as $queryTitle) {
+                $cleanTitle = trim(preg_replace('/[^\p{L}\p{N}\s\-]/u', '', $queryTitle));
+                $data = $this->fetchFromApi($endpoint, ['title' => $cleanTitle, 'limit' => 10]);
 
-            if (! empty($data)) {
-                return $this->parseVideoCdnEpisodes($data[0]);
+                foreach ($data as $item) {
+                    $episodes = $this->parseVideoCdnEpisodes($item);
+                    if (empty($episodes)) {
+                        continue;
+                    }
+
+                    $score = $this->matchScore($item, $titles, $year) + min(count($episodes), 50);
+                    if ($score > $bestScore) {
+                        $bestScore = $score;
+                        $best = $episodes;
+                    }
+                }
             }
         }
 
-        return [];
+        return $best ?? [];
     }
 
     private function fetchFromApi(string $endpoint, array $params): array
@@ -148,5 +166,49 @@ class VideoCdnService
         }
 
         return $url;
+    }
+
+    private function matchScore(array $item, array $wantedTitles, ?int $year): int
+    {
+        $score = 0;
+        $candidateTitles = array_filter([
+            $item['ru_title'] ?? null,
+            $item['orig_title'] ?? null,
+            $item['title'] ?? null,
+        ]);
+
+        foreach ($wantedTitles as $wanted) {
+            $wantedNormalized = $this->normalizeTitle($wanted);
+            foreach ($candidateTitles as $candidate) {
+                $candidateNormalized = $this->normalizeTitle((string) $candidate);
+                if ($wantedNormalized !== '' && $candidateNormalized !== '') {
+                    if ($candidateNormalized === $wantedNormalized) {
+                        $score += 100;
+                    } elseif (str_contains($candidateNormalized, $wantedNormalized) || str_contains($wantedNormalized, $candidateNormalized)) {
+                        $score += 40;
+                    }
+                }
+            }
+        }
+
+        $candidateYear = $item['year'] ?? $item['start_year'] ?? null;
+        if ($year && $candidateYear) {
+            $delta = abs((int) $candidateYear - $year);
+            $score += match (true) {
+                $delta === 0 => 30,
+                $delta === 1 => 10,
+                default => -20,
+            };
+        }
+
+        return $score;
+    }
+
+    private function normalizeTitle(string $title): string
+    {
+        $title = mb_strtolower($title);
+        $title = str_replace('ё', 'е', $title);
+
+        return trim(preg_replace('/[^\p{L}\p{N}]+/u', '', $title));
     }
 }

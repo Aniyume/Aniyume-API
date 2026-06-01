@@ -101,6 +101,7 @@ Route::prefix('v1')->group(function () {
             Route::delete('/comments/{comment}', [AdminCommentController::class, 'destroy']);
             Route::get('/audit-logs', [AdminAuditLogController::class, 'index']);
             Route::get('/episodes', [AdminEpisodeController::class, 'index']);
+            Route::get('/episodes/player-diagnostics', [AdminEpisodeController::class, 'playerDiagnostics']);
             Route::get('/episodes/{episode}', [AdminEpisodeController::class, 'show']);
             Route::match(['put', 'patch'], '/episodes/{episode}', [AdminEpisodeController::class, 'update']);
             Route::delete('/episodes/{episode}', [AdminEpisodeController::class, 'destroy']);

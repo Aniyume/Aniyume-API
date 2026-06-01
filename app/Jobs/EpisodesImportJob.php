@@ -23,6 +23,7 @@ class EpisodesImportJob implements ShouldQueue
         public int $animeId,
         public bool $update = false,
         public bool $onlyMissing = true,
+        public ?string $source = null,
     ) {}
 
     public function handle(EpisodeImportService $importService): void
@@ -38,6 +39,15 @@ class EpisodesImportJob implements ShouldQueue
         }
 
         $importService->setOnlyMissing($this->onlyMissing);
+
+        if ($this->source === 'anilibria') {
+            $importService->setAvailableSources(true, false);
+        } elseif ($this->source === 'kodik') {
+            $importService->setAvailableSources(false, true);
+        } elseif (in_array($this->source, ['videocdn', 'external'], true)) {
+            $importService->setAvailableSources(false, false);
+        }
+
         $importService->importForSingleAnime($anime, $this->update);
     }
 }

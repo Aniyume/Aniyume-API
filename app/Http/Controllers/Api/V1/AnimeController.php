@@ -38,6 +38,8 @@ class AnimeController extends Controller
         $query = Anime::query()
             ->with(['tags'])
             ->withCount('episodes')
+            // На публичном сайте показываем только тайтлы, которые реально можно смотреть.
+            ->whereHas('episodes')
             ->when($request->filled('type'), function ($q) use ($request) {
                 $q->where('type', $request->type);
             })
@@ -74,20 +76,17 @@ class AnimeController extends Controller
         $sort = $request->sort;
         if (! $sort || $sort === 'smart') {
             // Улучшенная умная сортировка
-            // 1. Приоритет тем, у кого есть серии в базе
-            $query->orderByRaw('CASE WHEN (SELECT count(*) FROM episodes WHERE episodes.anime_id = anime.id) > 0 THEN 0 ELSE 1 END');
-
-            // 2. Деприоритет тега "Детское" (чтобы китайские мультики не лезли в начало)
+            // 1. Деприоритет тега "Детское" (чтобы китайские мультики не лезли в начало)
             $query->orderByRaw('CASE WHEN EXISTS (
                 SELECT 1 FROM anime_tag 
                 JOIN tags ON tags.id = anime_tag.tag_id 
                 WHERE anime_tag.anime_id = anime.id AND tags.name = \'Детское\'
             ) THEN 1 ELSE 0 END');
 
-            // 3. Приоритет тем, у кого есть хоть какой-то рейтинг или популярность (отсеиваем ноунейм импорты)
+            // 2. Приоритет тем, у кого есть хоть какой-то рейтинг или популярность (отсеиваем ноунейм импорты)
             $query->orderByRaw('CASE WHEN (popularity > 0 OR rating > 0) THEN 0 ELSE 1 END');
 
-            // 4. Сначала свежие годы, но в рамках одного года — популярные
+            // 3. Сначала свежие годы, но в рамках одного года — популярные
             $query->orderBy('year', 'DESC')
                 ->orderBy('popularity', 'DESC')
                 ->orderBy('rating', 'DESC')
@@ -187,6 +186,7 @@ class AnimeController extends Controller
                         }
 
                         $foundAnime = Anime::query()->whereIn('shikimori_id', $shikimoriIds, 'and', false)
+                            ->whereHas('episodes')
                             ->limit(10)
                             ->get();
 
@@ -253,6 +253,11 @@ class AnimeController extends Controller
             ->join('anime_tag', 'anime.id', '=', 'anime_tag.anime_id')
             ->whereIn('anime_tag.tag_id', $tagIds)
             ->whereNotIn('anime.id', $excludeIds)
+            ->whereExists(function ($query) {
+                $query->selectRaw('1')
+                    ->from('episodes')
+                    ->whereColumn('episodes.anime_id', 'anime.id');
+            })
             ->groupBy('anime.id')
             ->orderByRaw('COUNT(*) DESC')
             ->offset($offset)
