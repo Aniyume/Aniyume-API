@@ -45,4 +45,9 @@ return [
         'cdn_url' => env('ANILIBRIA_CDN_URL', 'https://cache-rfn.libria.fun'),
     ],
 
+    'tmdb' => [
+        'key' => env('TMDB_API_KEY'),
+        'token' => env('TMDB_BEARER_TOKEN'),
+    ],
+
 ];

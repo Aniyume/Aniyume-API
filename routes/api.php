@@ -68,7 +68,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/contacts', [ContactMessageController::class, 'store']);
 
     Route::prefix('admin')
-        ->middleware(['auth:sanctum', 'admin'])
+        ->middleware(['clerk.admin'])
         ->group(function () {
             Route::get('/auth/me', AdminAuthMeController::class);
             Route::get('/dashboard', AdminDashboardController::class);

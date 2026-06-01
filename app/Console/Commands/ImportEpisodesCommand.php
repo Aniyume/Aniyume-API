@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Cache;
 
 class ImportEpisodesCommand extends Command
 {
-    protected $signature = 'import:episodes {--limit=100} {--offset=0} {--source= : anilibria or kodik} {--only-missing : Skip anime that already have episodes} {--clean : Wipe completely existing episodes before import}';
+    protected $signature = 'import:episodes {--limit=100} {--offset=0} {--cursor : Automatically continue from the previous batch offset} {--source= : anilibria or kodik} {--only-missing : Skip anime that already have episodes} {--clean : Wipe completely existing episodes before import}';
 
     protected $description = 'Import episodes from Anilibria/Kodik for existing anime with batch support';
 
@@ -28,6 +28,16 @@ class ImportEpisodesCommand extends Command
         try {
             $limit = $this->option('limit') ? (int) $this->option('limit') : 100;
             $offset = $this->option('offset') ? (int) $this->option('offset') : 0;
+            $usesCursor = (bool) $this->option('cursor');
+
+            if ($usesCursor) {
+                $totalAnime = \App\Models\Anime::query()->count();
+                $offset = (int) Cache::get('imports:episodes:next_offset', 0);
+
+                if ($offset >= $totalAnime) {
+                    $offset = 0;
+                }
+            }
 
             $source = $this->option('source');
 
@@ -64,6 +74,14 @@ class ImportEpisodesCommand extends Command
             // update existing episodes, apply limit and offset
             $importService->import(true, $limit, $offset);
 
+            if ($usesCursor) {
+                $totalAnime = \App\Models\Anime::query()->count();
+                $nextOffset = $totalAnime > 0 ? ($offset + $limit) % $totalAnime : 0;
+                Cache::forever('imports:episodes:next_offset', $nextOffset);
+
+                $this->info("Next cursor offset: {$nextOffset} / {$totalAnime}");
+            }
+
             $this->info('Episodes import finished.');
             $this->info("Processed: {$importService->processed}");
             $this->info("Created: {$importService->created}");
@@ -79,7 +97,7 @@ class ImportEpisodesCommand extends Command
                 'total_updated' => $importService->updated,
                 'total_skipped' => $importService->skipped,
                 'episodes_created' => $importService->created,
-                'errors' => $importService->errors > 0 ? json_encode(['errors' => $importService->errors]) : null,
+                'errors' => $importService->errors > 0 ? json_encode(['errors' => $importService->errors, 'offset' => $offset]) : null,
             ]);
 
             return $importService->errors > 0 ? self::FAILURE : self::SUCCESS;

@@ -170,13 +170,12 @@ class EpisodeImportService
             $query->limit($limit);
         }
 
-        $processedLocal = 0;
-
-        $query->orderBy('id', 'asc')->chunk(100, function ($animes) use (&$processedLocal, $update) {
-            foreach ($animes as $anime) {
-                $processedLocal++;
-                $this->importForSingleAnime($anime, $update);
-            }
+        // Do not use chunk() here: Laravel's chunk pagination applies its own
+        // offset/limit for every page and can override the batch offset above.
+        // The scheduled importer relies on a cursor offset, so load exactly the
+        // requested batch and process it deterministically.
+        $query->orderBy('id', 'asc')->get()->each(function (Anime $anime) use ($update) {
+            $this->importForSingleAnime($anime, $update);
         });
 
         $this->printStats();
