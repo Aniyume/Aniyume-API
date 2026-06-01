@@ -159,6 +159,9 @@ jobs:
               PROD_ROOT="/opt/aniyume"
             fi
 
+            IMAGE_REF="ghcr.io/${{ github.repository }}:release-latest"
+            IMAGE_REF="$(printf '%s' "$IMAGE_REF" | tr '[:upper:]' '[:lower:]')"
+
             cd "$PROD_ROOT/api"
             git checkout release
             if [ -n "$(git status --porcelain)" ]; then
@@ -167,8 +170,10 @@ jobs:
             git pull --ff-only origin release
 
             cd "$PROD_ROOT"
-            docker compose up -d --build api
+            docker pull "$IMAGE_REF"
+            docker tag "$IMAGE_REF" aniyume-api:latest
+            docker compose up -d --no-build --force-recreate api
             docker compose exec -T api php artisan migrate --force
             docker compose exec -T api php artisan optimize:clear
             docker compose exec -T api php artisan config:cache
-            docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.worker.yml up -d --force-recreate api-worker
+            docker compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.worker.yml up -d --no-build --force-recreate api-worker
