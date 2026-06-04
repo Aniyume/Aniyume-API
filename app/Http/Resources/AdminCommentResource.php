@@ -14,6 +14,12 @@ class AdminCommentResource extends JsonResource
             'comment' => $this->comment,
             'is_approved' => (bool) $this->is_approved,
             'status' => $this->is_approved ? 'approved' : 'rejected',
+            'parent_id' => $this->parent_id,
+            'likes_count' => (int) ($this->likes_count ?? 0),
+            'dislikes_count' => (int) ($this->dislikes_count ?? 0),
+            'admin_hearted' => (bool) $this->admin_hearted_at,
+            'admin_hearted_at' => $this->admin_hearted_at?->toISOString(),
+            'admin_hearted_by' => $this->admin_hearted_by,
             'user' => $this->whenLoaded('user', fn () => $this->user ? [
                 'id' => $this->user->id,
                 'name' => $this->user->name,

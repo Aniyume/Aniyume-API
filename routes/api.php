@@ -91,13 +91,16 @@ Route::prefix('v1')->group(function () {
             Route::match(['put', 'patch'], '/tags/{tag}', [AdminTagController::class, 'update']);
             Route::delete('/tags/{tag}', [AdminTagController::class, 'destroy']);
             Route::get('/users', [AdminUserController::class, 'index']);
+            Route::post('/users/premium/grant', [AdminUserController::class, 'grantPremiumByNickname']);
             Route::get('/users/{user}', [AdminUserController::class, 'show']);
+            Route::patch('/users/{user}/premium', [AdminUserController::class, 'updatePremium']);
             Route::post('/users/{user}/ban', [AdminUserController::class, 'ban']);
             Route::post('/users/{user}/unban', [AdminUserController::class, 'unban']);
             Route::delete('/users/{user}', [AdminUserController::class, 'destroy']);
             Route::get('/comments', [AdminCommentController::class, 'index']);
             Route::post('/comments/{comment}/approve', [AdminCommentController::class, 'approve']);
             Route::post('/comments/{comment}/reject', [AdminCommentController::class, 'reject']);
+            Route::post('/comments/{comment}/heart', [AdminCommentController::class, 'toggleHeart']);
             Route::delete('/comments/{comment}', [AdminCommentController::class, 'destroy']);
             Route::get('/audit-logs', [AdminAuditLogController::class, 'index']);
             Route::get('/episodes', [AdminEpisodeController::class, 'index']);
@@ -114,6 +117,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/ratings', [AdminRatingController::class, 'index']);
             Route::delete('/ratings/{rating}', [AdminRatingController::class, 'destroy']);
             Route::get('/contacts', [\App\Http\Controllers\Api\Admin\ContactMessageController::class, 'index']);
+            Route::get('/contacts/{contact}/photo', [\App\Http\Controllers\Api\Admin\ContactMessageController::class, 'photo']);
             Route::patch('/contacts/{contact}/status', [\App\Http\Controllers\Api\Admin\ContactMessageController::class, 'updateStatus']);
             Route::delete('/contacts/{contact}', [\App\Http\Controllers\Api\Admin\ContactMessageController::class, 'destroy']);
             Route::get('/settings', [AdminSettingController::class, 'index']);
@@ -131,12 +135,17 @@ Route::prefix('v1')->group(function () {
         Route::get('/ai/chat/sessions', [AiChatSessionController::class, 'index']);
         Route::get('/ai/chat/sessions/{sessionId}', [AiChatSessionController::class, 'show']);
         Route::get('/my-comments', [CommentsController::class, 'userComments']);
+        Route::post('/comments/{comment}/reactions', [CommentsController::class, 'react']);
+        Route::post('/comments/{comment}/admin-heart', [CommentsController::class, 'adminHeart']);
+        Route::post('/comments/{comment}/replies', [CommentsController::class, 'reply']);
         Route::apiResource('comments', CommentsController::class)->only(['store', 'update', 'destroy']);
         Route::post('/reports', [PublicReportController::class, 'store']);
 
         Route::get('/profile/me', [UserProfileController::class, 'getFullProfile']);
         Route::put('/profile/me', [UserProfileController::class, 'update']);
         Route::post('/profile/me/avatar', [UserProfileController::class, 'uploadAvatar']);
+        Route::get('/profile/me/frames', [UserProfileController::class, 'frames']);
+        Route::post('/profile/me/frames/select', [UserProfileController::class, 'selectFrame']);
 
         Route::get('/statistics/me', [UserStatisticsController::class, 'getStatistics']);
         Route::get('/statistics/me/episodes-summary', [UserStatisticsController::class, 'getEpisodesSummary']);

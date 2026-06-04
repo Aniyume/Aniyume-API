@@ -7,6 +7,7 @@ use App\Models\Anime;
 use App\Models\Episode;
 use App\Services\KodikService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -34,12 +35,16 @@ class EpisodeController extends Controller
      */
     public function getAllTranslators()
     {
-        $query = Episode::query();
-        /** @var mixed $query */
-        $translators = $query->whereNotNull('translator')
-            ->select('translator', 'translation_type')
-            ->distinct()
-            ->get();
+        $translators = Cache::remember('episodes_translators_all', now()->addHours(6), function () {
+            $query = Episode::query();
+            /** @var mixed $query */
+
+            return $query->whereNotNull('translator')
+                ->select('translator', 'translation_type')
+                ->distinct()
+                ->orderBy('translator')
+                ->get();
+        });
 
         return response()->json(['data' => $translators]);
     }
@@ -51,7 +56,7 @@ class EpisodeController extends Controller
      */
     public function show($id)
     {
-        $episode = Episode::findOrFail($id);
+        $episode = Episode::query()->findOrFail($id);
 
         return response()->json($episode);
     }
@@ -65,7 +70,9 @@ class EpisodeController extends Controller
      */
     public function getPlayer($id)
     {
-        $episode = Episode::findOrFail($id);
+        $episode = Episode::query()
+            ->select(['id', 'player_url', 'player_iframe'])
+            ->findOrFail($id);
 
         return response()->json([
             'player_url' => $episode->player_url,
@@ -80,26 +87,44 @@ class EpisodeController extends Controller
      */
     public function getByAnime(Anime $anime)
     {
-        // Get all episodes, order by episode_number
-        $episodes = $anime->episodes()
-            ->orderBy('episode_number', 'asc')
-            ->get();
+        $cacheKey = "anime_episodes_grouped_{$anime->id}_{$anime->updated_at?->timestamp}";
 
-        // Group by translator
-        $grouped = $episodes->groupBy('translator')->map(function ($eps) {
-            return $eps->map(function ($ep) {
-                return [
-                    'id' => $ep->id,
-                    'episode_number' => $ep->episode_number,
-                    'season_number' => $ep->season_number,
-                    'title' => $ep->title,
-                    'source' => $ep->source,
-                    'player_url' => $ep->player_url,
-                    'player_iframe' => $ep->player_iframe,
-                    'translation_type' => $ep->translation_type,
-                    'quality' => $ep->quality,
-                    'skip_times' => is_string($ep->skip_times) ? json_decode($ep->skip_times, true) : $ep->skip_times,
-                ];
+        $grouped = Cache::remember($cacheKey, now()->addMinutes(30), function () use ($anime) {
+            // Get all episodes, order by episode_number
+            $episodes = $anime->episodes()
+                ->select([
+                    'id',
+                    'anime_id',
+                    'episode_number',
+                    'season_number',
+                    'title',
+                    'source',
+                    'player_url',
+                    'player_iframe',
+                    'translator',
+                    'translation_type',
+                    'quality',
+                    'skip_times',
+                ])
+                ->orderBy('episode_number', 'asc')
+                ->get();
+
+            // Group by translator
+            return $episodes->groupBy('translator')->map(function ($eps) {
+                return $eps->map(function ($ep) {
+                    return [
+                        'id' => $ep->id,
+                        'episode_number' => $ep->episode_number,
+                        'season_number' => $ep->season_number,
+                        'title' => $ep->title,
+                        'source' => $ep->source,
+                        'player_url' => $ep->player_url,
+                        'player_iframe' => $ep->player_iframe,
+                        'translation_type' => $ep->translation_type,
+                        'quality' => $ep->quality,
+                        'skip_times' => is_string($ep->skip_times) ? json_decode($ep->skip_times, true) : $ep->skip_times,
+                    ];
+                });
             });
         });
 
@@ -117,76 +142,100 @@ class EpisodeController extends Controller
      */
     public function getPlayerSources(Anime $anime, int $episodeNumber)
     {
-        $query = Episode::query();
-        /** @var mixed $query */
-        $episodes = $query->where('anime_id', '=', $anime->id, 'and')
-            ->where('episode_number', '=', $episodeNumber, 'and')
-            ->orderByDesc('priority')
-            ->get();
+        $cacheKey = "player_sources_{$anime->id}_{$episodeNumber}_{$anime->updated_at?->timestamp}";
 
-        $sources = $episodes->map(function ($ep) {
-            $isHls = str_ends_with($ep->player_url ?? '', '.m3u8') || $ep->source === 'anilibria';
+        $payload = Cache::remember($cacheKey, now()->addMinutes(15), function () use ($anime, $episodeNumber) {
+            $query = Episode::query();
+            /** @var mixed $query */
+            $episodes = $query->where('anime_id', '=', $anime->id, 'and')
+                ->where('episode_number', '=', $episodeNumber, 'and')
+                ->select([
+                    'id',
+                    'source',
+                    'translator',
+                    'player_url',
+                    'player_iframe',
+                    'translation_type',
+                    'quality',
+                    'priority',
+                    'skip_times',
+                    'poster_url',
+                ])
+                ->orderByDesc('priority')
+                ->get();
 
-            // Better label format: "AniLibria" instead of "anilibria (AniLibria)"
-            $label = $ep->translator ?: ucfirst($ep->source ?? 'Unknown');
-            if ($ep->source === 'kodik' && $ep->translator && $ep->translator !== 'Kodik') {
-                $label = "Kodik ({$ep->translator})";
+            $sources = $episodes->map(function ($ep) {
+                $isHls = str_ends_with($ep->player_url ?? '', '.m3u8') || $ep->source === 'anilibria';
+
+                // Better label format: "AniLibria" instead of "anilibria (AniLibria)"
+                $label = $ep->translator ?: ucfirst($ep->source ?? 'Unknown');
+                if ($ep->source === 'kodik' && $ep->translator && $ep->translator !== 'Kodik') {
+                    $label = "Kodik ({$ep->translator})";
+                }
+
+                return [
+                    'id' => $ep->id,
+                    'source' => $ep->source,
+                    'translator' => $ep->translator,
+                    'label' => $label,
+                    'type' => $isHls ? 'hls' : 'iframe',
+                    'url' => $ep->player_url,
+                    'iframe' => $ep->player_iframe,
+                    'quality' => $ep->quality,
+                    'priority' => $ep->priority,
+                    'skip_times' => is_string($ep->skip_times) ? json_decode($ep->skip_times, true) : $ep->skip_times,
+                    'poster_url' => $ep->poster_url,
+                ];
+            })->toArray();
+
+            // Live Kodik fallback: if no sources found in DB, try Kodik in real-time
+            if (empty($sources) && $anime->shikimori_id) {
+                try {
+                    $kodikService = app(KodikService::class);
+                    $iframeUrl = $kodikService->buildEpisodeIframeUrl(
+                        (int) $anime->shikimori_id,
+                        $episodeNumber
+                    );
+
+                    if ($iframeUrl) {
+                        $sources[] = [
+                            'id' => 0,
+                            'source' => 'kodik',
+                            'translator' => 'Kodik',
+                            'label' => 'Kodik (авто)',
+                            'type' => 'iframe',
+                            'url' => $iframeUrl,
+                            'iframe' => null,
+                            'quality' => 'auto',
+                            'priority' => 1,
+                            'skip_times' => null,
+                            'poster_url' => null,
+                        ];
+                    }
+                } catch (\Throwable $e) {
+                    // Silently fail — Kodik might be down
+                    Log::debug('Kodik live fallback failed: '.$e->getMessage());
+                }
+            }
+
+            if (empty($sources)) {
+                return [
+                    'status' => 404,
+                    'body' => ['message' => 'Эпизод не найден'],
+                ];
             }
 
             return [
-                'id' => $ep->id,
-                'source' => $ep->source,
-                'translator' => $ep->translator,
-                'label' => $label,
-                'type' => $isHls ? 'hls' : 'iframe',
-                'url' => $ep->player_url,
-                'iframe' => $ep->player_iframe,
-                'quality' => $ep->quality,
-                'priority' => $ep->priority,
-                'skip_times' => is_string($ep->skip_times) ? json_decode($ep->skip_times, true) : $ep->skip_times,
-                'poster_url' => $ep->poster_url,
+                'status' => 200,
+                'body' => [
+                    'data' => [
+                        'episode_number' => $episodeNumber,
+                        'sources' => $sources,
+                    ],
+                ],
             ];
-        })->toArray();
+        });
 
-        // Live Kodik fallback: if no sources found in DB, try Kodik in real-time
-        if (empty($sources) && $anime->shikimori_id) {
-            try {
-                $kodikService = app(KodikService::class);
-                $iframeUrl = $kodikService->buildEpisodeIframeUrl(
-                    (int) $anime->shikimori_id,
-                    $episodeNumber
-                );
-
-                if ($iframeUrl) {
-                    $sources[] = [
-                        'id' => 0,
-                        'source' => 'kodik',
-                        'translator' => 'Kodik',
-                        'label' => 'Kodik (авто)',
-                        'type' => 'iframe',
-                        'url' => $iframeUrl,
-                        'iframe' => null,
-                        'quality' => 'auto',
-                        'priority' => 1,
-                        'skip_times' => null,
-                        'poster_url' => null,
-                    ];
-                }
-            } catch (\Throwable $e) {
-                // Silently fail — Kodik might be down
-                Log::debug('Kodik live fallback failed: '.$e->getMessage());
-            }
-        }
-
-        if (empty($sources)) {
-            return response()->json(['message' => 'Эпизод не найден'], 404);
-        }
-
-        return response()->json([
-            'data' => [
-                'episode_number' => $episodeNumber,
-                'sources' => $sources,
-            ],
-        ]);
+        return response()->json($payload['body'], $payload['status']);
     }
 }

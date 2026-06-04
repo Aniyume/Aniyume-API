@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\WatchHistory;
+use App\Application\Services\ProfileFrames\ProfileFrameService;
 use Illuminate\Support\Facades\DB;
 
 class UserProfileService
@@ -19,11 +20,13 @@ class UserProfileService
                 'bio' => $user->bio,
                 'custom_status' => $user->custom_status,
                 'is_premium' => (bool) $user->is_premium,
+                'selected_profile_frame' => $user->selected_profile_frame ?: 'none',
                 'created_at' => $user->created_at,
             ],
             'stats' => $this->getAnimeStats($user->id),
             'watch_time' => $this->getWatchTime($user->id),
             'watch_dynamics' => $this->getWatchDynamics($user->id, 10),
+            'profile_frames' => app(ProfileFrameService::class)->framesFor($user),
             'recently_watched' => $this->getRecentlyWatched($user->id, 5),
             'counts' => [
                 'anime_watching' => $this->countByStatus($user->id, 'watching'),

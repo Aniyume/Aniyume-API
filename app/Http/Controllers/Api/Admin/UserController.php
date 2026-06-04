@@ -75,6 +75,37 @@ class UserController extends Controller
         return response()->json(['data' => (new AdminUserResource($user->refresh()->load('roles')))->resolve($request)]);
     }
 
+    public function grantPremiumByNickname(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'nickname' => ['required', 'string', 'max:255'],
+        ]);
+
+        $nickname = trim($validated['nickname']);
+        $user = User::query()->where('name', $nickname)->first();
+        abort_if(! $user, 404, 'Пользователь с таким ником не найден.');
+
+        $before = $user->getOriginal();
+        $user->update(['is_premium' => true]);
+        app(AuditService::class)->log($request, 'grant_premium', "Granted premium to {$user->email} by nickname {$nickname}", $user, $before, $user->fresh()->toArray());
+
+        return response()->json(['data' => (new AdminUserResource($user->refresh()->load('roles')))->resolve($request)]);
+    }
+
+    public function updatePremium(Request $request, User $user): JsonResponse
+    {
+        $validated = $request->validate([
+            'is_premium' => ['required', 'boolean'],
+        ]);
+
+        $before = $user->getOriginal();
+        $user->update(['is_premium' => (bool) $validated['is_premium']]);
+        $action = $user->is_premium ? 'grant_premium' : 'revoke_premium';
+        app(AuditService::class)->log($request, $action, ucfirst(str_replace('_', ' ', $action))." for {$user->email}", $user, $before, $user->fresh()->toArray());
+
+        return response()->json(['data' => (new AdminUserResource($user->refresh()->load('roles')))->resolve($request)]);
+    }
+
     public function unban(Request $request, User $user): JsonResponse
     {
         $before = $user->getOriginal();

@@ -17,6 +17,12 @@ class AdminContactMessageResource extends JsonResource
             'subject' => $this->subject,
             'message' => $this->message,
             'status' => $this->status,
+            'photo' => $this->photo ? [
+                'name' => $this->photo_name,
+                'mime' => $this->photo_mime,
+                'size' => $this->photo_size,
+                'url' => "/api/v1/admin/contacts/{$this->id}/photo",
+            ] : null,
             'admin_note' => $this->admin_note,
             'ip_address' => $this->ip_address,
             'user_agent' => $this->user_agent,

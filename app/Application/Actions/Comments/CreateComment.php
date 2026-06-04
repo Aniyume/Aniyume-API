@@ -4,6 +4,7 @@ namespace App\Application\Actions\Comments;
 
 use App\Application\Services\AnimeCommentsCount;
 use App\Models\Comment;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class CreateComment
@@ -23,6 +24,7 @@ class CreateComment
             ]);
 
             $this->commentsCount->increment($animeId);
+            Cache::forget("user_statistics_{$userId}");
 
             return $comment;
         });

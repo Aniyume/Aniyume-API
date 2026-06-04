@@ -8,6 +8,7 @@ use App\Models\Anime;
 use App\Models\Episode;
 use App\Services\BannerService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
@@ -106,9 +107,13 @@ class AnimeController extends Controller
         $perPage = (int) $request->integer('per_page', 20);
         $perPage = max(1, min($perPage, 100));
 
-        $anime = $query->paginate($perPage);
+        $cacheKey = 'public_anime_index:'.sha1(json_encode($request->query(), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
 
-        return AnimeResource::collection($anime);
+        $payload = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($query, $perPage) {
+            return AnimeResource::collection($query->paginate($perPage))->response()->getData(true);
+        });
+
+        return response()->json($payload);
     }
 
     /**
@@ -118,11 +123,18 @@ class AnimeController extends Controller
      */
     public function show(Anime $anime)
     {
-        $anime->load(['tags']);
-        $maxEpisode = Episode::query()->where('anime_id', '=', $anime->id)->max('episode_number');
-        $anime->episodes_count = $maxEpisode ?: 0;
+        $cacheKey = "public_anime_show_{$anime->id}_{$anime->updated_at?->timestamp}";
 
-        return new AnimeResource($anime);
+        $payload = Cache::remember($cacheKey, now()->addMinutes(15), function () use ($anime) {
+            $anime->load(['tags']);
+            $anime->episodes_count = Episode::query()
+                ->where('anime_id', '=', $anime->id)
+                ->max('episode_number') ?: 0;
+
+            return (new AnimeResource($anime))->response()->getData(true);
+        });
+
+        return response()->json($payload);
     }
 
     /**
@@ -132,7 +144,7 @@ class AnimeController extends Controller
      */
     public function getCommunityStats(Anime $anime)
     {
-        return response()->json($anime->getCommunityStats());
+        return response()->json(Cache::remember("anime_community_stats_{$anime->id}", now()->addMinutes(10), fn () => $anime->getCommunityStats()));
     }
 
     /**
@@ -160,88 +172,92 @@ class AnimeController extends Controller
      */
     public function getRecommendations(Anime $anime)
     {
-        $related = [];
-        $hasOfficialRelated = false;
+        $cacheKey = "anime_recommendations_{$anime->id}_{$anime->updated_at?->timestamp}";
 
-        // 1. Try to get related anime from Shikimori API
-        if ($anime->shikimori_id) {
-            try {
-                $response = Http::timeout(5)
-                    ->withHeaders(['User-Agent' => 'Aniyume/1.0'])
-                    ->get("https://shikimori.io/api/animes/{$anime->shikimori_id}/related");
+        return response()->json(Cache::remember($cacheKey, now()->addHours(6), function () use ($anime) {
+            $related = [];
+            $hasOfficialRelated = false;
 
-                if ($response->successful()) {
-                    $relatedData = collect($response->json())
-                        ->filter(fn ($item) => ! empty($item['anime']))
-                        ->values();
+            // 1. Try to get related anime from Shikimori API
+            if ($anime->shikimori_id) {
+                try {
+                    $response = Http::timeout(5)
+                        ->withHeaders(['User-Agent' => 'Aniyume/1.0'])
+                        ->get("https://shikimori.io/api/animes/{$anime->shikimori_id}/related");
 
-                    $shikimoriIds = $relatedData
-                        ->map(fn ($item) => (int) $item['anime']['id'])
-                        ->toArray();
+                    if ($response->successful()) {
+                        $relatedData = collect($response->json())
+                            ->filter(fn ($item) => ! empty($item['anime']))
+                            ->values();
 
-                    if (! empty($shikimoriIds)) {
-                        $relationType = [];
-                        foreach ($relatedData as $item) {
-                            $relationType[(int) $item['anime']['id']] = $item['relation'] ?? null;
-                        }
+                        $shikimoriIds = $relatedData
+                            ->map(fn ($item) => (int) $item['anime']['id'])
+                            ->toArray();
 
-                        $foundAnime = Anime::query()->whereIn('shikimori_id', $shikimoriIds, 'and', false)
-                            ->whereHas('episodes')
-                            ->limit(10)
-                            ->get();
+                        if (! empty($shikimoriIds)) {
+                            $relationType = [];
+                            foreach ($relatedData as $item) {
+                                $relationType[(int) $item['anime']['id']] = $item['relation'] ?? null;
+                            }
 
-                        $related = $foundAnime->map(function ($a) use ($relationType) {
-                            return [
-                                'id' => $a->id,
-                                'title' => $a->title,
-                                'poster_url' => $a->poster_url,
-                                'type' => $a->type,
-                                'rating' => $a->rating,
-                                'year' => $a->year,
-                                'relation_type' => $relationType[(int) $a->shikimori_id] ?? null,
-                            ];
-                        })->toArray();
+                            $foundAnime = Anime::query()->whereIn('shikimori_id', $shikimoriIds, 'and', false)
+                                ->whereHas('episodes')
+                                ->limit(10)
+                                ->get();
 
-                        if (! empty($related)) {
-                            $hasOfficialRelated = true;
+                            $related = $foundAnime->map(function ($a) use ($relationType) {
+                                return [
+                                    'id' => $a->id,
+                                    'title' => $a->title,
+                                    'poster_url' => $a->poster_url,
+                                    'type' => $a->type,
+                                    'rating' => $a->rating,
+                                    'year' => $a->year,
+                                    'relation_type' => $relationType[(int) $a->shikimori_id] ?? null,
+                                ];
+                            })->toArray();
+
+                            if (! empty($related)) {
+                                $hasOfficialRelated = true;
+                            }
                         }
                     }
+                } catch (\Exception $e) {
+                    $related = [];
                 }
-            } catch (\Exception $e) {
-                $related = [];
             }
-        }
 
-        // 2. Get current anime tag IDs
-        $tagIds = $anime->tags()->pluck('tags.id')->toArray();
+            // 2. Get current anime tag IDs
+            $tagIds = $anime->tags()->pluck('tags.id')->toArray();
 
-        // 3. Exclude IDs
-        $excludeIds = array_merge(
-            [$anime->id],
-            array_column($related, 'id')
-        );
+            // 3. Exclude IDs
+            $excludeIds = array_merge(
+                [$anime->id],
+                array_column($related, 'id')
+            );
 
-        // 4. Similar by tags
-        $similar = [];
-        if (! empty($tagIds)) {
-            $similar = $this->getSimilarByTags($tagIds, $excludeIds, 5, 0);
-        }
-
-        // 5. Fallback: if related is empty, fill both from tags
-        if (empty($related)) {
-            $hasOfficialRelated = false;
+            // 4. Similar by tags
+            $similar = [];
             if (! empty($tagIds)) {
-                $allByTags = $this->getSimilarByTags($tagIds, [$anime->id], 10, 0);
-                $related = array_slice($allByTags, 0, 5);
-                $similar = array_slice($allByTags, 5, 5);
+                $similar = $this->getSimilarByTags($tagIds, $excludeIds, 5, 0);
             }
-        }
 
-        return response()->json([
-            'has_official_related' => $hasOfficialRelated,
-            'related' => $related,
-            'similar' => $similar,
-        ]);
+            // 5. Fallback: if related is empty, fill both from tags
+            if (empty($related)) {
+                $hasOfficialRelated = false;
+                if (! empty($tagIds)) {
+                    $allByTags = $this->getSimilarByTags($tagIds, [$anime->id], 10, 0);
+                    $related = array_slice($allByTags, 0, 5);
+                    $similar = array_slice($allByTags, 5, 5);
+                }
+            }
+
+            return [
+                'has_official_related' => $hasOfficialRelated,
+                'related' => $related,
+                'similar' => $similar,
+            ];
+        }));
     }
 
     /**

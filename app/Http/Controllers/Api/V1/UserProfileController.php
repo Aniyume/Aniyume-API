@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Application\Services\ProfileFrames\ProfileFrameService;
 use App\Http\Requests\UpdateUserProfileRequest;
 use App\Services\UserProfileService;
 use Illuminate\Http\JsonResponse;
@@ -76,5 +77,31 @@ class UserProfileController extends Controller
         }
 
         return response()->json(['message' => 'No file provided'], 400);
+    }
+
+    public function frames(Request $request, ProfileFrameService $frames): JsonResponse
+    {
+        return response()->json([
+            'data' => $frames->framesFor($request->user()),
+            'selected' => $request->user()->selected_profile_frame ?: 'none',
+        ]);
+    }
+
+    public function selectFrame(Request $request, ProfileFrameService $frames): JsonResponse
+    {
+        $validated = $request->validate([
+            'frame_key' => ['required', 'string', 'max:80'],
+        ]);
+
+        abort_unless((bool) $request->user()->is_premium, 403, 'Premium required.');
+        abort_unless($frames->canSelect($request->user(), $validated['frame_key']), 422, 'Frame is locked.');
+
+        $request->user()->update(['selected_profile_frame' => $validated['frame_key']]);
+
+        return response()->json([
+            'message' => 'Frame selected.',
+            'selected' => $validated['frame_key'],
+            'data' => $frames->framesFor($request->user()->fresh()),
+        ]);
     }
 }

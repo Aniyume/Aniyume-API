@@ -11,7 +11,9 @@ use App\Http\Requests\UpdateCommentRequest;
 use App\Http\Resources\Api\V1\CommentResource;
 use App\Models\Anime;
 use App\Models\Comment;
+use App\Models\CommentReaction;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 /**
  * @group Комментарии
@@ -25,13 +27,21 @@ class CommentsController extends Controller
      *
      * @urlParam anime integer ID аниме. Example: 3
      */
-    public function index(Anime $anime)
+    public function index(Request $request, Anime $anime)
     {
         $comments = $anime->comments()
-            ->with('user')
+            ->with(['user:id,name,email,avatar', 'replies.user:id,name,email,avatar'])
+            ->withCount([
+                'reactions as likes_count' => fn ($query) => $query->where('type', CommentReaction::TYPE_LIKE),
+                'reactions as dislikes_count' => fn ($query) => $query->where('type', CommentReaction::TYPE_DISLIKE),
+                'replies as replies_count',
+            ])
             ->where('is_approved', true)
+            ->whereNull('parent_id')
             ->orderBy('created_at', 'desc')
             ->paginate(50);
+
+        $this->attachViewerReactions($comments->getCollection(), $request);
 
         return CommentResource::collection($comments);
     }
@@ -90,7 +100,7 @@ class CommentsController extends Controller
      */
     public function destroy(Request $request, $id, DeleteComment $deleteComment)
     {
-        $comment = Comment::find($id);
+        $comment = Comment::query()->find($id);
         if (! $comment) {
             return response()->json(['message' => 'Not found'], 404);
         }
@@ -115,11 +125,93 @@ class CommentsController extends Controller
      */
     public function userComments(Request $request)
     {
-        $comments = Comment::with(['anime'])
+        $comments = Comment::with(['anime:id,title,slug,poster_url'])
             ->where('user_id', $request->user()->id)
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(50);
 
         return CommentResource::collection($comments);
+    }
+
+    public function react(Request $request, Comment $comment)
+    {
+        $validated = $request->validate([
+            'type' => ['required', 'string', Rule::in([CommentReaction::TYPE_LIKE, CommentReaction::TYPE_DISLIKE])],
+        ]);
+
+        $existing = CommentReaction::query()
+            ->where('comment_id', $comment->id)
+            ->where('user_id', $request->user()->id)
+            ->first();
+
+        if ($existing && $existing->type === $validated['type']) {
+            $existing->delete();
+        } else {
+            CommentReaction::query()->updateOrCreate(
+                ['comment_id' => $comment->id, 'user_id' => $request->user()->id],
+                ['type' => $validated['type']]
+            );
+        }
+
+        return new CommentResource($this->commentWithInteractions($comment->refresh(), $request));
+    }
+
+    public function adminHeart(Request $request, Comment $comment)
+    {
+        abort_unless($request->user()?->roles()->where('name', 'admin')->exists(), 403, 'Only admins can heart comments.');
+
+        $comment->update([
+            'admin_hearted_at' => $comment->admin_hearted_at ? null : now(),
+            'admin_hearted_by' => $comment->admin_hearted_at ? null : $request->user()->id,
+        ]);
+
+        return new CommentResource($this->commentWithInteractions($comment->refresh(), $request));
+    }
+
+    public function reply(Request $request, Comment $comment)
+    {
+        $validated = $request->validate([
+            'comment' => ['required', 'string', 'min:2', 'max:1000', new \App\Http\Rules\PassesModeration(\App\Domain\Moderation\ModerationMode::Medium), new \App\Http\Rules\PassesAiModeration('comment_reply')],
+        ]);
+
+        $reply = Comment::query()->create([
+            'parent_id' => $comment->id,
+            'anime_id' => $comment->anime_id,
+            'user_id' => $request->user()->id,
+            'comment' => $validated['comment'],
+            'is_approved' => true,
+        ]);
+
+        return new CommentResource($reply->load('user'));
+    }
+
+    private function commentWithInteractions(Comment $comment, Request $request): Comment
+    {
+        $comment->load(['user:id,name,email,avatar', 'replies.user:id,name,email,avatar']);
+        $comment->loadCount([
+            'reactions as likes_count' => fn ($query) => $query->where('type', CommentReaction::TYPE_LIKE),
+            'reactions as dislikes_count' => fn ($query) => $query->where('type', CommentReaction::TYPE_DISLIKE),
+        ]);
+        $this->attachViewerReactions(collect([$comment]), $request);
+
+        return $comment;
+    }
+
+    private function attachViewerReactions($comments, Request $request): void
+    {
+        $userId = $request->user()?->id;
+        if (! $userId) {
+            return;
+        }
+
+        $ids = $comments->pluck('id')->all();
+        $reactions = CommentReaction::query()
+            ->where('user_id', $userId)
+            ->whereIn('comment_id', $ids)
+            ->pluck('type', 'comment_id');
+
+        $comments->each(function (Comment $comment) use ($reactions) {
+            $comment->viewer_reaction = $reactions[$comment->id] ?? null;
+        });
     }
 }

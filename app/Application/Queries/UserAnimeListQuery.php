@@ -11,7 +11,10 @@ class UserAnimeListQuery
 
     public function paginated(User $user, ?string $status, int $perPage): LengthAwarePaginator
     {
-        $query = $user->animeList();
+        $perPage = max(1, min($perPage, 100));
+
+        $query = $user->animeList()
+            ->select(['anime.id', 'anime.title', 'anime.poster_url']);
 
         if ($status && $status !== 'all' && in_array($status, self::FILTERABLE_STATUSES, true)) {
             $query->wherePivot('status', $status);

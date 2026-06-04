@@ -2,6 +2,7 @@
 
 namespace App\Application\Services\WatchParty;
 
+use App\Models\Episode;
 use App\Models\WatchPartyMessage;
 use App\Models\WatchPartyRoom;
 
@@ -25,6 +26,7 @@ trait FormatsWatchPartyResponses
                 'poster_url' => $room->anime->poster_url,
                 'slug' => $room->anime->slug,
             ] : null,
+            'episode_id' => $this->resolveEpisodeId($room),
             'host' => $room->relationLoaded('host') ? [
                 'id' => $room->host->id,
                 'name' => $room->host->name,
@@ -60,6 +62,15 @@ trait FormatsWatchPartyResponses
     protected function nullableAvatarUrl(?string $avatar): ?string
     {
         return $avatar ? '/api-storage/avatars/'.$avatar : null;
+    }
+
+    protected function resolveEpisodeId(WatchPartyRoom $room): ?int
+    {
+        return Episode::query()
+            ->where('anime_id', $room->anime_id)
+            ->where('episode_number', $room->episode_number)
+            ->orderByDesc('priority')
+            ->value('id');
     }
 
     protected function broadcastAvatarUrl(?string $avatar): string

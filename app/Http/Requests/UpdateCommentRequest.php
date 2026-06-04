@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Domain\Moderation\ModerationMode;
 use App\Http\Rules\PassesModeration;
+use App\Http\Rules\PassesAiModeration;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateCommentRequest extends FormRequest
@@ -16,7 +17,7 @@ class UpdateCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'comment' => ['required', 'string', 'min:3', 'max:1000', new PassesModeration(ModerationMode::Medium)],
+            'comment' => ['required', 'string', 'min:3', 'max:1000', new PassesModeration(ModerationMode::Medium), new PassesAiModeration('comment')],
         ];
     }
 }

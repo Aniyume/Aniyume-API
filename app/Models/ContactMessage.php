@@ -20,6 +20,7 @@ class ContactMessage extends Model
     protected $fillable = [
         'user_id', 'name', 'email', 'category', 'subject', 'message', 'status',
         'admin_id', 'admin_note', 'ip_address', 'user_agent', 'resolved_at',
+        'photo', 'photo_mime', 'photo_name', 'photo_size',
     ];
 
     protected $casts = [

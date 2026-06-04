@@ -20,6 +20,7 @@ class User extends Authenticatable
         'custom_status',
         'is_online',
         'is_premium',
+        'selected_profile_frame',
         'is_active',
         'is_banned',
         'ban_reason',
