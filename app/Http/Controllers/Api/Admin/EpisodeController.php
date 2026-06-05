@@ -102,7 +102,7 @@ class EpisodeController extends Controller
     public function importForAnime(Request $request, Anime $anime): JsonResponse
     {
         $validated = $request->validate([
-            'source' => ['nullable', 'string', Rule::in(['all', 'anilibria', 'kodik', 'videocdn', 'external'])],
+            'source' => ['nullable', 'string', Rule::in(['all', 'anilibria', 'kodik', 'videocdn', 'allanime', 'external'])],
             'update' => ['sometimes', 'boolean'],
             'only_missing' => ['sometimes', 'boolean'],
         ]);
@@ -128,7 +128,7 @@ class EpisodeController extends Controller
         $validated = $request->validate([
             'anime_ids' => ['nullable', 'array'],
             'anime_ids.*' => ['integer', 'exists:anime,id'],
-            'source' => ['nullable', 'string', Rule::in(['all', 'anilibria', 'kodik', 'videocdn', 'external'])],
+            'source' => ['nullable', 'string', Rule::in(['all', 'anilibria', 'kodik', 'videocdn', 'allanime', 'external'])],
             'only_missing' => ['sometimes', 'boolean'],
             'limit' => ['nullable', 'integer', 'min:1', 'max:5000'],
         ]);

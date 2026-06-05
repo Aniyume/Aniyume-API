@@ -123,6 +123,10 @@ class AnimeController extends Controller
      */
     public function show(Anime $anime)
     {
+        if (! $anime->episodes()->exists()) {
+            abort(404);
+        }
+
         $cacheKey = "public_anime_show_{$anime->id}_{$anime->updated_at?->timestamp}";
 
         $payload = Cache::remember($cacheKey, now()->addMinutes(15), function () use ($anime) {

@@ -45,6 +45,18 @@ return [
         'cdn_url' => env('ANILIBRIA_CDN_URL', 'https://cache-rfn.libria.fun'),
     ],
 
+    'allanime' => [
+        'enabled' => env('ALLANIME_ENABLED', false),
+        'base_host' => env('ALLANIME_BASE_HOST', 'allanime.day'),
+        'api_url' => env('ALLANIME_API_URL', 'https://api.allanime.day/api'),
+        'referer' => env('ALLANIME_REFERER', 'https://youtu-chan.com'),
+        'mode' => env('ALLANIME_MODE', 'sub'),
+        'proxy_enabled' => env('ALLANIME_PROXY_ENABLED', true),
+        'proxy_public_prefix' => env('ALLANIME_PROXY_PUBLIC_PREFIX', '/api/external/public'),
+        'max_episodes_per_import' => env('ALLANIME_MAX_EPISODES_PER_IMPORT', 2000),
+        'user_agent' => env('ALLANIME_USER_AGENT', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:150.0) Gecko/20100101 Firefox/150.0'),
+    ],
+
     'tmdb' => [
         'key' => env('TMDB_API_KEY'),
         'token' => env('TMDB_BEARER_TOKEN'),

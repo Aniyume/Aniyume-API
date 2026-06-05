@@ -24,6 +24,12 @@ class EpisodeImportService
 
     protected bool $kodikEnabled = true;
 
+    protected bool $videoCdnEnabled = true;
+
+    protected bool $allAnimeEnabled = true;
+
+    protected bool $externalPlayersEnabled = true;
+
     protected bool $onlyMissing = false;
 
     protected VideoCdnService $videoCdnService;
@@ -36,6 +42,8 @@ class EpisodeImportService
 
     protected ExternalPlayerService $externalPlayerService;
 
+    protected AllAnimeService $allAnimeService;
+
     protected SettingService $settings;
 
     public function __construct(
@@ -44,6 +52,7 @@ class EpisodeImportService
         KodikService $kodikService,
         EpisodeLookupMetadataService $metadataService,
         ExternalPlayerService $externalPlayerService,
+        AllAnimeService $allAnimeService,
         SettingService $settings
     ) {
         $this->videoCdnService = $videoCdnService;
@@ -51,6 +60,7 @@ class EpisodeImportService
         $this->kodikService = $kodikService;
         $this->metadataService = $metadataService;
         $this->externalPlayerService = $externalPlayerService;
+        $this->allAnimeService = $allAnimeService;
         $this->settings = $settings;
     }
 
@@ -58,6 +68,13 @@ class EpisodeImportService
     {
         $this->anilibriaEnabled = $anilibria;
         $this->kodikEnabled = $kodik;
+    }
+
+    public function setFallbackSources(bool $videoCdn, bool $allAnime, bool $externalPlayers): void
+    {
+        $this->videoCdnEnabled = $videoCdn;
+        $this->allAnimeEnabled = $allAnime;
+        $this->externalPlayersEnabled = $externalPlayers;
     }
 
     public function setOnlyMissing(bool $onlyMissing): void
@@ -131,13 +148,19 @@ class EpisodeImportService
             }
 
             // PRIORITY 3: VideoCDN (Last resort)
-            if (empty($episodes)) {
+            if ($this->videoCdnEnabled && empty($episodes)) {
                 $episodes = $this->fetchFromVideoCdn($anime);
             }
 
-            // PRIORITY 4: Configured iframe aggregators / no-name voiceovers.
+            // PRIORITY 4: AllAnime fallback based on ani-cli scraping flow.
+            // Disabled by default via ALLANIME_ENABLED=false because direct HLS links may break/CORS-block.
+            if ($this->allAnimeEnabled && empty($episodes)) {
+                $episodes = $this->allAnimeService->getEpisodesForAnime($anime, $titleCandidates);
+            }
+
+            // PRIORITY 5: Configured iframe aggregators / no-name voiceovers.
             // Disabled by default until URL templates are configured by admin.
-            if (empty($episodes)) {
+            if ($this->externalPlayersEnabled && empty($episodes)) {
                 $episodes = $this->externalPlayerService->getEpisodes($anime, $titleCandidates);
             }
 

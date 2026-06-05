@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\V1\FriendshipController;
 use App\Http\Controllers\Api\V1\RatingsController;
 use App\Http\Controllers\Api\V1\ReportController as PublicReportController;
 use App\Http\Controllers\Api\V1\ScheduleController;
+use App\Http\Controllers\Api\V1\StreamProxyController;
 use App\Http\Controllers\Api\V1\TagController;
 use App\Http\Controllers\Api\V1\UserAnimeListController;
 use App\Http\Controllers\Api\V1\UserProfileController;
@@ -56,6 +57,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/anime/{anime}/episodes/{episodeNumber}/sources', [EpisodeController::class, 'getPlayerSources']);
         Route::get('/anime/{anime}/community-stats', [AnimeController::class, 'getCommunityStats']);
         Route::get('/anime/{anime}/recommendations', [AnimeController::class, 'getRecommendations']);
+        Route::match(['get', 'options'], '/stream/allanime/{encoded}', [StreamProxyController::class, 'allanime'])
+            ->where('encoded', '[A-Za-z0-9\-_]+');
         Route::get('/episodes/{episode}', [EpisodeController::class, 'show'])
             ->where('episode', '[0-9]+');
         Route::get('/episodes/{episode}/player', [EpisodeController::class, 'getPlayer'])

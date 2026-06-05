@@ -39,12 +39,20 @@ class PublicAnimeApiTest extends TestCase
 
     public function test_anime_details_returns_resource(): void
     {
-        $anime = Anime::factory()->create();
+        $anime = Anime::factory()->has(Episode::factory())->create();
 
         $this->getJson("/api/v1/public/anime/{$anime->id}")
             ->assertOk()
             ->assertJsonPath('data.id', $anime->id)
             ->assertJsonPath('data.title', $anime->title);
+    }
+
+    public function test_anime_without_episodes_is_hidden_from_public_details(): void
+    {
+        $anime = Anime::factory()->create();
+
+        $this->getJson("/api/v1/public/anime/{$anime->id}")
+            ->assertNotFound();
     }
 
     public function test_tags_endpoint_returns_tags(): void
