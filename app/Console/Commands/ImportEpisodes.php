@@ -15,10 +15,10 @@ class ImportEpisodes extends Command
     protected $signature = 'episodes:import
         {--update : Update existing episodes}
         {--limit= : Limit the number of anime to process}
-        {--source=all : Source to use: anilibria, kodik, all}
+        {--source=all : Source to use: all, anilibria, kodik, videocdn, allanime, external}
         {--only-missing : Only import for anime without any episodes}';
 
-    protected $description = 'Import episodes for anime from Anilibria/Kodik (priority: Anilibria > Kodik > VideoCDN)';
+    protected $description = 'Import episodes for anime from configured episode providers';
 
     public function handle(EpisodeImportService $service): int
     {
@@ -28,13 +28,33 @@ class ImportEpisodes extends Command
         $onlyMissing = $this->option('only-missing');
 
         // Configure sources
-        $anilibria = in_array($source, ['all', 'anilibria']);
-        $kodik = in_array($source, ['all', 'kodik']);
-        $service->setAvailableSources($anilibria, $kodik);
+        if ($source === 'all') {
+            $service->setAvailableSources(true, true);
+            $service->setFallbackSources(true, true, true);
+        } elseif ($source === 'anilibria') {
+            $service->setAvailableSources(true, false);
+            $service->setFallbackSources(false, false, false);
+        } elseif ($source === 'kodik') {
+            $service->setAvailableSources(false, true);
+            $service->setFallbackSources(false, false, false);
+        } elseif ($source === 'videocdn') {
+            $service->setAvailableSources(false, false);
+            $service->setFallbackSources(true, false, false);
+        } elseif ($source === 'allanime') {
+            $service->setAvailableSources(false, false);
+            $service->setFallbackSources(false, true, false);
+        } elseif ($source === 'external') {
+            $service->setAvailableSources(false, false);
+            $service->setFallbackSources(false, false, true);
+        } else {
+            $this->error('Invalid source. Use all, anilibria, kodik, videocdn, allanime or external.');
+
+            return self::FAILURE;
+        }
         $service->setOnlyMissing($onlyMissing);
 
         $this->info('🚀 Starting episodes import...');
-        $this->info('   Sources: '.($source === 'all' ? 'Anilibria → Kodik → VideoCDN' : $source));
+        $this->info('   Sources: '.($source === 'all' ? 'Anilibria → Kodik → VideoCDN → AllAnime → External' : $source));
         if ($onlyMissing) {
             $this->info('   Mode: only anime without episodes');
         }

@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Cache;
 
 class ImportEpisodesCommand extends Command
 {
-    protected $signature = 'import:episodes {--limit=100} {--offset=0} {--cursor : Automatically continue from the previous batch offset} {--source= : anilibria, kodik or videocdn} {--only-missing : Skip anime that already have episodes} {--clean : Wipe completely existing episodes before import}';
+    protected $signature = 'import:episodes {--limit=100} {--offset=0} {--cursor : Automatically continue from the previous batch offset} {--source= : all, anilibria, kodik, videocdn, allanime or external} {--only-missing : Skip anime that already have episodes} {--clean : Wipe completely existing episodes before import}';
 
-    protected $description = 'Import episodes from Anilibria/Kodik/VideoCDN with metadata-assisted matching';
+    protected $description = 'Import episodes from Anilibria/Kodik/VideoCDN/AllAnime/external providers with metadata-assisted matching';
 
     public function handle(EpisodeImportService $importService)
     {
@@ -39,7 +39,10 @@ class ImportEpisodesCommand extends Command
                 }
             }
 
-            $source = $this->option('source');
+            $source = $this->option('source') ? strtolower((string) $this->option('source')) : null;
+            if ($source === 'all') {
+                $source = null;
+            }
 
             if ($this->option('clean')) {
                 $this->warn('Wiping existing episodes...');
@@ -58,13 +61,28 @@ class ImportEpisodesCommand extends Command
 
             if ($source === 'anilibria') {
                 $importService->setAvailableSources(true, false);
+                $importService->setFallbackSources(false, false, false);
                 $this->info('Source: Anilibria only');
             } elseif ($source === 'kodik') {
                 $importService->setAvailableSources(false, true);
+                $importService->setFallbackSources(false, false, false);
                 $this->info('Source: Kodik only');
             } elseif ($source === 'videocdn') {
                 $importService->setAvailableSources(false, false);
+                $importService->setFallbackSources(true, false, false);
                 $this->info('Source: VideoCDN only');
+            } elseif ($source === 'allanime') {
+                $importService->setAvailableSources(false, false);
+                $importService->setFallbackSources(false, true, false);
+                $this->info('Source: AllAnime only');
+            } elseif ($source === 'external') {
+                $importService->setAvailableSources(false, false);
+                $importService->setFallbackSources(false, false, true);
+                $this->info('Source: External players only');
+            } elseif ($source !== null) {
+                $this->error('Invalid source. Use all, anilibria, kodik, videocdn, allanime or external.');
+
+                return self::FAILURE;
             }
 
             if ($this->option('only-missing')) {
