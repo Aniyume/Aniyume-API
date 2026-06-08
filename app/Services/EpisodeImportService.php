@@ -24,6 +24,12 @@ class EpisodeImportService
 
     protected bool $kodikEnabled = true;
 
+    protected bool $videoCdnEnabled = true;
+
+    protected bool $allAnimeEnabled = true;
+
+    protected bool $externalPlayersEnabled = true;
+
     protected bool $onlyMissing = false;
 
     protected VideoCdnService $videoCdnService;
@@ -32,20 +38,43 @@ class EpisodeImportService
 
     protected KodikService $kodikService;
 
+    protected EpisodeLookupMetadataService $metadataService;
+
+    protected ExternalPlayerService $externalPlayerService;
+
+    protected AllAnimeService $allAnimeService;
+
+    protected SettingService $settings;
+
     public function __construct(
         VideoCdnService $videoCdnService,
         AnilibriaService $anilibriaService,
-        KodikService $kodikService
+        KodikService $kodikService,
+        EpisodeLookupMetadataService $metadataService,
+        ExternalPlayerService $externalPlayerService,
+        AllAnimeService $allAnimeService,
+        SettingService $settings
     ) {
         $this->videoCdnService = $videoCdnService;
         $this->anilibriaService = $anilibriaService;
         $this->kodikService = $kodikService;
+        $this->metadataService = $metadataService;
+        $this->externalPlayerService = $externalPlayerService;
+        $this->allAnimeService = $allAnimeService;
+        $this->settings = $settings;
     }
 
     public function setAvailableSources(bool $anilibria, bool $kodik): void
     {
         $this->anilibriaEnabled = $anilibria;
         $this->kodikEnabled = $kodik;
+    }
+
+    public function setFallbackSources(bool $videoCdn, bool $allAnime, bool $externalPlayers): void
+    {
+        $this->videoCdnEnabled = $videoCdn;
+        $this->allAnimeEnabled = $allAnime;
+        $this->externalPlayersEnabled = $externalPlayers;
     }
 
     public function setOnlyMissing(bool $onlyMissing): void
@@ -82,13 +111,20 @@ class EpisodeImportService
             }
 
             $episodes = [];
+            $titleCandidates = $this->metadataService->titleCandidates($anime);
 
             // PRIORITY 1: Anilibria (No ads, HLS, internal player)
             if ($this->anilibriaEnabled) {
                 if ($anime->anilibria_id) {
                     $episodes = $this->anilibriaService->getEpisodes((int) $anime->anilibria_id);
                 } else {
-                    $found = $this->anilibriaService->findByTitle($anime->title, $anime->title_en);
+                    $found = null;
+                    foreach ($titleCandidates as $candidateTitle) {
+                        $found = $this->anilibriaService->findByTitle($candidateTitle, null);
+                        if ($found) {
+                            break;
+                        }
+                    }
                     if ($found) {
                         $anime->update(['anilibria_id' => $found['id']]);
                         $episodes = $this->anilibriaService->getEpisodes((int) $found['id']);
@@ -100,36 +136,32 @@ class EpisodeImportService
             if ($this->kodikEnabled && empty($episodes)) {
                 $kodikData = $anime->shikimori_id
                     ? $this->kodikService->searchByShikimoriId($anime->shikimori_id)
-                    : $this->kodikService->searchByTitle($anime->title);
+                    : $this->kodikService->searchByTitles($titleCandidates, $anime->year, $anime->type);
+
+                if (empty($kodikData) && $anime->shikimori_id) {
+                    $kodikData = $this->kodikService->searchByTitles($titleCandidates, $anime->year, $anime->type);
+                }
+
                 if (! empty($kodikData)) {
-                    // To prevent franchise mish-mash (e.g. Naruto mixed with Boruto or Shippuden),
-                    // we must enforce that all processed Kodik translations belong to the exact same anime entity.
-                    $targetShikimoriId = $kodikData[0]['shikimori_id'] ?? null;
-                    $targetTitle = mb_strtolower(trim($kodikData[0]['title'] ?? $kodikData[0]['title_orig'] ?? ''));
-
-                    // Process ALL Kodik results (different translations/dubs) that belong to the SAME anime
-                    foreach ($kodikData as $kodikResult) {
-                        $currentShiki = $kodikResult['shikimori_id'] ?? null;
-                        $currentTitle = mb_strtolower(trim($kodikResult['title'] ?? $kodikResult['title_orig'] ?? ''));
-
-                        $isSameAnime = false;
-                        if ($targetShikimoriId && $currentShiki) {
-                            $isSameAnime = ((string) $currentShiki === (string) $targetShikimoriId);
-                        } else {
-                            $isSameAnime = ($currentTitle === $targetTitle);
-                        }
-
-                        if ($isSameAnime) {
-                            $kodikEpisodes = $this->formatKodikEpisodes($kodikResult);
-                            $episodes = array_merge($episodes, $kodikEpisodes);
-                        }
-                    }
+                    $episodes = array_merge($episodes, $this->collectKodikEpisodes($kodikData));
                 }
             }
 
             // PRIORITY 3: VideoCDN (Last resort)
-            if (empty($episodes)) {
+            if ($this->videoCdnEnabled && empty($episodes)) {
                 $episodes = $this->fetchFromVideoCdn($anime);
+            }
+
+            // PRIORITY 4: AllAnime fallback based on ani-cli scraping flow.
+            // Disabled by default via ALLANIME_ENABLED=false because direct HLS links may break/CORS-block.
+            if ($this->allAnimeEnabled && empty($episodes)) {
+                $episodes = $this->allAnimeService->getEpisodesForAnime($anime, $titleCandidates);
+            }
+
+            // PRIORITY 5: Configured iframe aggregators / no-name voiceovers.
+            // Disabled by default until URL templates are configured by admin.
+            if ($this->externalPlayersEnabled && empty($episodes)) {
+                $episodes = $this->externalPlayerService->getEpisodes($anime, $titleCandidates);
             }
 
             // Persistence
@@ -190,10 +222,89 @@ class EpisodeImportService
             }
         }
 
-        return $this->videoCdnService->getEpisodesByTitle($anime->title);
+        return $this->videoCdnService->getEpisodesByTitles($this->metadataService->titleCandidates($anime), $anime->year, $anime->type);
     }
 
-    protected function formatKodikEpisodes(array $animeData): array
+    protected function collectKodikEpisodes(array $kodikData): array
+    {
+        $settings = $this->settings->all();
+        $importAllTranslations = (bool) ($settings['episodes.import_all_translations'] ?? true);
+        $maxTranslations = max(0, (int) ($settings['episodes.max_kodik_translations'] ?? 25));
+        $includeSubtitles = (bool) ($settings['episodes.include_kodik_subtitles'] ?? true);
+        $preferredTranslators = is_array($settings['episodes.preferred_translators'] ?? null)
+            ? $settings['episodes.preferred_translators']
+            : [];
+
+        $target = $kodikData[0] ?? [];
+        $targetShikimoriId = $target['shikimori_id'] ?? null;
+        $targetTitle = mb_strtolower(trim($target['title'] ?? $target['title_orig'] ?? ''));
+
+        $sameAnime = array_values(array_filter($kodikData, function (array $kodikResult) use ($targetShikimoriId, $targetTitle) {
+            $currentShiki = $kodikResult['shikimori_id'] ?? null;
+            $currentTitle = mb_strtolower(trim($kodikResult['title'] ?? $kodikResult['title_orig'] ?? ''));
+
+            if ($targetShikimoriId && $currentShiki) {
+                return (string) $currentShiki === (string) $targetShikimoriId;
+            }
+
+            return $currentTitle !== '' && $currentTitle === $targetTitle;
+        }));
+
+        $sameAnime = array_values(array_filter($sameAnime, function (array $kodikResult) use ($includeSubtitles) {
+            $type = $kodikResult['translation']['type'] ?? 'voice';
+
+            return $includeSubtitles || $type !== 'subtitles';
+        }));
+
+        usort($sameAnime, function (array $a, array $b) use ($preferredTranslators) {
+            $aTranslator = cloneKodikTranslator($a['translation'] ?? []);
+            $bTranslator = cloneKodikTranslator($b['translation'] ?? []);
+            $aPreferred = $this->translatorPriority($aTranslator, $preferredTranslators);
+            $bPreferred = $this->translatorPriority($bTranslator, $preferredTranslators);
+
+            if ($aPreferred !== $bPreferred) {
+                return $aPreferred <=> $bPreferred;
+            }
+
+            return $this->countKodikEpisodes($b) <=> $this->countKodikEpisodes($a);
+        });
+
+        if (! $importAllTranslations) {
+            $sameAnime = array_slice($sameAnime, 0, 1);
+        } elseif ($maxTranslations > 0) {
+            $sameAnime = array_slice($sameAnime, 0, $maxTranslations);
+        }
+
+        $episodes = [];
+        foreach ($sameAnime as $index => $kodikResult) {
+            $episodes = array_merge($episodes, $this->formatKodikEpisodes($kodikResult, 5 + $index));
+        }
+
+        return $episodes;
+    }
+
+    private function translatorPriority(string $translator, array $preferredTranslators): int
+    {
+        foreach ($preferredTranslators as $index => $preferred) {
+            if (mb_strtolower($translator) === mb_strtolower((string) $preferred)) {
+                return $index;
+            }
+        }
+
+        return 999;
+    }
+
+    private function countKodikEpisodes(array $animeData): int
+    {
+        $count = 0;
+        foreach (($animeData['seasons'] ?? []) as $seasonData) {
+            $count += count($seasonData['episodes'] ?? []);
+        }
+
+        return $count ?: (! empty($animeData['link']) ? 1 : 0);
+    }
+
+    protected function formatKodikEpisodes(array $animeData, int $priority = 5): array
     {
         $episodes = [];
         $seasons = $animeData['seasons'] ?? [];
@@ -220,7 +331,7 @@ class EpisodeImportService
                     'translator' => cloneKodikTranslator($animeData['translation'] ?? []),
                     'translation_type' => $animeData['translation']['type'] ?? 'voice',
                     'quality' => 'auto',
-                    'priority' => 5, // Medium priority, lower than Anilibria but higher than VideoCdn
+                    'priority' => $priority, // Lower than AniLibria, higher than VideoCDN/external.
                 ];
             }
         }
@@ -239,7 +350,7 @@ class EpisodeImportService
                 'translator' => cloneKodikTranslator($animeData['translation'] ?? []),
                 'translation_type' => $animeData['translation']['type'] ?? 'voice',
                 'quality' => 'auto',
-                'priority' => 5,
+                'priority' => $priority,
             ];
         }
 
@@ -286,6 +397,7 @@ class EpisodeImportService
                     $legacyDuplicate = Episode::where('anime_id', $anime->id)
                         ->where('episode_number', $data['episode_number'])
                         ->when($translator, fn ($query) => $query->where('translator', $translator))
+                        ->when($source, fn ($query) => $query->where('source', $source))
                         ->first();
 
                     if ($legacyDuplicate) {

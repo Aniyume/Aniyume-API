@@ -208,23 +208,56 @@ class KodikService
         return $this->requestWithFallback('/search', $params) ?? [];
     }
 
-    public function searchByTitle(string $title): array
+    public function searchByTitle(string $title, ?string $titleEn = null, ?int $year = null, ?string $type = null): array
     {
-        $params = [
-            'title' => $title,
-            'with_episodes' => true,
-            'with_material_data' => true,
-            'limit' => 10,
-            'types' => 'anime-serial,anime',
-        ];
+        return $this->searchByTitles(array_filter([$title, $titleEn]), $year, $type);
+    }
 
-        if ($this->apiToken) {
-            $params['token'] = $this->apiToken;
+    public function searchByTitles(array $titles, ?int $year = null, ?string $type = null): array
+    {
+        $queries = array_values(array_unique(array_filter($titles)));
+        $results = [];
+
+        foreach ($queries as $query) {
+            $params = [
+                'title' => $query,
+                'with_episodes' => true,
+                'with_episodes_data' => true,
+                'with_material_data' => true,
+                'limit' => 20,
+                'types' => $type === 'movie' ? 'anime' : 'anime-serial,anime',
+            ];
+
+            if ($year) {
+                $params['year'] = $year;
+            }
+
+            if ($this->apiToken) {
+                $params['token'] = $this->apiToken;
+            }
+
+            $results = array_merge($results, $this->requestWithFallback('/search', $params) ?? []);
         }
 
-        $results = $this->requestWithFallback('/search', $params) ?? [];
+        $seen = [];
+        $results = array_values(array_filter($results, function ($item) use (&$seen) {
+            $key = (string) ($item['id'] ?? md5(($item['title'] ?? '').($item['link'] ?? '')));
+            if (isset($seen[$key])) {
+                return false;
+            }
+            $seen[$key] = true;
 
-        usort($results, function ($a, $b) {
+            return $this->countEpisodes($item) > 0 || ! empty($item['link']);
+        }));
+
+        usort($results, function ($a, $b) use ($queries, $year) {
+            $aScore = $this->matchScore($a, $queries, $year);
+            $bScore = $this->matchScore($b, $queries, $year);
+
+            if ($aScore !== $bScore) {
+                return $bScore <=> $aScore;
+            }
+
             $aEpisodes = $this->countEpisodes($a);
             $bEpisodes = $this->countEpisodes($b);
 
@@ -272,6 +305,55 @@ class KodikService
         }
 
         return $count;
+    }
+
+    private function matchScore(array $anime, array $wantedTitles, ?int $year): int
+    {
+        $score = 0;
+        $candidateTitles = array_filter([
+            $anime['title'] ?? null,
+            $anime['title_orig'] ?? null,
+            $anime['other_title'] ?? null,
+            $anime['material_data']['title'] ?? null,
+            $anime['material_data']['anime_title'] ?? null,
+            $anime['material_data']['title_en'] ?? null,
+        ]);
+
+        foreach ($wantedTitles as $wanted) {
+            $wantedNormalized = $this->normalizeTitle($wanted);
+            foreach ($candidateTitles as $candidate) {
+                $candidateNormalized = $this->normalizeTitle((string) $candidate);
+                if ($wantedNormalized !== '' && $candidateNormalized !== '') {
+                    if ($candidateNormalized === $wantedNormalized) {
+                        $score += 100;
+                    } elseif (str_contains($candidateNormalized, $wantedNormalized) || str_contains($wantedNormalized, $candidateNormalized)) {
+                        $score += 40;
+                    }
+                }
+            }
+        }
+
+        $candidateYear = $anime['year'] ?? $anime['material_data']['year'] ?? null;
+        if ($year && $candidateYear) {
+            $delta = abs((int) $candidateYear - $year);
+            $score += match (true) {
+                $delta === 0 => 30,
+                $delta === 1 => 10,
+                default => -20,
+            };
+        }
+
+        $score += min($this->countEpisodes($anime), 50);
+
+        return $score;
+    }
+
+    private function normalizeTitle(string $title): string
+    {
+        $title = mb_strtolower($title);
+        $title = str_replace('ё', 'е', $title);
+
+        return trim(preg_replace('/[^\p{L}\p{N}]+/u', '', $title));
     }
 
     /**

@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\V1\FriendshipController;
 use App\Http\Controllers\Api\V1\RatingsController;
 use App\Http\Controllers\Api\V1\ReportController as PublicReportController;
 use App\Http\Controllers\Api\V1\ScheduleController;
+use App\Http\Controllers\Api\V1\StreamProxyController;
 use App\Http\Controllers\Api\V1\TagController;
 use App\Http\Controllers\Api\V1\UserAnimeListController;
 use App\Http\Controllers\Api\V1\UserProfileController;
@@ -56,6 +57,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/anime/{anime}/episodes/{episodeNumber}/sources', [EpisodeController::class, 'getPlayerSources']);
         Route::get('/anime/{anime}/community-stats', [AnimeController::class, 'getCommunityStats']);
         Route::get('/anime/{anime}/recommendations', [AnimeController::class, 'getRecommendations']);
+        Route::match(['get', 'options'], '/stream/allanime/{encoded}', [StreamProxyController::class, 'allanime'])
+            ->where('encoded', '[A-Za-z0-9\-_]+');
         Route::get('/episodes/{episode}', [EpisodeController::class, 'show'])
             ->where('episode', '[0-9]+');
         Route::get('/episodes/{episode}/player', [EpisodeController::class, 'getPlayer'])
@@ -91,16 +94,23 @@ Route::prefix('v1')->group(function () {
             Route::match(['put', 'patch'], '/tags/{tag}', [AdminTagController::class, 'update']);
             Route::delete('/tags/{tag}', [AdminTagController::class, 'destroy']);
             Route::get('/users', [AdminUserController::class, 'index']);
+            Route::post('/users/premium/grant', [AdminUserController::class, 'grantPremiumByNickname']);
             Route::get('/users/{user}', [AdminUserController::class, 'show']);
+            Route::patch('/users/{user}/profile', [AdminUserController::class, 'updateProfile']);
+            Route::post('/users/{user}/avatar', [AdminUserController::class, 'uploadAvatar']);
+            Route::delete('/users/{user}/avatar', [AdminUserController::class, 'deleteAvatar']);
+            Route::patch('/users/{user}/premium', [AdminUserController::class, 'updatePremium']);
             Route::post('/users/{user}/ban', [AdminUserController::class, 'ban']);
             Route::post('/users/{user}/unban', [AdminUserController::class, 'unban']);
             Route::delete('/users/{user}', [AdminUserController::class, 'destroy']);
             Route::get('/comments', [AdminCommentController::class, 'index']);
             Route::post('/comments/{comment}/approve', [AdminCommentController::class, 'approve']);
             Route::post('/comments/{comment}/reject', [AdminCommentController::class, 'reject']);
+            Route::post('/comments/{comment}/heart', [AdminCommentController::class, 'toggleHeart']);
             Route::delete('/comments/{comment}', [AdminCommentController::class, 'destroy']);
             Route::get('/audit-logs', [AdminAuditLogController::class, 'index']);
             Route::get('/episodes', [AdminEpisodeController::class, 'index']);
+            Route::get('/episodes/player-diagnostics', [AdminEpisodeController::class, 'playerDiagnostics']);
             Route::get('/episodes/{episode}', [AdminEpisodeController::class, 'show']);
             Route::match(['put', 'patch'], '/episodes/{episode}', [AdminEpisodeController::class, 'update']);
             Route::delete('/episodes/{episode}', [AdminEpisodeController::class, 'destroy']);
@@ -113,6 +123,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/ratings', [AdminRatingController::class, 'index']);
             Route::delete('/ratings/{rating}', [AdminRatingController::class, 'destroy']);
             Route::get('/contacts', [\App\Http\Controllers\Api\Admin\ContactMessageController::class, 'index']);
+            Route::get('/contacts/{contact}/photo', [\App\Http\Controllers\Api\Admin\ContactMessageController::class, 'photo']);
             Route::patch('/contacts/{contact}/status', [\App\Http\Controllers\Api\Admin\ContactMessageController::class, 'updateStatus']);
             Route::delete('/contacts/{contact}', [\App\Http\Controllers\Api\Admin\ContactMessageController::class, 'destroy']);
             Route::get('/settings', [AdminSettingController::class, 'index']);
@@ -123,19 +134,24 @@ Route::prefix('v1')->group(function () {
             Route::post('/imports/run', [AdminImportController::class, 'run']);
         });
 
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'not_banned'])->group(function () {
         Route::get('/user', [AuthController::class, 'me']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::post('/ai/chat', AiChatController::class)->middleware('throttle:ai');
         Route::get('/ai/chat/sessions', [AiChatSessionController::class, 'index']);
         Route::get('/ai/chat/sessions/{sessionId}', [AiChatSessionController::class, 'show']);
         Route::get('/my-comments', [CommentsController::class, 'userComments']);
+        Route::post('/comments/{comment}/reactions', [CommentsController::class, 'react']);
+        Route::post('/comments/{comment}/admin-heart', [CommentsController::class, 'adminHeart']);
+        Route::post('/comments/{comment}/replies', [CommentsController::class, 'reply']);
         Route::apiResource('comments', CommentsController::class)->only(['store', 'update', 'destroy']);
         Route::post('/reports', [PublicReportController::class, 'store']);
 
         Route::get('/profile/me', [UserProfileController::class, 'getFullProfile']);
         Route::put('/profile/me', [UserProfileController::class, 'update']);
         Route::post('/profile/me/avatar', [UserProfileController::class, 'uploadAvatar']);
+        Route::get('/profile/me/frames', [UserProfileController::class, 'frames']);
+        Route::post('/profile/me/frames/select', [UserProfileController::class, 'selectFrame']);
 
         Route::get('/statistics/me', [UserStatisticsController::class, 'getStatistics']);
         Route::get('/statistics/me/episodes-summary', [UserStatisticsController::class, 'getEpisodesSummary']);
@@ -171,12 +187,15 @@ Route::prefix('v1')->group(function () {
             Route::get('/', 'index');                          // GET /friends
             Route::get('/requests', 'requests');               // GET /friends/requests
             Route::get('/requests/count', 'requestsCount');    // GET /friends/requests/count
+            Route::post('/by-nickname', 'sendByNickname');     // POST /friends/by-nickname
             Route::post('/{userId}', 'send');                  // POST /friends/{userId}
             Route::post('/{userId}/accept', 'accept');         // POST /friends/{userId}/accept
             Route::post('/{userId}/decline', 'decline');       // POST /friends/{userId}/decline
             Route::get('/{userId}/status', 'status');          // GET /friends/{userId}/status
         });
         Route::get('/users/search', [FriendshipController::class, 'search']); // GET /users/search?q=
+        Route::get('/users/{userId}/profile', [FriendshipController::class, 'profile'])
+            ->where('userId', '[0-9]+');
 
         // === Watch Party ===
         Route::prefix('watch-party')->controller(WatchPartyController::class)->group(function () {

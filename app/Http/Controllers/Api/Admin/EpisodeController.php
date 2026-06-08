@@ -9,6 +9,8 @@ use App\Jobs\EpisodesImportJob;
 use App\Models\Anime;
 use App\Models\AuditLog;
 use App\Models\Episode;
+use App\Services\EpisodeLookupMetadataService;
+use App\Services\ExternalPlayerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -99,13 +101,24 @@ class EpisodeController extends Controller
 
     public function importForAnime(Request $request, Anime $anime): JsonResponse
     {
-        EpisodesImportJob::dispatch($anime->id, false);
-        $this->audit($request, 'import_episodes', "Started episodes import for anime {$anime->title} (ID {$anime->id})");
+        $validated = $request->validate([
+            'source' => ['nullable', 'string', Rule::in(['all', 'anilibria', 'kodik', 'videocdn', 'allanime', 'external'])],
+            'update' => ['sometimes', 'boolean'],
+            'only_missing' => ['sometimes', 'boolean'],
+        ]);
+
+        $source = ($validated['source'] ?? 'all') === 'all' ? null : $validated['source'];
+        $update = (bool) ($validated['update'] ?? false);
+        $onlyMissing = (bool) ($validated['only_missing'] ?? true);
+
+        EpisodesImportJob::dispatch($anime->id, $update, $onlyMissing, $source);
+        $this->audit($request, 'import_episodes', "Started episodes import for anime {$anime->title} (ID {$anime->id}) using source ".($source ?? 'all'));
 
         return response()->json([
             'data' => [
                 'message' => 'Episodes import queued',
                 'anime_id' => $anime->id,
+                'source' => $source ?? 'all',
             ],
         ], 202);
     }
@@ -115,21 +128,54 @@ class EpisodeController extends Controller
         $validated = $request->validate([
             'anime_ids' => ['nullable', 'array'],
             'anime_ids.*' => ['integer', 'exists:anime,id'],
+            'source' => ['nullable', 'string', Rule::in(['all', 'anilibria', 'kodik', 'videocdn', 'allanime', 'external'])],
+            'only_missing' => ['sometimes', 'boolean'],
+            'limit' => ['nullable', 'integer', 'min:1', 'max:5000'],
         ]);
 
-        $animeIds = $validated['anime_ids'] ?? Anime::query()->pluck('id')->all();
-        foreach ($animeIds as $animeId) {
-            EpisodesImportJob::dispatch((int) $animeId, false);
+        $source = ($validated['source'] ?? 'all') === 'all' ? null : $validated['source'];
+        $onlyMissing = (bool) ($validated['only_missing'] ?? true);
+
+        $animeQuery = Anime::query()->orderBy('id');
+        if ($onlyMissing) {
+            $animeQuery->whereDoesntHave('episodes');
         }
 
-        $this->audit($request, 'bulk_import_episodes', 'Started episodes bulk import for '.count($animeIds).' anime');
+        if (! empty($validated['limit'])) {
+            $animeQuery->limit((int) $validated['limit']);
+        }
+
+        $animeIds = $validated['anime_ids'] ?? $animeQuery->pluck('id')->all();
+        foreach ($animeIds as $animeId) {
+            EpisodesImportJob::dispatch((int) $animeId, false, $onlyMissing, $source);
+        }
+
+        $this->audit($request, 'bulk_import_episodes', 'Started episodes bulk import for '.count($animeIds).' anime using source '.($source ?? 'all'));
 
         return response()->json([
             'data' => [
                 'message' => 'Episodes bulk import queued',
                 'queued_count' => count($animeIds),
+                'source' => $source ?? 'all',
             ],
         ], 202);
+    }
+
+    public function playerDiagnostics(Request $request, ExternalPlayerService $players, EpisodeLookupMetadataService $metadata): JsonResponse
+    {
+        $validated = $request->validate([
+            'anime_id' => ['nullable', 'integer', 'exists:anime,id'],
+        ]);
+
+        $anime = isset($validated['anime_id']) ? Anime::query()->find($validated['anime_id']) : Anime::query()->whereNotNull('shikimori_id')->first();
+        $titles = $anime ? $metadata->titleCandidates($anime) : [];
+
+        return response()->json([
+            'data' => [
+                'anime' => $anime ? ['id' => $anime->id, 'title' => $anime->title, 'shikimori_id' => $anime->shikimori_id] : null,
+                'providers' => $players->diagnostics($anime, $titles),
+            ],
+        ]);
     }
 
     private function audit(Request $request, string $action, string $description): void

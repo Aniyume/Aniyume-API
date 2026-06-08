@@ -5,6 +5,7 @@ namespace App\Application\Actions\WatchHistory;
 use App\Models\Episode;
 use App\Models\WatchHistory;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 
 class SyncWatchProgressAction
 {
@@ -35,6 +36,9 @@ class SyncWatchProgressAction
         if (($data['completed'] ?? false) === true) {
             $this->markEpisodeWatched($userId, $episode);
         }
+
+        Cache::forget("user_statistics_{$userId}");
+        Cache::forget("user_episodes_summary_{$userId}_10");
 
         return $watchHistory->refresh();
     }

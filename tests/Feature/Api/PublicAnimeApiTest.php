@@ -14,7 +14,7 @@ class PublicAnimeApiTest extends TestCase
 
     public function test_anime_list_returns_paginated_data(): void
     {
-        Anime::factory()->count(3)->create();
+        Anime::factory()->count(3)->has(Episode::factory())->create();
 
         $this->getJson('/api/v1/public/anime')
             ->assertOk()
@@ -29,7 +29,7 @@ class PublicAnimeApiTest extends TestCase
 
     public function test_anime_list_respects_per_page_limit(): void
     {
-        Anime::factory()->count(3)->create();
+        Anime::factory()->count(3)->has(Episode::factory())->create();
 
         $this->getJson('/api/v1/public/anime?per_page=1')
             ->assertOk()
@@ -39,12 +39,20 @@ class PublicAnimeApiTest extends TestCase
 
     public function test_anime_details_returns_resource(): void
     {
-        $anime = Anime::factory()->create();
+        $anime = Anime::factory()->has(Episode::factory())->create();
 
         $this->getJson("/api/v1/public/anime/{$anime->id}")
             ->assertOk()
             ->assertJsonPath('data.id', $anime->id)
             ->assertJsonPath('data.title', $anime->title);
+    }
+
+    public function test_anime_without_episodes_is_hidden_from_public_details(): void
+    {
+        $anime = Anime::factory()->create();
+
+        $this->getJson("/api/v1/public/anime/{$anime->id}")
+            ->assertNotFound();
     }
 
     public function test_tags_endpoint_returns_tags(): void

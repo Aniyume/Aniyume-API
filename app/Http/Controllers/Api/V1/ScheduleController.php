@@ -34,6 +34,7 @@ class ScheduleController extends Controller
                 // Достаем из нашей базы те аниме, которые есть в календаре
                 $animesFromDb = Anime::whereIn('shikimori_id', $shikimoriIds)
                     ->with(['tags'])
+                    ->whereHas('episodes')
                     ->get()
                     ->keyBy('shikimori_id');
 
@@ -87,6 +88,7 @@ class ScheduleController extends Controller
     private function fallbackSchedule()
     {
         $ongoing = Anime::where('status', 'ongoing')
+            ->whereHas('episodes')
             ->orderBy('id', 'DESC')
             ->limit(50)
             ->get();

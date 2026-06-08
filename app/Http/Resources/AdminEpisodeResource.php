@@ -22,8 +22,10 @@ class AdminEpisodeResource extends JsonResource
             'duration' => $this->duration,
             'thumbnail_url' => $this->thumbnail_url,
             'translator' => $this->translator,
+            'translation_type' => $this->translation_type,
             'quality' => $this->quality,
             'source' => $this->source,
+            'priority' => $this->priority,
             'anime' => $this->whenLoaded('anime', fn () => $this->anime ? [
                 'id' => $this->anime->id,
                 'title' => $this->anime->title,

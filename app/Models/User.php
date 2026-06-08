@@ -16,13 +16,14 @@ class User extends Authenticatable
         'email',
         'password',
         'avatar',
-        'bio',
         'custom_status',
         'is_online',
         'is_premium',
+        'selected_profile_frame',
         'is_active',
         'is_banned',
         'ban_reason',
+        'ban_expires_at',
         'last_login_at',
         'last_login_ip',
     ];
@@ -39,8 +40,33 @@ class User extends Authenticatable
         'is_premium' => 'boolean',
         'is_active' => 'boolean',
         'is_banned' => 'boolean',
+        'ban_expires_at' => 'datetime',
         'last_login_at' => 'datetime',
     ];
+
+    public function hasActiveBan(): bool
+    {
+        if (! $this->is_banned) {
+            return false;
+        }
+
+        return $this->ban_expires_at === null || $this->ban_expires_at->isFuture();
+    }
+
+    public function clearExpiredBan(): bool
+    {
+        if (! $this->is_banned || $this->ban_expires_at === null || $this->ban_expires_at->isFuture()) {
+            return false;
+        }
+
+        $this->forceFill([
+            'is_banned' => false,
+            'ban_reason' => null,
+            'ban_expires_at' => null,
+        ])->save();
+
+        return true;
+    }
 
     public function roles()
     {

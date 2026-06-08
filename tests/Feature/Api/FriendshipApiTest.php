@@ -120,9 +120,10 @@ class FriendshipApiTest extends TestCase
             ->getJson('/api/v1/friends/requests')
             ->assertOk()
             ->assertJsonPath('incoming.0.id', $incomingUser->id)
-            ->assertJsonPath('incoming.0.avatar', '/api-storage/avatars/incoming.png')
+            ->assertJsonPath('incoming.0.avatar', 'incoming.png')
             ->assertJsonPath('incoming.0.custom_status', 'hello')
             ->assertJsonPath('incoming.0.is_online', true)
+            ->assertJsonPath('incoming.0.selected_profile_frame', 'none')
             ->assertJsonPath('outgoing.0.id', $outgoingUser->id);
 
         $this->actingAs($currentUser, 'sanctum')
@@ -162,10 +163,66 @@ class FriendshipApiTest extends TestCase
                 [
                     'id' => $foundUser->id,
                     'name' => 'Naruto Uzumaki',
-                    'avatar' => '/api-storage/avatars/naruto.jpg',
+                    'avatar' => 'naruto.jpg',
                     'custom_status' => 'dattebayo',
                     'is_online' => false,
+                    'selected_profile_frame' => 'none',
+                    'friendship_status' => 'none',
+                    'is_sender' => null,
                 ],
+            ]);
+    }
+
+    public function test_authenticated_user_can_send_friend_request_by_nickname(): void
+    {
+        /** @var User $sender */
+        $sender = User::factory()->create();
+        /** @var User $target */
+        $target = User::factory()->create(['name' => 'ExactNick']);
+
+        $this->actingAs($sender, 'sanctum')
+            ->postJson('/api/v1/friends/by-nickname', ['nickname' => 'exactnick'])
+            ->assertCreated()
+            ->assertJsonPath('message', 'Заявка отправлена');
+
+        $this->assertDatabaseHas('friendships', [
+            'user_id' => $sender->id,
+            'friend_id' => $target->id,
+            'status' => 'pending',
+        ]);
+    }
+
+    public function test_authenticated_user_can_open_friend_profile_summary(): void
+    {
+        /** @var User $sender */
+        $sender = User::factory()->create();
+        /** @var User $target */
+        $target = User::factory()->create([
+            'name' => 'Profile Friend',
+            'avatar' => 'profile.png',
+            'custom_status' => 'watching classics',
+            'is_online' => true,
+        ]);
+
+        Friendship::create([
+            'user_id' => $sender->id,
+            'friend_id' => $target->id,
+            'status' => 'pending',
+        ]);
+
+        $this->actingAs($sender, 'sanctum')
+            ->getJson("/api/v1/users/{$target->id}/profile")
+            ->assertOk()
+            ->assertJsonPath('user.id', $target->id)
+            ->assertJsonPath('user.name', 'Profile Friend')
+            ->assertJsonPath('user.avatar', 'profile.png')
+            ->assertJsonPath('user.custom_status', 'watching classics')
+            ->assertJsonPath('user.is_online', true)
+            ->assertJsonPath('user.selected_profile_frame', 'none')
+            ->assertJsonPath('user.friendship_status', 'pending')
+            ->assertJsonPath('user.is_sender', true)
+            ->assertJsonStructure([
+                'counts' => ['friends', 'comments', 'ratings', 'favorites'],
             ]);
     }
 }

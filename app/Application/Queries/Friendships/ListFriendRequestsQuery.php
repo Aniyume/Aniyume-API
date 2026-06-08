@@ -12,13 +12,13 @@ class ListFriendRequestsQuery
 
     public function getFor(User $user): array
     {
-        $incoming = Friendship::with('user:id,name,avatar,custom_status,is_online')
+        $incoming = Friendship::with('user:id,name,avatar,custom_status,is_online,selected_profile_frame')
             ->where('friend_id', $user->id)
             ->where('status', 'pending')
             ->get()
             ->map(fn (Friendship $friendship) => $this->formatter->format($friendship->user));
 
-        $outgoing = Friendship::with('friend:id,name,avatar,custom_status,is_online')
+        $outgoing = Friendship::with('friend:id,name,avatar,custom_status,is_online,selected_profile_frame')
             ->where('user_id', $user->id)
             ->where('status', 'pending')
             ->get()

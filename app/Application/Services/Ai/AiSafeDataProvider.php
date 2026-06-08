@@ -101,7 +101,6 @@ final class AiSafeDataProvider
             'id' => $user->id,
             'name' => $user->name,
             'avatar' => $user->avatar,
-            'bio' => $user->bio,
             'custom_status' => $user->custom_status,
             'is_premium' => (bool) $user->is_premium,
             'roles' => $user->roles()->pluck('name')->values()->all(),

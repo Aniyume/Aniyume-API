@@ -67,6 +67,16 @@ class ContactMessageController extends Controller
         return response()->json(['data' => (new AdminContactMessageResource($contact->refresh()->load(['user', 'admin'])))->resolve($request)]);
     }
 
+    public function photo(ContactMessage $contact)
+    {
+        abort_if(! $contact->photo, 404, 'Photo not found.');
+
+        return response($contact->photo, 200, [
+            'Content-Type' => $contact->photo_mime ?: 'application/octet-stream',
+            'Content-Disposition' => 'inline; filename="'.addslashes($contact->photo_name ?: 'contact-photo').'"',
+        ]);
+    }
+
     public function destroy(Request $request, ContactMessage $contact): JsonResponse
     {
         $id = $contact->id;

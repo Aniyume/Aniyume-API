@@ -27,7 +27,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:users,name',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
         ]);
@@ -83,7 +83,18 @@ class AuthController extends Controller
             return response()->json(['message' => 'Аккаунт деактивирован.'], 403);
         }
 
+        $user->clearExpiredBan();
+
+        if ($user->hasActiveBan()) {
+            return response()->json([
+                'message' => 'Аккаунт заблокирован.',
+                'ban_reason' => $user->ban_reason,
+                'ban_expires_at' => $user->ban_expires_at?->toISOString(),
+            ], 403);
+        }
+
         $user->forceFill([
+            'is_online' => true,
             'last_login_at' => now(),
             'last_login_ip' => $request->ip(),
         ])->save();
@@ -114,6 +125,21 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
+        $user->clearExpiredBan();
+
+        if ($user->hasActiveBan()) {
+            $token = $user->currentAccessToken();
+            if ($token !== null) {
+                $user->tokens()->where('id', '=', $token->id, 'and')->delete();
+            }
+
+            return response()->json([
+                'message' => 'Аккаунт заблокирован.',
+                'ban_reason' => $user->ban_reason,
+                'ban_expires_at' => $user->ban_expires_at?->toISOString(),
+            ], 403);
+        }
+
         return response()->json([
             'status' => 'success',
             'data' => $user->load('roles'),
@@ -139,6 +165,10 @@ class AuthController extends Controller
 
         if ($token !== null) {
             $user->tokens()->where('id', '=', $token->id, 'and')->delete();
+        }
+
+        if ($user->tokens()->count() === 0) {
+            $user->forceFill(['is_online' => false])->save();
         }
 
         return response()->json(['status' => 'success']);

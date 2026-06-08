@@ -3,63 +3,68 @@
 namespace App\Services;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class UserStatisticsService
 {
     public function getStatistics(int $userId): array
     {
-        $totalSeconds = $this->getTotalWatchTime($userId);
+        return Cache::remember("user_statistics_{$userId}", now()->addMinutes(5), function () use ($userId) {
+            $totalSeconds = $this->getTotalWatchTime($userId);
 
-        return [
-            'status_counts' => $this->getStatusCounts($userId),
-            'episodes_watched' => $this->getTotalEpisodesWatched($userId),
-            'total_watch_time' => $this->formatWatchTime($totalSeconds),
-            'recent_ratings' => $this->getRecentRatings($userId, 3),
-            'watch_dynamics' => $this->getWatchDynamics($userId, 10),
-            'recently_watched' => $this->getRecentlyWatched($userId, 5),
-            'comments_count' => $this->getTotalCommentsCount($userId),
-        ];
+            return [
+                'status_counts' => $this->getStatusCounts($userId),
+                'episodes_watched' => $this->getTotalEpisodesWatched($userId),
+                'total_watch_time' => $this->formatWatchTime($totalSeconds),
+                'recent_ratings' => $this->getRecentRatings($userId, 3),
+                'watch_dynamics' => $this->getWatchDynamics($userId, 10),
+                'recently_watched' => $this->getRecentlyWatched($userId, 5),
+                'comments_count' => $this->getTotalCommentsCount($userId),
+            ];
+        });
     }
 
     public function getWatchEpisodesSummary(int $userId, int $days = 10): array
     {
-        $startDate = Carbon::now()->subDays($days - 1)->startOfDay();
+        return Cache::remember("user_episodes_summary_{$userId}_{$days}", now()->addMinutes(5), function () use ($userId, $days) {
+            $startDate = Carbon::now()->subDays($days - 1)->startOfDay();
 
-        $dynamics = DB::table('watch_history')
-            ->where('user_id', $userId)
-            ->where('watched_at', '>=', $startDate)
-            ->select(
-                DB::raw('DATE(watched_at) as date'),
-                DB::raw('COUNT(*) as count')
-            )
-            ->groupBy(DB::raw('DATE(watched_at)'))
-            ->get()
-            ->keyBy('date');
+            $dynamics = DB::table('watch_history')
+                ->where('user_id', $userId)
+                ->where('watched_at', '>=', $startDate)
+                ->select(
+                    DB::raw('DATE(watched_at) as date'),
+                    DB::raw('COUNT(*) as count')
+                )
+                ->groupBy(DB::raw('DATE(watched_at)'))
+                ->get()
+                ->keyBy('date');
 
-        $episodesPerDay = [];
-        $totalInPeriod = 0;
+            $episodesPerDay = [];
+            $totalInPeriod = 0;
 
-        for ($i = $days - 1; $i >= 0; $i--) {
-            $date = Carbon::now()->subDays($i)->format('Y-m-d');
-            $count = isset($dynamics[$date]) ? (int) $dynamics[$date]->count : 0;
+            for ($i = $days - 1; $i >= 0; $i--) {
+                $date = Carbon::now()->subDays($i)->format('Y-m-d');
+                $count = isset($dynamics[$date]) ? (int) $dynamics[$date]->count : 0;
 
-            $episodesPerDay[] = [
-                'date' => $date,
-                'episodes_count' => $count,
+                $episodesPerDay[] = [
+                    'date' => $date,
+                    'episodes_count' => $count,
+                ];
+
+                $totalInPeriod += $count;
+            }
+
+            $todayDate = Carbon::now()->format('Y-m-d');
+            $totalToday = isset($dynamics[$todayDate]) ? (int) $dynamics[$todayDate]->count : 0;
+
+            return [
+                'total_episodes_today' => $totalToday,
+                'episodes_per_day_last_10_days' => $episodesPerDay,
+                'average_episodes_last_10_days' => $days > 0 ? round($totalInPeriod / $days, 2) : 0,
             ];
-
-            $totalInPeriod += $count;
-        }
-
-        $todayDate = Carbon::now()->format('Y-m-d');
-        $totalToday = isset($dynamics[$todayDate]) ? (int) $dynamics[$todayDate]->count : 0;
-
-        return [
-            'total_episodes_today' => $totalToday,
-            'episodes_per_day_last_10_days' => $episodesPerDay,
-            'average_episodes_last_10_days' => $days > 0 ? round($totalInPeriod / $days, 2) : 0,
-        ];
+        });
     }
 
     private function getStatusCounts(int $userId): array

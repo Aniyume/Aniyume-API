@@ -11,8 +11,10 @@ use App\Application\Queries\Friendships\ListFriendsQuery;
 use App\Application\Queries\Friendships\ResolveFriendshipStatusQuery;
 use App\Application\Queries\Friendships\SearchUsersForFriendshipQuery;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class FriendshipController extends Controller
 {
@@ -47,6 +49,26 @@ class FriendshipController extends Controller
         return response()->json($result['payload'], $result['status']);
     }
 
+    public function sendByNickname(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'nickname' => ['required', 'string', 'min:1', 'max:255'],
+        ]);
+
+        $nickname = trim($validated['nickname']);
+        $target = User::query()
+            ->whereRaw('LOWER(name) = ?', [mb_strtolower($nickname)])
+            ->first();
+
+        if (! $target) {
+            return response()->json(['message' => 'User with this nickname was not found'], 404);
+        }
+
+        $result = $this->sendFriendRequest->execute($request->user(), $target->id);
+
+        return response()->json($result['payload'], $result['status']);
+    }
+
     // POST /friends/{userId}/accept — принять заявку
     public function accept(Request $request, int $userId): JsonResponse
     {
@@ -77,11 +99,51 @@ class FriendshipController extends Controller
         return response()->json($this->searchUsers->search($request->user(), $request->q));
     }
 
+    public function profile(Request $request, int $userId): JsonResponse
+    {
+        $target = User::query()
+            ->select('id', 'name', 'avatar', 'custom_status', 'is_online', 'is_premium', 'selected_profile_frame', 'created_at')
+            ->findOrFail($userId);
+
+        $friendship = $this->friendshipStatus->resolve($request->user(), $target->id);
+
+        return response()->json([
+            'user' => [
+                'id' => $target->id,
+                'name' => $target->name,
+                'avatar' => $target->avatar,
+                'custom_status' => $target->custom_status,
+                'is_online' => (bool) $target->is_online,
+                'is_premium' => (bool) $target->is_premium,
+                'selected_profile_frame' => $target->selected_profile_frame ?: 'none',
+                'created_at' => $target->created_at?->toISOString(),
+                'friendship_status' => $friendship['status'],
+                'is_sender' => $friendship['is_sender'] ?? null,
+            ],
+            'counts' => [
+                'friends' => $this->countFriends($target->id),
+                'comments' => DB::table('comments')->where('user_id', $target->id)->count(),
+                'ratings' => DB::table('ratings')->where('user_id', $target->id)->count(),
+                'favorites' => DB::table('favorites')->where('user_id', $target->id)->count(),
+            ],
+        ]);
+    }
+
     // GET /friends/count — количество входящих заявок (для badge)
     public function requestsCount(Request $request): JsonResponse
     {
         return response()->json([
             'count' => $this->incomingFriendRequests->countFor($request->user()),
         ]);
+    }
+
+    private function countFriends(int $userId): int
+    {
+        return DB::table('friendships')
+            ->where('status', 'accepted')
+            ->where(function ($query) use ($userId) {
+                $query->where('user_id', $userId)->orWhere('friend_id', $userId);
+            })
+            ->count();
     }
 }

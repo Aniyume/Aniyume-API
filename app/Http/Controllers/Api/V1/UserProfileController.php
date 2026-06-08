@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Application\Services\ProfileFrames\ProfileFrameService;
 use App\Http\Requests\UpdateUserProfileRequest;
 use App\Services\UserProfileService;
 use Illuminate\Http\JsonResponse;
@@ -32,7 +33,6 @@ class UserProfileController extends Controller
      * Обновить профиль
      *
      * @bodyParam name string Имя. Example: Ivan
-     * @bodyParam bio string О себе. Example: Люблю меха и сенены.
      * @bodyParam custom_status string Статус. Example: Смотрю One Piece
      */
     public function update(UpdateUserProfileRequest $request): JsonResponse
@@ -47,7 +47,6 @@ class UserProfileController extends Controller
                 'name' => $updated->name,
                 'email' => $updated->email,
                 'avatar' => $updated->avatar,
-                'bio' => $updated->bio,
                 'custom_status' => $updated->custom_status,
                 'is_premium' => (bool) $updated->is_premium,
             ],
@@ -76,5 +75,31 @@ class UserProfileController extends Controller
         }
 
         return response()->json(['message' => 'No file provided'], 400);
+    }
+
+    public function frames(Request $request, ProfileFrameService $frames): JsonResponse
+    {
+        return response()->json([
+            'data' => $frames->framesFor($request->user()),
+            'selected' => $request->user()->selected_profile_frame ?: 'none',
+        ]);
+    }
+
+    public function selectFrame(Request $request, ProfileFrameService $frames): JsonResponse
+    {
+        $validated = $request->validate([
+            'frame_key' => ['required', 'string', 'max:80'],
+        ]);
+
+        abort_unless((bool) $request->user()->is_premium, 403, 'Premium required.');
+        abort_unless($frames->canSelect($request->user(), $validated['frame_key']), 422, 'Frame is locked.');
+
+        $request->user()->update(['selected_profile_frame' => $validated['frame_key']]);
+
+        return response()->json([
+            'message' => 'Frame selected.',
+            'selected' => $validated['frame_key'],
+            'data' => $frames->framesFor($request->user()->fresh()),
+        ]);
     }
 }
