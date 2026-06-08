@@ -96,6 +96,9 @@ Route::prefix('v1')->group(function () {
             Route::get('/users', [AdminUserController::class, 'index']);
             Route::post('/users/premium/grant', [AdminUserController::class, 'grantPremiumByNickname']);
             Route::get('/users/{user}', [AdminUserController::class, 'show']);
+            Route::patch('/users/{user}/profile', [AdminUserController::class, 'updateProfile']);
+            Route::post('/users/{user}/avatar', [AdminUserController::class, 'uploadAvatar']);
+            Route::delete('/users/{user}/avatar', [AdminUserController::class, 'deleteAvatar']);
             Route::patch('/users/{user}/premium', [AdminUserController::class, 'updatePremium']);
             Route::post('/users/{user}/ban', [AdminUserController::class, 'ban']);
             Route::post('/users/{user}/unban', [AdminUserController::class, 'unban']);
@@ -131,7 +134,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/imports/run', [AdminImportController::class, 'run']);
         });
 
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'not_banned'])->group(function () {
         Route::get('/user', [AuthController::class, 'me']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::post('/ai/chat', AiChatController::class)->middleware('throttle:ai');
@@ -184,12 +187,15 @@ Route::prefix('v1')->group(function () {
             Route::get('/', 'index');                          // GET /friends
             Route::get('/requests', 'requests');               // GET /friends/requests
             Route::get('/requests/count', 'requestsCount');    // GET /friends/requests/count
+            Route::post('/by-nickname', 'sendByNickname');     // POST /friends/by-nickname
             Route::post('/{userId}', 'send');                  // POST /friends/{userId}
             Route::post('/{userId}/accept', 'accept');         // POST /friends/{userId}/accept
             Route::post('/{userId}/decline', 'decline');       // POST /friends/{userId}/decline
             Route::get('/{userId}/status', 'status');          // GET /friends/{userId}/status
         });
         Route::get('/users/search', [FriendshipController::class, 'search']); // GET /users/search?q=
+        Route::get('/users/{userId}/profile', [FriendshipController::class, 'profile'])
+            ->where('userId', '[0-9]+');
 
         // === Watch Party ===
         Route::prefix('watch-party')->controller(WatchPartyController::class)->group(function () {

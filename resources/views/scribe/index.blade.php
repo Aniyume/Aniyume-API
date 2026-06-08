@@ -18039,7 +18039,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Accept: application/json" \
     --data "{
     \"name\": \"b\",
-    \"bio\": \"n\",
     \"custom_status\": \"g\"
 }"
 </code></pre></div>
@@ -18057,7 +18056,6 @@ const headers = {
 
 let body = {
     "name": "b",
-    "bio": "n",
     "custom_status": "g"
 };
 
@@ -18154,18 +18152,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="body">
     <br>
 <p>Must not be greater than 255 characters. Example: <code>b</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>bio</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
-<i>optional</i> &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="bio"                data-endpoint="PUTapi-v1-profile-me"
-               value="n"
-               data-component="body">
-    <br>
-<p>Must not be greater than 500 characters. Example: <code>n</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>custom_status</code></b>&nbsp;&nbsp;

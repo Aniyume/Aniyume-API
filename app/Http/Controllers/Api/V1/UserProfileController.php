@@ -33,7 +33,6 @@ class UserProfileController extends Controller
      * Обновить профиль
      *
      * @bodyParam name string Имя. Example: Ivan
-     * @bodyParam bio string О себе. Example: Люблю меха и сенены.
      * @bodyParam custom_status string Статус. Example: Смотрю One Piece
      */
     public function update(UpdateUserProfileRequest $request): JsonResponse
@@ -48,7 +47,6 @@ class UserProfileController extends Controller
                 'name' => $updated->name,
                 'email' => $updated->email,
                 'avatar' => $updated->avatar,
-                'bio' => $updated->bio,
                 'custom_status' => $updated->custom_status,
                 'is_premium' => (bool) $updated->is_premium,
             ],

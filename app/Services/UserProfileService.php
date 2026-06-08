@@ -17,7 +17,6 @@ class UserProfileService
                 'name' => $user->name,
                 'email' => $user->email,
                 'avatar' => $user->avatar,
-                'bio' => $user->bio,
                 'custom_status' => $user->custom_status,
                 'is_premium' => (bool) $user->is_premium,
                 'selected_profile_frame' => $user->selected_profile_frame ?: 'none',
@@ -38,6 +37,7 @@ class UserProfileService
                 'ratings' => $user->ratings()->count(),
                 'watch_history' => $user->watchHistory()->count(),
                 'comments' => DB::table('comments')->where('user_id', $user->id)->count(),
+                'friends' => $this->countFriends($user->id),
             ],
         ];
     }
@@ -64,6 +64,16 @@ class UserProfileService
         return DB::table('anime_user')
             ->where('user_id', $userId)
             ->where('status', $status)
+            ->count();
+    }
+
+    private function countFriends(int $userId): int
+    {
+        return DB::table('friendships')
+            ->where('status', 'accepted')
+            ->where(function ($query) use ($userId) {
+                $query->where('user_id', $userId)->orWhere('friend_id', $userId);
+            })
             ->count();
     }
 

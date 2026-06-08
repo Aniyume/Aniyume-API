@@ -1170,17 +1170,6 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      bio:
-        custom: []
-        name: bio
-        description: 'Must not be greater than 500 characters.'
-        required: false
-        example: 'n'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
       custom_status:
         custom: []
         name: custom_status
@@ -1194,7 +1183,6 @@ endpoints:
         deprecated: false
     cleanBodyParameters:
       name: b
-      bio: 'n'
       custom_status: g
     fileParameters: []
     responses: []

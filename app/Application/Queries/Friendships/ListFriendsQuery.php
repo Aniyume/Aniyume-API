@@ -23,7 +23,7 @@ class ListFriendsQuery
             ->values();
 
         return User::whereIn('id', $friendIds)
-            ->select('id', 'name', 'avatar', 'custom_status', 'is_online')
+            ->select('id', 'name', 'avatar', 'custom_status', 'is_online', 'selected_profile_frame')
             ->get()
             ->map(fn (User $friend) => $this->formatter->format($friend));
     }

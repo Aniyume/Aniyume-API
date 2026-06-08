@@ -10,11 +10,30 @@ use App\Models\User;
 use App\Services\AuditService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
     use BuildsPaginationMeta;
+
+    private const PROFILE_FRAME_KEYS = [
+        'none',
+        'ramka1000people',
+        'ramka1-10lvl',
+        'ramka11-20lvl',
+        'ramka21-30lvl',
+        'ramka31-40lvl',
+        'ramka41-50lvl',
+        'ramka51-60lvl',
+        'ramka61-70lvl',
+        'ramka67',
+        'ramka+5friend',
+        'ramka+10friend',
+        'ramka+25friend',
+        'ramkaShark',
+        'ramkaUborka',
+    ];
 
     public function index(Request $request): JsonResponse
     {
@@ -67,10 +86,21 @@ class UserController extends Controller
 
     public function ban(Request $request, User $user): JsonResponse
     {
-        $validated = $request->validate(['reason' => ['required', 'string', 'max:255']]);
+        $validated = $request->validate([
+            'reason' => ['required', 'string', 'max:255'],
+            'expires_at' => ['nullable', 'date', 'after:now'],
+        ]);
         $before = $user->getOriginal();
-        $user->update(['is_banned' => true, 'ban_reason' => $validated['reason']]);
-        app(AuditService::class)->log($request, 'ban_user', "Banned user {$user->email}: {$validated['reason']}", $user, $before, $user->fresh()->toArray());
+        $user->update([
+            'is_banned' => true,
+            'is_online' => false,
+            'ban_reason' => $validated['reason'],
+            'ban_expires_at' => $validated['expires_at'] ?? null,
+        ]);
+        $user->tokens()->delete();
+
+        $until = $user->ban_expires_at ? ' until '.$user->ban_expires_at->toISOString() : ' permanently';
+        app(AuditService::class)->log($request, 'ban_user', "Banned user {$user->email}{$until}: {$validated['reason']}", $user, $before, $user->fresh()->toArray());
 
         return response()->json(['data' => (new AdminUserResource($user->refresh()->load('roles')))->resolve($request)]);
     }
@@ -106,10 +136,57 @@ class UserController extends Controller
         return response()->json(['data' => (new AdminUserResource($user->refresh()->load('roles')))->resolve($request)]);
     }
 
+    public function updateProfile(Request $request, User $user): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => ['sometimes', 'required', 'string', 'max:255', Rule::unique('users', 'name')->ignore($user->id)],
+            'custom_status' => ['nullable', 'string', 'max:100'],
+            'selected_profile_frame' => ['nullable', 'string', Rule::in(self::PROFILE_FRAME_KEYS)],
+        ]);
+
+        if (array_key_exists('selected_profile_frame', $validated)) {
+            $validated['selected_profile_frame'] = $validated['selected_profile_frame'] ?: 'none';
+        }
+
+        $before = $user->getOriginal();
+        $user->update($validated);
+
+        app(AuditService::class)->log($request, 'update_user_profile', "Updated profile fields for {$user->email}", $user, $before, $user->fresh()->toArray());
+
+        return response()->json(['data' => (new AdminUserResource($user->refresh()->load('roles')))->resolve($request)]);
+    }
+
+    public function uploadAvatar(Request $request, User $user): JsonResponse
+    {
+        $validated = $request->validate([
+            'avatar' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
+        ]);
+
+        $before = $user->getOriginal();
+        $path = $validated['avatar']->store('avatars', 'public');
+        $this->deleteStoredAvatar($user->avatar);
+        $user->update(['avatar' => $path]);
+
+        app(AuditService::class)->log($request, 'update_user_avatar', "Updated avatar for {$user->email}", $user, $before, $user->fresh()->toArray());
+
+        return response()->json(['data' => (new AdminUserResource($user->refresh()->load('roles')))->resolve($request)]);
+    }
+
+    public function deleteAvatar(Request $request, User $user): JsonResponse
+    {
+        $before = $user->getOriginal();
+        $this->deleteStoredAvatar($user->avatar);
+        $user->update(['avatar' => null]);
+
+        app(AuditService::class)->log($request, 'delete_user_avatar', "Deleted avatar for {$user->email}", $user, $before, $user->fresh()->toArray());
+
+        return response()->json(['data' => (new AdminUserResource($user->refresh()->load('roles')))->resolve($request)]);
+    }
+
     public function unban(Request $request, User $user): JsonResponse
     {
         $before = $user->getOriginal();
-        $user->update(['is_banned' => false, 'ban_reason' => null]);
+        $user->update(['is_banned' => false, 'ban_reason' => null, 'ban_expires_at' => null]);
         app(AuditService::class)->log($request, 'unban_user', "Unbanned user {$user->email}", $user, $before, $user->fresh()->toArray());
 
         return response()->json(['data' => (new AdminUserResource($user->refresh()->load('roles')))->resolve($request)]);
@@ -135,5 +212,14 @@ class UserController extends Controller
             'user_agent' => $request->userAgent(),
             'created_at' => now(),
         ]);
+    }
+
+    private function deleteStoredAvatar(?string $avatar): void
+    {
+        if (! $avatar || str_starts_with($avatar, 'http://') || str_starts_with($avatar, 'https://')) {
+            return;
+        }
+
+        Storage::disk('public')->delete(ltrim(str_replace(['/api-storage/', 'api-storage/', '/storage/', 'storage/'], '', $avatar), '/'));
     }
 }
