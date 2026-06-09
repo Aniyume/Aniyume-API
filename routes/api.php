@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\V1\AnimeController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CommentsController;
 use App\Http\Controllers\Api\V1\ContactMessageController;
+use App\Http\Controllers\Api\V1\DirectMessageController;
 use App\Http\Controllers\Api\V1\EpisodeController;
 use App\Http\Controllers\Api\V1\FavoritesController;
 use App\Http\Controllers\Api\V1\FriendshipController;
@@ -149,6 +150,7 @@ Route::prefix('v1')->group(function () {
 
         Route::get('/profile/me', [UserProfileController::class, 'getFullProfile']);
         Route::put('/profile/me', [UserProfileController::class, 'update']);
+        Route::get('/profile/name-availability', [UserProfileController::class, 'nameAvailability']);
         Route::post('/profile/me/avatar', [UserProfileController::class, 'uploadAvatar']);
         Route::get('/profile/me/frames', [UserProfileController::class, 'frames']);
         Route::post('/profile/me/frames/select', [UserProfileController::class, 'selectFrame']);
@@ -196,6 +198,13 @@ Route::prefix('v1')->group(function () {
         Route::get('/users/search', [FriendshipController::class, 'search']); // GET /users/search?q=
         Route::get('/users/{userId}/profile', [FriendshipController::class, 'profile'])
             ->where('userId', '[0-9]+');
+
+        Route::get('/chats', [DirectMessageController::class, 'conversations']);
+        Route::get('/chats/{userId}', [DirectMessageController::class, 'show'])->where('userId', '[0-9]+');
+        Route::post('/chats/{userId}/messages', [DirectMessageController::class, 'store'])->where('userId', '[0-9]+');
+        Route::delete('/chats/{userId}', [DirectMessageController::class, 'clear'])->where('userId', '[0-9]+');
+        Route::post('/chats/{userId}/block', [DirectMessageController::class, 'block'])->where('userId', '[0-9]+');
+        Route::delete('/chats/{userId}/block', [DirectMessageController::class, 'unblock'])->where('userId', '[0-9]+');
 
         // === Watch Party ===
         Route::prefix('watch-party')->controller(WatchPartyController::class)->group(function () {

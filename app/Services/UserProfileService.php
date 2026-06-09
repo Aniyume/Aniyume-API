@@ -18,6 +18,7 @@ class UserProfileService
                 'email' => $user->email,
                 'avatar' => $user->avatar,
                 'custom_status' => $user->custom_status,
+                'social_links' => $user->social_links ?? [],
                 'is_premium' => (bool) $user->is_premium,
                 'selected_profile_frame' => $user->selected_profile_frame ?: 'none',
                 'created_at' => $user->created_at,
@@ -142,7 +143,7 @@ class UserProfileService
 
     public function updateProfile(User $user, array $data): User
     {
-        $user->update(array_filter($data, fn ($value) => $value !== null));
+        $user->update(array_filter($data, fn ($value, $key) => $value !== null || $key === 'custom_status', ARRAY_FILTER_USE_BOTH));
 
         return $user->fresh();
     }

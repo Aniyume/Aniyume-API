@@ -17,9 +17,32 @@ class UpdateUserProfileRequest extends FormRequest
 
     public function rules(): array
     {
+        $nameRules = ['sometimes', 'string', 'max:255', Rule::unique('users', 'name')->ignore($this->user()?->id)];
+        if ($this->input('name') !== $this->user()?->name) {
+            $nameRules[] = function (string $attribute, mixed $value, \Closure $fail): void {
+                $exists = \App\Models\User::query()
+                    ->whereKeyNot($this->user()?->id)
+                    ->whereRaw('LOWER(name) = ?', [mb_strtolower(trim((string) $value))])
+                    ->exists();
+                if ($exists) {
+                    $fail('Это имя уже занято другим пользователем');
+                }
+            };
+            $nameRules[] = new PassesModeration(ModerationMode::Soft);
+            $nameRules[] = new PassesAiModeration('profile_name');
+        }
+
+        $statusRules = ['nullable', 'string', 'max:100'];
+        if ($this->input('custom_status') !== $this->user()?->custom_status) {
+            $statusRules[] = new PassesModeration(ModerationMode::Medium);
+            $statusRules[] = new PassesAiModeration('profile_status');
+        }
+
         return [
-            'name' => ['sometimes', 'string', 'max:255', Rule::unique('users', 'name')->ignore($this->user()?->id), new PassesModeration(ModerationMode::Soft), new PassesAiModeration('profile_name')],
-            'custom_status' => ['nullable', 'string', 'max:100', new PassesModeration(ModerationMode::Medium), new PassesAiModeration('profile_status')],
+            'name' => $nameRules,
+            'custom_status' => $statusRules,
+            'social_links' => ['sometimes', 'array', 'max:10'],
+            'social_links.*' => ['required', 'url:http,https', 'max:500'],
         ];
     }
 

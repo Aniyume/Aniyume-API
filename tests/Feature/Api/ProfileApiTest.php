@@ -92,4 +92,45 @@ class ProfileApiTest extends TestCase
             'custom_status' => 'Initial status',
         ]);
     }
+
+    public function test_user_can_save_social_links_and_check_name_availability(): void
+    {
+        $user = User::factory()->create(['name' => 'CurrentName']);
+        User::factory()->create(['name' => 'TakenName']);
+
+        $this->actingAs($user, 'sanctum')
+            ->putJson('/api/v1/profile/me', [
+                'social_links' => ['https://t.me/current-name', 'https://github.com/current-name'],
+            ])
+            ->assertOk()
+            ->assertJsonPath('user.social_links.0', 'https://t.me/current-name');
+
+        $this->actingAs($user, 'sanctum')
+            ->getJson('/api/v1/profile/name-availability?name=TakenName')
+            ->assertOk()
+            ->assertJsonPath('available', false)
+            ->assertJsonCount(3, 'suggestions');
+
+        $this->actingAs($user, 'sanctum')
+            ->getJson('/api/v1/profile/name-availability?name=CurrentName')
+            ->assertOk()
+            ->assertJsonPath('available', true);
+    }
+
+    public function test_unchanged_admin_profile_values_do_not_block_other_profile_updates(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'Admin Set Name',
+            'custom_status' => 'Admin Set Status',
+        ]);
+
+        $this->actingAs($user, 'sanctum')
+            ->putJson('/api/v1/profile/me', [
+                'name' => 'Admin Set Name',
+                'custom_status' => 'Admin Set Status',
+                'social_links' => ['https://example.com/profile'],
+            ])
+            ->assertOk()
+            ->assertJsonPath('user.social_links.0', 'https://example.com/profile');
+    }
 }

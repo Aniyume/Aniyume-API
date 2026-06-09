@@ -17,6 +17,7 @@ class User extends Authenticatable
         'password',
         'avatar',
         'custom_status',
+        'social_links',
         'is_online',
         'is_premium',
         'selected_profile_frame',
@@ -42,6 +43,7 @@ class User extends Authenticatable
         'is_banned' => 'boolean',
         'ban_expires_at' => 'datetime',
         'last_login_at' => 'datetime',
+        'social_links' => 'array',
     ];
 
     public function hasActiveBan(): bool

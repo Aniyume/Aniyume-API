@@ -15,6 +15,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\UserProfileService;
 
 class FriendshipController extends Controller
 {
@@ -101,32 +102,16 @@ class FriendshipController extends Controller
 
     public function profile(Request $request, int $userId): JsonResponse
     {
-        $target = User::query()
-            ->select('id', 'name', 'avatar', 'custom_status', 'is_online', 'is_premium', 'selected_profile_frame', 'created_at')
-            ->findOrFail($userId);
+        $target = User::findOrFail($userId);
 
         $friendship = $this->friendshipStatus->resolve($request->user(), $target->id);
+        $profile = app(UserProfileService::class)->getFullProfile($target);
+        unset($profile['user']['email'], $profile['profile_frames']);
+        $profile['user']['is_online'] = (bool) $target->is_online;
+        $profile['user']['friendship_status'] = $friendship['status'];
+        $profile['user']['is_sender'] = $friendship['is_sender'] ?? null;
 
-        return response()->json([
-            'user' => [
-                'id' => $target->id,
-                'name' => $target->name,
-                'avatar' => $target->avatar,
-                'custom_status' => $target->custom_status,
-                'is_online' => (bool) $target->is_online,
-                'is_premium' => (bool) $target->is_premium,
-                'selected_profile_frame' => $target->selected_profile_frame ?: 'none',
-                'created_at' => $target->created_at?->toISOString(),
-                'friendship_status' => $friendship['status'],
-                'is_sender' => $friendship['is_sender'] ?? null,
-            ],
-            'counts' => [
-                'friends' => $this->countFriends($target->id),
-                'comments' => DB::table('comments')->where('user_id', $target->id)->count(),
-                'ratings' => DB::table('ratings')->where('user_id', $target->id)->count(),
-                'favorites' => DB::table('favorites')->where('user_id', $target->id)->count(),
-            ],
-        ]);
+        return response()->json($profile);
     }
 
     // GET /friends/count — количество входящих заявок (для badge)

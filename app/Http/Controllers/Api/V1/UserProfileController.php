@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateUserProfileRequest;
 use App\Services\UserProfileService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 /**
  * @group Профиль пользователя
@@ -48,9 +49,37 @@ class UserProfileController extends Controller
                 'email' => $updated->email,
                 'avatar' => $updated->avatar,
                 'custom_status' => $updated->custom_status,
+                'social_links' => $updated->social_links ?? [],
                 'is_premium' => (bool) $updated->is_premium,
             ],
         ], 200);
+    }
+
+    public function nameAvailability(Request $request): JsonResponse
+    {
+        $validated = $request->validate(['name' => ['required', 'string', 'min:2', 'max:255']]);
+        $name = trim($validated['name']);
+        $query = User::query()->whereRaw('LOWER(name) = ?', [mb_strtolower($name)]);
+        if ($request->user()) {
+            $query->whereKeyNot($request->user()->id);
+        }
+        $available = ! $query->exists();
+        $suggestions = [];
+
+        if (! $available) {
+            $suggestionBase = mb_substr($name, 0, 250);
+            foreach (range(1, 20) as $attempt) {
+                $candidate = $suggestionBase.random_int(10, 9999);
+                if (! User::query()->whereRaw('LOWER(name) = ?', [mb_strtolower($candidate)])->exists()) {
+                    $suggestions[] = $candidate;
+                }
+                if (count($suggestions) === 3) {
+                    break;
+                }
+            }
+        }
+
+        return response()->json(['available' => $available, 'suggestions' => $suggestions]);
     }
 
     /**
