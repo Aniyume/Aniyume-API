@@ -39,7 +39,7 @@ class WatchPartyApiTest extends TestCase
 
     public function test_user_can_create_watch_party_room(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['is_premium' => true]);
         $anime = Anime::factory()->create();
         $previousRoom = $this->createRoom($user, $anime);
 
@@ -86,6 +86,36 @@ class WatchPartyApiTest extends TestCase
             ->assertJsonPath('code', $room->code)
             ->assertJsonPath('anime.id', $anime->id)
             ->assertJsonPath('host.id', $host->id);
+    }
+
+    public function test_standard_user_cannot_create_room_for_more_than_two_people(): void
+    {
+        $user = User::factory()->create(['is_premium' => false]);
+        $anime = Anime::factory()->create();
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson('/api/v1/watch-party', [
+                'anime_id' => $anime->id,
+                'episode_number' => 1,
+                'max_participants' => 3,
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('max_participants');
+    }
+
+    public function test_premium_user_cannot_create_room_for_more_than_ten_people(): void
+    {
+        $user = User::factory()->create(['is_premium' => true]);
+        $anime = Anime::factory()->create();
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson('/api/v1/watch-party', [
+                'anime_id' => $anime->id,
+                'episode_number' => 1,
+                'max_participants' => 11,
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('max_participants');
     }
 
     public function test_another_user_can_join_room(): void

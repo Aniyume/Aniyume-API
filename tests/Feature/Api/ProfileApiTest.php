@@ -4,6 +4,7 @@ namespace Tests\Feature\Api;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class ProfileApiTest extends TestCase
@@ -132,5 +133,26 @@ class ProfileApiTest extends TestCase
             ])
             ->assertOk()
             ->assertJsonPath('user.social_links.0', 'https://example.com/profile');
+    }
+
+    public function test_non_premium_user_can_equip_and_remove_admin_granted_frame(): void
+    {
+        $user = User::factory()->create(['is_premium' => false]);
+        DB::table('user_profile_frames')->insert([
+            'user_id' => $user->id,
+            'frame_key' => 'ramkaShark',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson('/api/v1/profile/me/frames/select', ['frame_key' => 'ramkaShark'])
+            ->assertOk()
+            ->assertJsonPath('selected', 'ramkaShark');
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson('/api/v1/profile/me/frames/select', ['frame_key' => 'none'])
+            ->assertOk()
+            ->assertJsonPath('selected', 'none');
     }
 }

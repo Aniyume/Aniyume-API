@@ -120,8 +120,7 @@ class UserProfileController extends Controller
             'frame_key' => ['required', 'string', 'max:80'],
         ]);
 
-        abort_unless((bool) $request->user()->is_premium, 403, 'Premium required.');
-        abort_unless($frames->canSelect($request->user(), $validated['frame_key']), 422, 'Frame is locked.');
+        abort_unless($frames->canUserSelect($request->user(), $validated['frame_key']), 422, 'Frame is locked.');
 
         $request->user()->update(['selected_profile_frame' => $validated['frame_key']]);
 

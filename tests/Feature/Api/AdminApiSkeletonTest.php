@@ -239,6 +239,32 @@ class AdminApiSkeletonTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_admin_can_grant_and_revoke_user_profile_frame(): void
+    {
+        $admin = $this->createAdminUser();
+        $user = User::factory()->create();
+
+        $this->actingAs($admin, 'sanctum')
+            ->patchJson("/api/v1/admin/users/{$user->id}/frames/ramkaShark", ['enabled' => true])
+            ->assertOk()
+            ->assertJsonPath('data.admin_granted_profile_frames.0', 'ramkaShark');
+
+        $this->assertDatabaseHas('user_profile_frames', [
+            'user_id' => $user->id,
+            'frame_key' => 'ramkaShark',
+            'granted_by' => $admin->id,
+        ]);
+
+        $user->update(['selected_profile_frame' => 'ramkaShark']);
+
+        $this->actingAs($admin, 'sanctum')
+            ->patchJson("/api/v1/admin/users/{$user->id}/frames/ramkaShark", ['enabled' => false])
+            ->assertOk()
+            ->assertJsonPath('data.selected_profile_frame', 'none');
+
+        $this->assertDatabaseMissing('user_profile_frames', ['user_id' => $user->id, 'frame_key' => 'ramkaShark']);
+    }
+
     private function createAdminUser(): User
     {
         $admin = User::factory()->create();

@@ -20,16 +20,24 @@ class ProfileFrameService
             ->exists();
 
         return array_map(function (array $frame) use ($user, $level, $hasFrame67) {
-            $unlocked = match ($frame['key']) {
+            $adminGranted = $frame['key'] !== 'none' && DB::table('user_profile_frames')
+                ->where('user_id', $user->id)
+                ->where('frame_key', $frame['key'])
+                ->exists();
+            $unlocked = $adminGranted || match ($frame['key']) {
                 'none' => true,
                 'ramka1000people' => $user->id <= 1000,
                 'ramka67' => $hasFrame67,
+                'ramka+5friend' => $this->friendsCount($user) >= 5,
+                'ramka+10friend' => $this->friendsCount($user) >= 10,
+                'ramka+25friend' => $this->friendsCount($user) >= 25,
                 default => isset($frame['min_level']) && $level >= $frame['min_level'],
             };
 
             return [
                 ...$frame,
                 'unlocked' => $unlocked,
+                'admin_granted' => $adminGranted,
                 'selected' => ($user->selected_profile_frame ?: 'none') === $frame['key'],
             ];
         }, $this->catalog());
@@ -44,6 +52,20 @@ class ProfileFrameService
         }
 
         return false;
+    }
+
+    public function canUserSelect(User $user, string $key): bool
+    {
+        if ($key === 'none') {
+            return true;
+        }
+
+        $adminGranted = DB::table('user_profile_frames')
+            ->where('user_id', $user->id)
+            ->where('frame_key', $key)
+            ->exists();
+
+        return $adminGranted || ((bool) $user->is_premium && $this->canSelect($user, $key));
     }
 
     /**
@@ -62,7 +84,20 @@ class ProfileFrameService
             ['key' => 'ramka51-60lvl', 'name' => 'Хранитель коллекции', 'image_path' => '/images/ramka/ramka51-60lvl.png', 'min_level' => 51],
             ['key' => 'ramka61-70lvl', 'name' => 'Обсидиановый ранг', 'image_path' => '/images/ramka/ramka61-70lvl.png', 'min_level' => 61],
             ['key' => 'ramka67', 'name' => 'Секретная рамка', 'image_path' => '/images/ramka/ramka67.png', 'secret' => true],
+            ['key' => 'ramka+5friend', 'name' => '5 friends', 'image_path' => '/images/ramka/ramka+5friend.png'],
+            ['key' => 'ramka+10friend', 'name' => '10 friends', 'image_path' => '/images/ramka/ramka+10friend.png'],
+            ['key' => 'ramka+25friend', 'name' => '25 friends', 'image_path' => '/images/ramka/ramka+25friend.png'],
+            ['key' => 'ramkaShark', 'name' => 'Shark', 'image_path' => '/images/ramka/ramkaShark.png', 'secret' => true],
+            ['key' => 'ramkaUborka', 'name' => 'Uborka', 'image_path' => '/images/ramka/ramkaUborka.png', 'secret' => true],
         ];
+    }
+
+    private function friendsCount(User $user): int
+    {
+        return DB::table('friendships')
+            ->where('status', 'accepted')
+            ->where(fn ($query) => $query->where('user_id', $user->id)->orWhere('friend_id', $user->id))
+            ->count();
     }
 
     private function level(User $user): int

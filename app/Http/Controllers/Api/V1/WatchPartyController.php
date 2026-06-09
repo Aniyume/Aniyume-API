@@ -24,10 +24,11 @@ class WatchPartyController extends Controller
 
     public function create(Request $request, CreateRoomAction $action): JsonResponse
     {
+        $maxParticipants = $request->user()->is_premium ? 10 : 2;
         $data = $request->validate([
             'anime_id' => 'required|exists:anime,id',
             'episode_number' => 'required|integer|min:1',
-            'max_participants' => 'integer|min:2|max:20',
+            'max_participants' => "integer|min:2|max:{$maxParticipants}",
             'is_private' => 'boolean',
         ]);
 

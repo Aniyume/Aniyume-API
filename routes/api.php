@@ -98,6 +98,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/users/premium/grant', [AdminUserController::class, 'grantPremiumByNickname']);
             Route::get('/users/{user}', [AdminUserController::class, 'show']);
             Route::patch('/users/{user}/profile', [AdminUserController::class, 'updateProfile']);
+            Route::patch('/users/{user}/frames/{frameKey}', [AdminUserController::class, 'updateFrameAccess']);
             Route::post('/users/{user}/avatar', [AdminUserController::class, 'uploadAvatar']);
             Route::delete('/users/{user}/avatar', [AdminUserController::class, 'deleteAvatar']);
             Route::patch('/users/{user}/premium', [AdminUserController::class, 'updatePremium']);

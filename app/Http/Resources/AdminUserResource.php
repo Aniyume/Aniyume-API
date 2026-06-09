@@ -16,6 +16,11 @@ class AdminUserResource extends JsonResource
             'avatar' => $this->avatar,
             'custom_status' => $this->custom_status,
             'selected_profile_frame' => $this->selected_profile_frame ?: 'none',
+            'admin_granted_profile_frames' => \Illuminate\Support\Facades\DB::table('user_profile_frames')
+                ->where('user_id', $this->id)
+                ->pluck('frame_key')
+                ->values()
+                ->all(),
             'roles' => $this->whenLoaded('roles', fn () => $this->roles->pluck('name')->values()->all(), []),
             'permissions' => ['admin.access'],
             'is_admin' => $this->hasRole('admin'),

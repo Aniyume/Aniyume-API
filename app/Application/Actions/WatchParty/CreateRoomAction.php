@@ -13,6 +13,8 @@ class CreateRoomAction
 
     public function execute(User $user, array $data): array
     {
+        $maxParticipants = $user->is_premium ? 10 : 2;
+
         WatchPartyRoom::where('host_user_id', $user->id)
             ->where('is_active', true)
             ->update(['is_active' => false]);
@@ -22,7 +24,7 @@ class CreateRoomAction
             'anime_id' => $data['anime_id'],
             'episode_number' => $data['episode_number'],
             'host_user_id' => $user->id,
-            'max_participants' => $data['max_participants'] ?? 10,
+            'max_participants' => min($maxParticipants, $data['max_participants'] ?? $maxParticipants),
             'is_private' => $data['is_private'] ?? false,
             'is_playing' => false,
             'current_time' => 0,

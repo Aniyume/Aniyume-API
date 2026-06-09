@@ -172,6 +172,37 @@ class UserController extends Controller
         return response()->json(['data' => (new AdminUserResource($user->refresh()->load('roles')))->resolve($request)]);
     }
 
+    public function updateFrameAccess(Request $request, User $user, string $frameKey): JsonResponse
+    {
+        abort_unless(in_array($frameKey, self::PROFILE_FRAME_KEYS, true) && $frameKey !== 'none', 422, 'Unknown frame.');
+        $validated = $request->validate(['enabled' => ['required', 'boolean']]);
+
+        if ($validated['enabled']) {
+            \Illuminate\Support\Facades\DB::table('user_profile_frames')->updateOrInsert(
+                ['user_id' => $user->id, 'frame_key' => $frameKey],
+                ['granted_by' => $request->user()?->id, 'created_at' => now(), 'updated_at' => now()],
+            );
+        } else {
+            \Illuminate\Support\Facades\DB::table('user_profile_frames')
+                ->where('user_id', $user->id)
+                ->where('frame_key', $frameKey)
+                ->delete();
+
+            if ($user->selected_profile_frame === $frameKey) {
+                $user->update(['selected_profile_frame' => 'none']);
+            }
+        }
+
+        app(AuditService::class)->log(
+            $request,
+            $validated['enabled'] ? 'grant_profile_frame' : 'revoke_profile_frame',
+            ($validated['enabled'] ? 'Granted ' : 'Revoked ')."profile frame {$frameKey} for {$user->email}",
+            $user,
+        );
+
+        return response()->json(['data' => (new AdminUserResource($user->refresh()->load('roles')))->resolve($request)]);
+    }
+
     public function deleteAvatar(Request $request, User $user): JsonResponse
     {
         $before = $user->getOriginal();
