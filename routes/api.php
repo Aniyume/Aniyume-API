@@ -69,6 +69,9 @@ Route::prefix('v1')->group(function () {
 
     Route::post('/auth/register', [AuthController::class, 'register']);
     Route::post('/auth/login', [AuthController::class, 'login']);
+    Route::post('/auth/password/forgot', [AuthController::class, 'forgotPassword'])->middleware('throttle:5,1');
+    Route::post('/auth/password/verify', [AuthController::class, 'verifyResetCode'])->middleware('throttle:10,1');
+    Route::post('/auth/password/reset', [AuthController::class, 'resetPassword'])->middleware('throttle:10,1');
     Route::post('/contacts', [ContactMessageController::class, 'store']);
 
     Route::prefix('admin')

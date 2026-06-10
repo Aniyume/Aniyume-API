@@ -25,7 +25,7 @@ return new class extends Migration
         $now = now();
         DB::table('settings')->insert([
             ['key' => 'site.name', 'value' => 'AniYume', 'type' => 'string', 'group' => 'general', 'is_public' => true, 'description' => 'Public service name', 'created_at' => $now, 'updated_at' => $now],
-            ['key' => 'site.support_email', 'value' => 'support@aniyume.com', 'type' => 'string', 'group' => 'general', 'is_public' => true, 'description' => 'Support email shown to users', 'created_at' => $now, 'updated_at' => $now],
+            ['key' => 'site.support_email', 'value' => 'zanshugurov07@gmail.com', 'type' => 'string', 'group' => 'general', 'is_public' => true, 'description' => 'Support email shown to users', 'created_at' => $now, 'updated_at' => $now],
             ['key' => 'site.maintenance_mode', 'value' => 'false', 'type' => 'boolean', 'group' => 'general', 'is_public' => false, 'description' => 'Soft maintenance flag for UI', 'created_at' => $now, 'updated_at' => $now],
             ['key' => 'features.registration', 'value' => 'true', 'type' => 'boolean', 'group' => 'features', 'is_public' => false, 'description' => 'Allow new registrations', 'created_at' => $now, 'updated_at' => $now],
             ['key' => 'features.comments', 'value' => 'true', 'type' => 'boolean', 'group' => 'features', 'is_public' => false, 'description' => 'Enable comments', 'created_at' => $now, 'updated_at' => $now],

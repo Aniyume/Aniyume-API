@@ -11,7 +11,7 @@ use App\Http\Controllers\Controller;
  *     description="Complete REST API documentation for AniYume - Anime Streaming Platform with user features",
  *
  *     @OA\Contact(
- *         email="support@aniyume.com",
+ *         email="zanshugurov07@gmail.com",
  *         name="AniYume Support"
  *     ),
  *
