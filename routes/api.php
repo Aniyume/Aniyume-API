@@ -79,6 +79,7 @@ Route::prefix('v1')->group(function () {
         ->middleware(['clerk.admin'])
         ->group(function () {
             Route::get('/auth/me', AdminAuthMeController::class);
+            Route::post('/broadcast/toggle', [\App\Http\Controllers\Api\Admin\BroadcastController::class, 'toggle']);
             Route::get('/dashboard', AdminDashboardController::class);
             Route::get('/monitoring/health', [AdminMonitoringController::class, 'health']);
             Route::get('/anime', [AdminAnimeController::class, 'index']);
