@@ -156,10 +156,13 @@ Route::prefix('v1')->group(function () {
 
         Route::get('/profile/me', [UserProfileController::class, 'getFullProfile']);
         Route::put('/profile/me', [UserProfileController::class, 'update']);
+        Route::patch('/profile/me/account', [UserProfileController::class, 'updateAccount']);
         Route::get('/profile/name-availability', [UserProfileController::class, 'nameAvailability']);
         Route::post('/profile/me/avatar', [UserProfileController::class, 'uploadAvatar']);
         Route::get('/profile/me/frames', [UserProfileController::class, 'frames']);
         Route::post('/profile/me/frames/select', [UserProfileController::class, 'selectFrame']);
+        Route::get('/profile/me/privacy', [UserProfileController::class, 'getPrivacy']);
+        Route::put('/profile/me/privacy', [UserProfileController::class, 'updatePrivacy']);
 
         Route::get('/statistics/me', [UserStatisticsController::class, 'getStatistics']);
         Route::get('/statistics/me/episodes-summary', [UserStatisticsController::class, 'getEpisodesSummary']);
