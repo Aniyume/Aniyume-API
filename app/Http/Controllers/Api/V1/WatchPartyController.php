@@ -14,11 +14,11 @@ use App\Application\Actions\WatchParty\SyncRoomStateAction;
 use App\Application\Queries\WatchParty\FindActiveRoomQuery;
 use App\Application\Queries\WatchParty\GetMessagesQuery;
 use App\Application\Queries\WatchParty\ListInvitesQuery;
-use App\Models\WatchPartyInvite;
 use App\Application\Services\WatchParty\FormatsWatchPartyResponses;
 use App\Domain\Moderation\ModerationMode;
 use App\Http\Controllers\Controller;
 use App\Http\Rules\PassesModeration;
+use App\Models\WatchPartyInvite;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

@@ -78,6 +78,27 @@ class PublicAnimeApiTest extends TestCase
             ->assertJsonStructure(['data']);
     }
 
+    public function test_anime_recommendations_rank_anime_by_matching_genres(): void
+    {
+        [$action, $fantasy] = Tag::factory()->count(2)->create();
+
+        $anime = Anime::factory()->has(Episode::factory())->create();
+        $bestMatch = Anime::factory()->has(Episode::factory())->create();
+        $partialMatch = Anime::factory()->has(Episode::factory())->create();
+        $unrelated = Anime::factory()->has(Episode::factory())->create();
+
+        $anime->tags()->attach([$action->id, $fantasy->id]);
+        $bestMatch->tags()->attach([$action->id, $fantasy->id]);
+        $partialMatch->tags()->attach($action->id);
+        $unrelated->tags()->attach(Tag::factory()->create()->id);
+
+        $this->getJson("/api/v1/public/anime/{$anime->id}/recommendations")
+            ->assertOk()
+            ->assertJsonPath('related.0.id', $bestMatch->id)
+            ->assertJsonPath('related.1.id', $partialMatch->id)
+            ->assertJsonMissing(['id' => $unrelated->id]);
+    }
+
     public function test_unknown_anime_returns_json_404(): void
     {
         $this->getJson('/api/v1/public/anime/999999')

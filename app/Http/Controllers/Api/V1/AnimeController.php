@@ -289,8 +289,13 @@ class AnimeController extends Controller
             return [];
         }
 
-        return Anime::query()->whereIn('id', $animeRows->all(), 'and', false)
+        $animeById = Anime::query()->whereIn('id', $animeRows->all(), 'and', false)
             ->get()
+            ->keyBy('id');
+
+        return $animeRows
+            ->map(fn ($id) => $animeById->get($id))
+            ->filter()
             ->map(fn ($a) => [
                 'id' => $a->id,
                 'title' => $a->title,

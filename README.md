@@ -37,6 +37,7 @@ The root and legacy `/admin/*` URLs redirect to the separate Next.js admin appli
 - Authenticated user API: `/api/v1/*`
 - Admin API: `/api/v1/admin/*`
 - Health check: `/up`
+- Readiness check with database and cache verification: `/ready`
 
 ## Swagger
 

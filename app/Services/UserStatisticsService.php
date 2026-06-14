@@ -168,6 +168,7 @@ class UserStatisticsService
         $watched = DB::table('watch_history')
             ->join('anime', 'watch_history.anime_id', '=', 'anime.id')
             ->where('watch_history.user_id', $userId)
+            ->where('watch_history.watch_time', '>', 0)
             ->select([
                 'anime.id as anime_id',
                 'anime.title',
