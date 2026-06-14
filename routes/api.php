@@ -207,6 +207,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/users/search', [FriendshipController::class, 'search']); // GET /users/search?q=
         Route::get('/users/{userId}/profile', [FriendshipController::class, 'profile'])
             ->where('userId', '[0-9]+');
+        Route::get('/users/{userId}/favorites', [FavoritesController::class, 'userFavorites'])
+            ->where('userId', '[0-9]+');
 
         Route::get('/chats', [DirectMessageController::class, 'conversations']);
         Route::get('/chats/{userId}', [DirectMessageController::class, 'show'])->where('userId', '[0-9]+');

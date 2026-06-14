@@ -2,8 +2,11 @@
 
 namespace Tests\Feature\Api;
 
+use App\Models\Anime;
+use App\Models\Favorite;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class ProfilePrivacyApiTest extends TestCase
@@ -80,5 +83,51 @@ class ProfilePrivacyApiTest extends TestCase
     {
         $this->getJson('/api/v1/profile/me/privacy')->assertUnauthorized();
         $this->putJson('/api/v1/profile/me/privacy', [])->assertUnauthorized();
+    }
+
+    private function befriend(User $a, User $b): void
+    {
+        DB::table('friendships')->insert([
+            'user_id' => $a->id,
+            'friend_id' => $b->id,
+            'status' => 'accepted',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    public function test_friend_can_view_favorites_when_level_friends(): void
+    {
+        $owner = User::factory()->create(['privacy_favorites' => 'friends']);
+        $friend = User::factory()->create();
+        $this->befriend($owner, $friend);
+        $anime = Anime::factory()->create();
+        Favorite::create(['user_id' => $owner->id, 'anime_id' => $anime->id]);
+
+        $this->actingAs($friend, 'sanctum')
+            ->getJson("/api/v1/users/{$owner->id}/favorites")
+            ->assertOk()
+            ->assertJsonPath('data.0.anime_id', $anime->id);
+    }
+
+    public function test_stranger_blocked_from_favorites_when_level_friends(): void
+    {
+        $owner = User::factory()->create(['privacy_favorites' => 'friends']);
+        $stranger = User::factory()->create();
+
+        $this->actingAs($stranger, 'sanctum')
+            ->getJson("/api/v1/users/{$owner->id}/favorites")
+            ->assertForbidden()
+            ->assertJsonPath('reason', 'private');
+    }
+
+    public function test_anyone_views_favorites_when_level_everyone(): void
+    {
+        $owner = User::factory()->create(['privacy_favorites' => 'everyone']);
+        $stranger = User::factory()->create();
+
+        $this->actingAs($stranger, 'sanctum')
+            ->getJson("/api/v1/users/{$owner->id}/favorites")
+            ->assertOk();
     }
 }
