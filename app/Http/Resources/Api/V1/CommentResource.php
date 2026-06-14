@@ -29,6 +29,7 @@ class CommentResource extends JsonResource
                 'name' => $this->user->name,
                 'email' => $this->user->email,
                 'avatar' => $this->user->avatar,
+                'selected_profile_frame' => $this->user->selected_profile_frame ?: 'none',
             ]),
             'anime' => $this->whenLoaded('anime', fn () => [
                 'id' => $this->anime->id,

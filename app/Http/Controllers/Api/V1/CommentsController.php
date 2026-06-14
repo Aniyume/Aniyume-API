@@ -30,7 +30,7 @@ class CommentsController extends Controller
     public function index(Request $request, Anime $anime)
     {
         $comments = $anime->comments()
-            ->with(['user:id,name,email,avatar', 'replies.user:id,name,email,avatar'])
+            ->with(['user:id,name,email,avatar,selected_profile_frame', 'replies.user:id,name,email,avatar,selected_profile_frame'])
             ->withCount([
                 'reactions as likes_count' => fn ($query) => $query->where('type', CommentReaction::TYPE_LIKE),
                 'reactions as dislikes_count' => fn ($query) => $query->where('type', CommentReaction::TYPE_DISLIKE),
@@ -187,7 +187,7 @@ class CommentsController extends Controller
 
     private function commentWithInteractions(Comment $comment, Request $request): Comment
     {
-        $comment->load(['user:id,name,email,avatar', 'replies.user:id,name,email,avatar']);
+        $comment->load(['user:id,name,email,avatar,selected_profile_frame', 'replies.user:id,name,email,avatar,selected_profile_frame']);
         $comment->loadCount([
             'reactions as likes_count' => fn ($query) => $query->where('type', CommentReaction::TYPE_LIKE),
             'reactions as dislikes_count' => fn ($query) => $query->where('type', CommentReaction::TYPE_DISLIKE),

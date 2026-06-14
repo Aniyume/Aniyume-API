@@ -22,7 +22,7 @@ class DirectMessageController extends Controller
         $friendIds = $this->friendIds($user->id);
         $friends = User::query()
             ->whereIn('id', $friendIds)
-            ->select('id', 'name', 'avatar', 'custom_status', 'is_online')
+            ->select('id', 'name', 'avatar', 'custom_status', 'is_online', 'selected_profile_frame')
             ->get();
 
         $data = $friends->map(function (User $friend) use ($user) {
@@ -186,6 +186,7 @@ class DirectMessageController extends Controller
             'avatar' => $user->avatar,
             'custom_status' => $user->custom_status,
             'is_online' => (bool) $user->is_online,
+            'selected_profile_frame' => $user->selected_profile_frame ?: 'none',
             'is_blocked' => DB::table('user_blocks')->where('blocker_id', $viewerId)->where('blocked_id', $user->id)->exists(),
         ];
     }
