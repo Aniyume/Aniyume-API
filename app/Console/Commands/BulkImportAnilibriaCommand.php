@@ -5,18 +5,25 @@ namespace App\Console\Commands;
 use App\Models\Anime;
 use App\Models\Episode;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class BulkImportAnilibriaCommand extends Command
 {
     protected $signature = 'episodes:bulk-import
-        {--id-from=8000  : Start of Anilibria release ID range}
-        {--id-to=10300   : End of Anilibria release ID range}
-        {--batch=20      : Concurrent requests per batch}
-        {--no-cache      : Re-fetch even if already imported}';
+        {--per-page=50      : Releases per catalog page}
+        {--max-pages=0      : Limit catalog pages this run (0 = all)}
+        {--limit=0          : Max matched titles to import this run (0 = no limit)}
+        {--sleep=300        : Pause in ms between API requests}
+        {--no-cache         : Re-fetch/update even if episode already imported}
+        {--fail-threshold=8 : Abort after N consecutive request failures}';
 
-    protected $description = 'Bulk-import Anilibria episodes: fetch all releases by ID, match to local anime, store episodes';
+    protected $description = 'Импорт эпизодов AniLibria через каталог (постранично, последовательно, без перебора мёртвых ID).';
+
+    private const CATALOG_URL = 'https://anilibria.top/api/v1/anime/catalog/releases';
+
+    private const RELEASE_URL = 'https://anilibria.top/api/v1/anime/releases/';
 
     private int $fetched = 0;
 
@@ -24,66 +31,137 @@ class BulkImportAnilibriaCommand extends Command
 
     private int $created = 0;
 
+    private int $updated = 0;
+
     private int $skipped = 0;
 
     private int $errors = 0;
 
+    private int $consecutiveFailures = 0;
+
     public function handle(): int
     {
-        $idFrom = (int) $this->option('id-from');
-        $idTo = (int) $this->option('id-to');
-        $batchSize = (int) $this->option('batch');
-        $noCache = $this->option('no-cache');
+        @set_time_limit(0);
 
-        $this->info("Fetching Anilibria releases ID {$idFrom}–{$idTo} in batches of {$batchSize}...");
+        $perPage = max(1, (int) $this->option('per-page'));
+        $maxPages = (int) $this->option('max-pages');
+        $limit = (int) $this->option('limit');
+        $sleepMs = max(0, (int) $this->option('sleep'));
+        $noCache = (bool) $this->option('no-cache');
+        $failThreshold = max(1, (int) $this->option('fail-threshold'));
 
-        // Build a local title index from our anime DB for fast matching
-        $this->info('Building local anime title index...');
-        $animeIndex = $this->buildAnimeIndex();
-        $this->line('  Index size: '.count($animeIndex).' entries');
+        // Блокировка: не даём двум импортам идти параллельно (это и роняло VPS).
+        $lock = Cache::lock('episodes:bulk-import', 3600);
+        if (! $lock->get()) {
+            $this->error('Импорт уже выполняется (lock занят). Дождитесь завершения предыдущего запуска.');
 
-        $ids = range($idFrom, $idTo);
-        $chunks = array_chunk($ids, $batchSize);
-        $total = count($chunks);
-
-        $bar = $this->output->createProgressBar($total);
-        $bar->setFormat(' %current%/%max% [%bar%] %percent:3s%% | fetched=%fetched% matched=%matched% created=%created%');
-        $bar->setMessage('0', 'fetched');
-        $bar->setMessage('0', 'matched');
-        $bar->setMessage('0', 'created');
-        $bar->start();
-
-        foreach ($chunks as $chunk) {
-            $releases = $this->fetchBatch($chunk);
-
-            foreach ($releases as $release) {
-                $this->processRelease($release, $animeIndex, $noCache);
-                $bar->setMessage((string) $this->fetched, 'fetched');
-                $bar->setMessage((string) $this->matched, 'matched');
-                $bar->setMessage((string) $this->created, 'created');
-            }
-
-            $bar->advance();
+            return self::FAILURE;
         }
 
-        $bar->finish();
-        $this->newLine(2);
+        try {
+            $this->info('Строю индекс локальных тайтлов...');
+            [$nameIndex, $anilibriaMap] = $this->buildIndexes();
+            $this->line('  Индекс: '.count($nameIndex).' названий, '.count($anilibriaMap).' уже привязанных к AniLibria');
 
-        $this->table(
-            ['Metric', 'Value'],
-            [
-                ['Releases fetched',   $this->fetched],
-                ['Anime matched',      $this->matched],
-                ['Episodes created',   $this->created],
-                ['Episodes skipped',   $this->skipped],
-                ['Errors',             $this->errors],
-            ]
-        );
+            $page = 1;
+            $totalPages = null;
+            $processedReleaseIds = [];
 
-        // Final coverage report
+            $this->info('Обхожу каталог AniLibria постранично...');
+
+            while (true) {
+                if ($maxPages > 0 && $page > $maxPages) {
+                    $this->line("  Достигнут лимит страниц ({$maxPages}).");
+                    break;
+                }
+
+                $catalog = $this->request(self::CATALOG_URL, [
+                    'limit' => $perPage,
+                    'page' => $page,
+                ]);
+
+                if ($catalog === null) {
+                    if ($this->consecutiveFailures >= $failThreshold) {
+                        $this->newLine();
+                        $this->error("AniLibria недоступна: {$failThreshold} ошибок подряд. Останавливаюсь, чтобы не грузить сервер.");
+                        break;
+                    }
+                    $this->throttle($sleepMs);
+
+                    continue; // повторим эту же страницу после паузы
+                }
+
+                $releases = $catalog['data'] ?? [];
+                $totalPages ??= (int) ($catalog['meta']['pagination']['total_pages'] ?? 0);
+
+                if (empty($releases)) {
+                    break;
+                }
+
+                foreach ($releases as $listItem) {
+                    $releaseId = $listItem['id'] ?? null;
+                    if (! $releaseId || isset($processedReleaseIds[$releaseId])) {
+                        continue;
+                    }
+
+                    $animeId = $this->matchAnime($listItem, $nameIndex, $anilibriaMap);
+                    if (! $animeId) {
+                        continue;
+                    }
+
+                    $processedReleaseIds[$releaseId] = true;
+                    $this->matched++;
+
+                    // Детальный запрос только для совпавших тайтлов.
+                    $this->throttle($sleepMs);
+                    $detail = $this->request(self::RELEASE_URL.$releaseId);
+                    if ($detail === null) {
+                        continue;
+                    }
+                    $this->fetched++;
+
+                    $this->storeEpisodes($detail, $animeId, $noCache);
+
+                    if ($limit > 0 && $this->matched >= $limit) {
+                        $this->line("  Достигнут лимит тайтлов ({$limit}).");
+                        break 2;
+                    }
+                }
+
+                // Гигиена памяти.
+                unset($catalog, $releases);
+                if ($page % 5 === 0) {
+                    gc_collect_cycles();
+                    $this->line(sprintf('  Стр. %d/%s | fetched=%d matched=%d created=%d updated=%d | mem=%dMB',
+                        $page, $totalPages ?: '?', $this->fetched, $this->matched, $this->created, $this->updated,
+                        (int) (memory_get_usage(true) / 1048576)));
+                }
+
+                if ($totalPages && $page >= $totalPages) {
+                    break;
+                }
+                $page++;
+                $this->throttle($sleepMs);
+            }
+        } finally {
+            $lock->release();
+        }
+
+        $this->newLine();
+        $this->table(['Метрика', 'Значение'], [
+            ['Релизов получено (детально)', $this->fetched],
+            ['Тайтлов сопоставлено', $this->matched],
+            ['Эпизодов создано', $this->created],
+            ['Эпизодов обновлено', $this->updated],
+            ['Эпизодов пропущено', $this->skipped],
+            ['Ошибок запросов', $this->errors],
+        ]);
+
         $total = Anime::count();
-        $withEp = Anime::whereHas('episodes')->count();
-        $this->info("Coverage: {$withEp}/{$total} (".round($withEp / $total * 100).'%)');
+        if ($total > 0) {
+            $withEp = Anime::whereHas('episodes')->count();
+            $this->info("Покрытие: {$withEp}/{$total} (".round($withEp / $total * 100).'%)');
+        }
 
         return self::SUCCESS;
     }
@@ -91,97 +169,125 @@ class BulkImportAnilibriaCommand extends Command
     // ─────────────────────────────────────────────────────────────
 
     /**
-     * Fetch a batch of release IDs concurrently using Http::pool().
+     * Один GET с таймаутом и ретраями. Возвращает массив JSON или null при ошибке.
+     * Ведёт счётчик ошибок подряд для авто-останова.
      */
-    private function fetchBatch(array $ids): array
+    private function request(string $url, array $query = []): ?array
     {
-        $releases = [];
-
         try {
-            $responses = Http::pool(function ($pool) use ($ids) {
-                foreach ($ids as $id) {
-                    $pool->as((string) $id)
-                        ->timeout(8)
-                        ->withHeaders(['Accept' => 'application/json'])
-                        ->get("https://anilibria.top/api/v1/anime/releases/{$id}");
-                }
-            });
+            $response = Http::timeout(15)
+                ->connectTimeout(10)
+                ->retry(2, 800, throw: false)
+                ->withHeaders(['Accept' => 'application/json'])
+                ->get($url, $query);
 
-            foreach ($responses as $id => $response) {
-                if ($response instanceof \Throwable) {
-                    $this->errors++;
+            if ($response->successful()) {
+                $this->consecutiveFailures = 0;
 
-                    continue;
-                }
-                if ($response->successful()) {
-                    $releases[] = $response->json();
-                    $this->fetched++;
-                }
+                return $response->json();
             }
+
+            // 404 — релиз не существует, это не сбой связи.
+            if ($response->status() === 404) {
+                $this->consecutiveFailures = 0;
+
+                return null;
+            }
+
+            $this->errors++;
+            $this->consecutiveFailures++;
+
+            return null;
         } catch (\Throwable $e) {
             $this->errors++;
-            Log::error('BulkImport batch error: '.$e->getMessage());
-        }
+            $this->consecutiveFailures++;
+            Log::warning('AniLibria request failed', ['url' => $url, 'error' => $e->getMessage()]);
 
-        return $releases;
+            return null;
+        }
+    }
+
+    private function throttle(int $ms): void
+    {
+        if ($ms > 0) {
+            usleep($ms * 1000);
+        }
     }
 
     /**
-     * Build a normalized title → anime_id index for fast O(1) lookups.
+     * @return array{0: array<string,int>, 1: array<int,int>} [normalizedName => animeId, anilibriaId => animeId]
      */
-    private function buildAnimeIndex(): array
+    private function buildIndexes(): array
     {
-        $index = [];
+        $nameIndex = [];
+        $anilibriaMap = [];
 
-        Anime::select('id', 'title', 'anilibria_id')
-            ->chunkById(1000, function ($animes) use (&$index) {
+        Anime::select('id', 'title', 'title_en', 'title_jp', 'anilibria_id')
+            ->chunkById(1000, function ($animes) use (&$nameIndex, &$anilibriaMap) {
                 foreach ($animes as $anime) {
                     if ($anime->anilibria_id) {
-                        continue; // already matched
+                        $anilibriaMap[(int) $anime->anilibria_id] = $anime->id;
                     }
-                    if ($anime->title) {
-                        $index[$this->normalize($anime->title)] = $anime->id;
+                    foreach ([$anime->title, $anime->title_en, $anime->title_jp] as $t) {
+                        if ($t) {
+                            $key = $this->normalize($t);
+                            // не перетираем уже занятый ключ
+                            $nameIndex[$key] ??= $anime->id;
+                        }
                     }
                 }
             });
 
-        return $index;
+        return [$nameIndex, $anilibriaMap];
     }
 
     /**
-     * Try to match a release to a local anime, then store episodes.
+     * Сопоставление релиза каталога с локальным аниме: сначала по anilibria_id, затем по названиям.
      */
-    private function processRelease(array $release, array &$animeIndex, bool $noCache): void
+    private function matchAnime(array $item, array &$nameIndex, array &$anilibriaMap): ?int
+    {
+        $releaseId = (int) ($item['id'] ?? 0);
+        if ($releaseId && isset($anilibriaMap[$releaseId])) {
+            return $anilibriaMap[$releaseId];
+        }
+
+        $names = $item['name'] ?? [];
+        $candidates = array_filter([
+            $names['main'] ?? null,
+            $names['english'] ?? null,
+            $names['alternative'] ?? null,
+        ]);
+
+        foreach ($candidates as $name) {
+            $key = $this->normalize($name);
+            if (isset($nameIndex[$key])) {
+                return $nameIndex[$key];
+            }
+            $stripped = preg_replace('/\s*\(\d{4}\)\s*$/', '', $name);
+            if ($stripped !== $name) {
+                $key2 = $this->normalize($stripped);
+                if (isset($nameIndex[$key2])) {
+                    return $nameIndex[$key2];
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function storeEpisodes(array $release, int $animeId, bool $noCache): void
     {
         $releaseId = $release['id'] ?? null;
-        if (! $releaseId) {
-            return;
-        }
-
-        // Find matching anime
-        $animeId = $this->findMatch($release, $animeIndex);
-        if (! $animeId) {
-            return;
-        }
-
-        $this->matched++;
 
         $anime = Anime::find($animeId);
         if (! $anime) {
             return;
         }
-
-        // Save the anilibria_id for future use
-        if (! $anime->anilibria_id) {
+        if (! $anime->anilibria_id && $releaseId) {
             $anime->update(['anilibria_id' => $releaseId]);
         }
 
-        $episodes = $release['episodes'] ?? [];
-        if (empty($episodes)) {
-            return;
-        }
-
-        foreach ($episodes as $ep) {
+        foreach (($release['episodes'] ?? []) as $ep) {
             $url = $ep['hls_1080'] ?? $ep['hls_720'] ?? $ep['hls_480'] ?? null;
             if (! $url) {
                 continue;
@@ -231,6 +337,7 @@ class BulkImportAnilibriaCommand extends Command
             try {
                 if ($existing) {
                     $existing->update($data);
+                    $this->updated++;
                 } else {
                     Episode::create($data);
                     $this->created++;
@@ -244,37 +351,6 @@ class BulkImportAnilibriaCommand extends Command
                 ]);
             }
         }
-    }
-
-    /**
-     * Find local anime ID by matching release names against the index.
-     */
-    private function findMatch(array $release, array &$animeIndex): ?int
-    {
-        $names = $release['name'] ?? [];
-        $candidates = array_filter([
-            $names['main'] ?? null,
-            $names['english'] ?? null,
-            $names['alternative'] ?? null,
-        ]);
-
-        foreach ($candidates as $name) {
-            $key = $this->normalize($name);
-            if (isset($animeIndex[$key])) {
-                return $animeIndex[$key];
-            }
-
-            // Try without year suffix: "Аниме (2024)" → "аниме"
-            $stripped = preg_replace('/\s*\(\d{4}\)\s*$/', '', $name);
-            if ($stripped !== $name) {
-                $key2 = $this->normalize($stripped);
-                if (isset($animeIndex[$key2])) {
-                    return $animeIndex[$key2];
-                }
-            }
-        }
-
-        return null;
     }
 
     private function normalize(string $s): string
