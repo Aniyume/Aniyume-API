@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Favorite;
+use App\Models\User;
+use App\Services\ProfileVisibilityService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -21,11 +23,30 @@ class FavoritesController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $user = $request->user();
-        $perPage = $request->get('per_page', 20);
+        return $this->paginatedFavorites(
+            $request->user()->id,
+            (int) $request->get('per_page', 20)
+        );
+    }
 
+    public function userFavorites(Request $request, int $userId, ProfileVisibilityService $visibility): JsonResponse
+    {
+        $owner = User::findOrFail($userId);
+
+        if (! $visibility->canView($request->user(), $owner, 'favorites')) {
+            return response()->json([
+                'message' => 'This list is private.',
+                'reason' => 'private',
+            ], 403);
+        }
+
+        return $this->paginatedFavorites($owner->id, (int) $request->get('per_page', 20));
+    }
+
+    private function paginatedFavorites(int $userId, int $perPage): JsonResponse
+    {
         $favorites = Favorite::query()
-            ->where('user_id', $user->id)
+            ->where('user_id', $userId)
             ->with(['anime:id,title,slug,poster_url'])
             ->paginate($perPage);
 

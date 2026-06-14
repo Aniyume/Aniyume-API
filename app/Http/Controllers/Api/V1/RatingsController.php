@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreRatingRequest;
 use App\Http\Resources\Api\V1\RatingResource;
 use App\Models\Rating;
+use App\Models\User;
+use App\Services\ProfileVisibilityService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -81,6 +83,38 @@ class RatingsController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to delete rating'], 500);
         }
+    }
+
+    /**
+     * Оценки пользователя (с проверкой приватности)
+     *
+     * @urlParam userId integer ID пользователя. Example: 5
+     */
+    public function userRatings(Request $request, int $userId, ProfileVisibilityService $visibility): JsonResponse
+    {
+        $owner = User::findOrFail($userId);
+
+        if (! $visibility->canView($request->user(), $owner, 'ratings')) {
+            return response()->json([
+                'message' => 'This list is private.',
+                'reason' => 'private',
+            ], 403);
+        }
+
+        $ratings = Rating::with('anime')
+            ->where('user_id', $owner->id)
+            ->orderBy('updated_at', 'desc')
+            ->paginate(20);
+
+        return response()->json([
+            'data' => RatingResource::collection($ratings),
+            'pagination' => [
+                'total' => $ratings->total(),
+                'per_page' => $ratings->perPage(),
+                'current_page' => $ratings->currentPage(),
+                'last_page' => $ratings->lastPage(),
+            ],
+        ]);
     }
 
     /**

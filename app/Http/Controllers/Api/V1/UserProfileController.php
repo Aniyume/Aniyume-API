@@ -3,12 +3,16 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Application\Services\ProfileFrames\ProfileFrameService;
+use App\Enums\ProfileVisibility;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateUserProfileRequest;
 use App\Models\User;
 use App\Services\UserProfileService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 /**
  * @group Профиль пользователя
@@ -53,6 +57,60 @@ class UserProfileController extends Controller
                 'is_premium' => (bool) $updated->is_premium,
             ],
         ], 200);
+    }
+
+    public function updateAccount(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $validated = $request->validate([
+            'current_password' => ['required', 'string'],
+            'email' => [
+                'sometimes',
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($user->id),
+            ],
+            'password' => ['sometimes', 'required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        if (! array_key_exists('email', $validated) && ! array_key_exists('password', $validated)) {
+            throw ValidationException::withMessages([
+                'account' => ['Укажите новый email или пароль.'],
+            ]);
+        }
+
+        if (! Hash::check($validated['current_password'], $user->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => ['Текущий пароль указан неверно.'],
+            ]);
+        }
+
+        if (array_key_exists('email', $validated)) {
+            $user->email = mb_strtolower(trim($validated['email']));
+            $user->email_verified_at = null;
+        }
+
+        if (array_key_exists('password', $validated)) {
+            $user->password = Hash::make($validated['password']);
+        }
+
+        $user->save();
+
+        if (array_key_exists('password', $validated)) {
+            $currentTokenId = $user->currentAccessToken()?->id;
+            $user->tokens()
+                ->when($currentTokenId, fn ($query) => $query->whereKeyNot($currentTokenId))
+                ->delete();
+        }
+
+        return response()->json([
+            'message' => 'Данные аккаунта обновлены.',
+            'user' => [
+                'id' => $user->id,
+                'email' => $user->email,
+            ],
+        ]);
     }
 
     public function nameAvailability(Request $request): JsonResponse
@@ -128,6 +186,40 @@ class UserProfileController extends Controller
             'message' => 'Frame selected.',
             'selected' => $validated['frame_key'],
             'data' => $frames->framesFor($request->user()->fresh()),
+        ]);
+    }
+
+    public function getPrivacy(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        return response()->json([
+            'favorites' => $user->privacy_favorites,
+            'watch_history' => $user->privacy_watch_history,
+            'ratings' => $user->privacy_ratings,
+        ]);
+    }
+
+    public function updatePrivacy(Request $request): JsonResponse
+    {
+        $rule = ['required', Rule::in(ProfileVisibility::values())];
+        $validated = $request->validate([
+            'favorites' => $rule,
+            'watch_history' => $rule,
+            'ratings' => $rule,
+        ]);
+
+        $user = $request->user();
+        $user->update([
+            'privacy_favorites' => $validated['favorites'],
+            'privacy_watch_history' => $validated['watch_history'],
+            'privacy_ratings' => $validated['ratings'],
+        ]);
+
+        return response()->json([
+            'favorites' => $user->privacy_favorites,
+            'watch_history' => $user->privacy_watch_history,
+            'ratings' => $user->privacy_ratings,
         ]);
     }
 }
