@@ -5,6 +5,7 @@ namespace Tests\Feature\Api;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class ProfileApiTest extends TestCase
@@ -15,6 +16,7 @@ class ProfileApiTest extends TestCase
     {
         $this->getJson('/api/v1/profile/me')->assertUnauthorized();
         $this->putJson('/api/v1/profile/me', ['name' => 'No Auth'])->assertUnauthorized();
+        $this->patchJson('/api/v1/profile/me/account', ['current_password' => 'password'])->assertUnauthorized();
         $this->postJson('/api/v1/profile/me/avatar')->assertUnauthorized();
     }
 
@@ -154,5 +156,52 @@ class ProfileApiTest extends TestCase
             ->postJson('/api/v1/profile/me/frames/select', ['frame_key' => 'none'])
             ->assertOk()
             ->assertJsonPath('selected', 'none');
+    }
+
+    public function test_user_can_change_email_and_password_with_current_password(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'old@example.com',
+            'password' => Hash::make('old-password'),
+            'email_verified_at' => now(),
+        ]);
+
+        $this->actingAs($user, 'sanctum')
+            ->patchJson('/api/v1/profile/me/account', [
+                'current_password' => 'old-password',
+                'email' => 'new@example.com',
+                'password' => 'new-password',
+                'password_confirmation' => 'new-password',
+            ])
+            ->assertOk()
+            ->assertJsonPath('user.email', 'new@example.com');
+
+        $user->refresh();
+        $this->assertSame('new@example.com', $user->email);
+        $this->assertNull($user->email_verified_at);
+        $this->assertTrue(Hash::check('new-password', $user->password));
+    }
+
+    public function test_account_update_rejects_wrong_current_password_and_duplicate_email(): void
+    {
+        $user = User::factory()->create(['password' => Hash::make('correct-password')]);
+        $other = User::factory()->create(['email' => 'taken@example.com']);
+
+        $this->actingAs($user, 'sanctum')
+            ->patchJson('/api/v1/profile/me/account', [
+                'current_password' => 'wrong-password',
+                'password' => 'new-password',
+                'password_confirmation' => 'new-password',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['current_password']);
+
+        $this->actingAs($user, 'sanctum')
+            ->patchJson('/api/v1/profile/me/account', [
+                'current_password' => 'correct-password',
+                'email' => $other->email,
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['email']);
     }
 }

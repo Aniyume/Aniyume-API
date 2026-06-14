@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\Api;
 
+use App\Mail\PasswordResetCodeMail;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class AuthApiTest extends TestCase
@@ -97,5 +99,40 @@ class AuthApiTest extends TestCase
         ])
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['email']);
+    }
+
+    public function test_user_can_reset_password_with_emailed_code(): void
+    {
+        Mail::fake();
+        $user = User::factory()->create([
+            'email' => 'reset@example.com',
+            'password' => Hash::make('old-password'),
+        ]);
+        $code = null;
+
+        $this->postJson('/api/v1/auth/password/forgot', ['email' => $user->email])
+            ->assertOk()
+            ->assertJsonPath('status', 'success');
+
+        Mail::assertSent(PasswordResetCodeMail::class, function (PasswordResetCodeMail $mail) use (&$code, $user) {
+            $code = $mail->code;
+
+            return $mail->hasTo($user->email);
+        });
+
+        $this->postJson('/api/v1/auth/password/verify', [
+            'email' => $user->email,
+            'code' => $code,
+        ])->assertOk();
+
+        $this->postJson('/api/v1/auth/password/reset', [
+            'email' => $user->email,
+            'code' => $code,
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ])->assertOk();
+
+        $this->assertTrue(Hash::check('new-password', $user->fresh()->password));
+        $this->assertDatabaseMissing('password_reset_codes', ['email' => $user->email]);
     }
 }

@@ -3,15 +3,14 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Mail\PasswordResetCodeMail;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\PasswordResetMailer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -214,7 +213,7 @@ class AuthController extends Controller
             ]);
 
             try {
-                Mail::to($email)->send(new PasswordResetCodeMail($code, self::RESET_CODE_TTL_MINUTES));
+                app(PasswordResetMailer::class)->send($email, $code, self::RESET_CODE_TTL_MINUTES);
             } catch (\Throwable $e) {
                 Log::error('Не удалось отправить код сброса пароля', ['email' => $email, 'error' => $e->getMessage()]);
             }
