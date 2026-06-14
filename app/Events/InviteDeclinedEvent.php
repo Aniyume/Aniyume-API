@@ -8,18 +8,15 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class FriendInviteEvent implements ShouldBroadcastNow
+class InviteDeclinedEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public function __construct(
         public readonly int $toUserId,
-        public readonly int $fromUserId,
-        public readonly string $fromUserName,
-        public readonly string $fromUserAvatar,
-        public readonly string $roomCode,
+        public readonly string $declinedByName,
         public readonly string $animeTitle,
-        public readonly int $inviteId,
+        public readonly string $roomCode,
     ) {}
 
     public function broadcastOn(): array
@@ -31,19 +28,16 @@ class FriendInviteEvent implements ShouldBroadcastNow
 
     public function broadcastAs(): string
     {
-        return 'friend.invite';
+        return 'invite.declined';
     }
 
     public function broadcastWith(): array
     {
         return [
-            'invite_id' => $this->inviteId,
-            'from_user_id' => $this->fromUserId,
-            'from_user_name' => $this->fromUserName,
-            'from_user_avatar' => $this->fromUserAvatar,
-            'room_code' => $this->roomCode,
+            'declined_by_name' => $this->declinedByName,
             'anime_title' => $this->animeTitle,
-            'sent_at' => now()->toISOString(),
+            'room_code' => $this->roomCode,
+            'at' => now()->toISOString(),
         ];
     }
 }

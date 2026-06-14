@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Application\Actions\WatchParty\AcceptInviteAction;
 use App\Application\Actions\WatchParty\CloseRoomAction;
 use App\Application\Actions\WatchParty\CreateRoomAction;
+use App\Application\Actions\WatchParty\DeclineInviteAction;
 use App\Application\Actions\WatchParty\InviteFriendAction;
 use App\Application\Actions\WatchParty\JoinRoomAction;
 use App\Application\Actions\WatchParty\LeaveRoomAction;
@@ -11,6 +13,8 @@ use App\Application\Actions\WatchParty\SendMessageAction;
 use App\Application\Actions\WatchParty\SyncRoomStateAction;
 use App\Application\Queries\WatchParty\FindActiveRoomQuery;
 use App\Application\Queries\WatchParty\GetMessagesQuery;
+use App\Application\Queries\WatchParty\ListInvitesQuery;
+use App\Models\WatchPartyInvite;
 use App\Application\Services\WatchParty\FormatsWatchPartyResponses;
 use App\Domain\Moderation\ModerationMode;
 use App\Http\Controllers\Controller;
@@ -88,6 +92,25 @@ class WatchPartyController extends Controller
         $action->execute($request->user(), $code, $data['friend_id']);
 
         return response()->json(['message' => 'Приглашение отправлено']);
+    }
+
+    public function invites(Request $request, ListInvitesQuery $query): JsonResponse
+    {
+        return response()->json($query->getFor($request->user()));
+    }
+
+    public function acceptInvite(Request $request, WatchPartyInvite $invite, AcceptInviteAction $action): JsonResponse
+    {
+        $action->execute($request->user(), $invite);
+
+        return response()->json(['message' => 'Приглашение принято']);
+    }
+
+    public function declineInvite(Request $request, WatchPartyInvite $invite, DeclineInviteAction $action): JsonResponse
+    {
+        $action->execute($request->user(), $invite);
+
+        return response()->json(['message' => 'Приглашение отклонено']);
     }
 
     public function close(Request $request, string $code, CloseRoomAction $action): JsonResponse
