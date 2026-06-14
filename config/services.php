@@ -75,10 +75,6 @@ return [
             'url' => env('NOCODB_INTERNAL_URL'),
             'health_path' => '/',
         ],
-        'understand-anything' => [
-            'url' => env('UNDERSTAND_ANYTHING_INTERNAL_URL'),
-            'health_path' => '/',
-        ],
     ],
 
     /*

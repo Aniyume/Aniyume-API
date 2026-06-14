@@ -87,10 +87,10 @@ class AdminApiSkeletonTest extends TestCase
     public function test_admin_monitoring_health_reports_unconfigured_service(): void
     {
         $admin = $this->createAdminUser();
-        config(['services.monitoring.understand-anything.url' => null]);
+        config(['services.monitoring.nocodb.url' => null]);
 
         $this->actingAs($admin, 'sanctum')
-            ->getJson('/api/v1/admin/monitoring/health?target=understand-anything')
+            ->getJson('/api/v1/admin/monitoring/health?target=nocodb')
             ->assertOk()
             ->assertJsonPath('data.configured', false)
             ->assertJsonPath('data.ok', false)
