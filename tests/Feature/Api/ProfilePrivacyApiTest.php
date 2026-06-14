@@ -188,4 +188,21 @@ class ProfilePrivacyApiTest extends TestCase
             ->assertForbidden()
             ->assertJsonPath('reason', 'private');
     }
+
+    public function test_profile_includes_visibility_for_viewer(): void
+    {
+        $owner = User::factory()->create([
+            'privacy_favorites' => 'everyone',
+            'privacy_watch_history' => 'friends',
+            'privacy_ratings' => 'nobody',
+        ]);
+        $stranger = User::factory()->create();
+
+        $this->actingAs($stranger, 'sanctum')
+            ->getJson("/api/v1/users/{$owner->id}/profile")
+            ->assertOk()
+            ->assertJsonPath('visibility.favorites', 'visible')
+            ->assertJsonPath('visibility.watch_history', 'hidden')
+            ->assertJsonPath('visibility.ratings', 'hidden');
+    }
 }

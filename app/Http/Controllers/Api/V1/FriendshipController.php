@@ -12,6 +12,7 @@ use App\Application\Queries\Friendships\ResolveFriendshipStatusQuery;
 use App\Application\Queries\Friendships\SearchUsersForFriendshipQuery;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\ProfileVisibilityService;
 use App\Services\UserProfileService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -110,6 +111,14 @@ class FriendshipController extends Controller
         $profile['user']['is_online'] = (bool) $target->is_online;
         $profile['user']['friendship_status'] = $friendship['status'];
         $profile['user']['is_sender'] = $friendship['is_sender'] ?? null;
+
+        $visibility = app(ProfileVisibilityService::class);
+        $viewer = $request->user();
+        $profile['visibility'] = [
+            'favorites' => $visibility->canView($viewer, $target, 'favorites') ? 'visible' : 'hidden',
+            'watch_history' => $visibility->canView($viewer, $target, 'watch_history') ? 'visible' : 'hidden',
+            'ratings' => $visibility->canView($viewer, $target, 'ratings') ? 'visible' : 'hidden',
+        ];
 
         return response()->json($profile);
     }
