@@ -82,6 +82,11 @@ class EpisodeImportService
         $this->onlyMissing = $onlyMissing;
     }
 
+    public function forceEnableAllAnime(): void
+    {
+        $this->allAnimeService->forceEnable();
+    }
+
     /**
      * Reset (delete) episodes from the database.
      *

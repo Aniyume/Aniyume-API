@@ -43,6 +43,7 @@ class ImportEpisodes extends Command
         } elseif ($source === 'allanime') {
             $service->setAvailableSources(false, false);
             $service->setFallbackSources(false, true, false);
+            $service->forceEnableAllAnime();
         } elseif ($source === 'external') {
             $service->setAvailableSources(false, false);
             $service->setFallbackSources(false, false, true);

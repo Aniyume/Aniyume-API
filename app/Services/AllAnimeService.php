@@ -11,6 +11,8 @@ use Illuminate\Support\Str;
 
 class AllAnimeService
 {
+    private bool $forceEnabled = false;
+
     private string $baseHost;
 
     private string $apiUrl;
@@ -36,7 +38,12 @@ class AllAnimeService
 
     public function isEnabled(): bool
     {
-        return (bool) config('services.allanime.enabled', false);
+        return $this->forceEnabled || (bool) config('services.allanime.enabled', false);
+    }
+
+    public function forceEnable(): void
+    {
+        $this->forceEnabled = true;
     }
 
     public function findBestMatch(Anime $anime, array $titleCandidates): ?array
