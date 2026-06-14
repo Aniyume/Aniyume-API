@@ -4,6 +4,7 @@ namespace Tests\Feature\Api;
 
 use App\Models\Anime;
 use App\Models\Favorite;
+use App\Models\Rating;
 use App\Models\User;
 use App\Models\WatchHistory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -159,6 +160,31 @@ class ProfilePrivacyApiTest extends TestCase
 
         $this->actingAs($friend, 'sanctum')
             ->getJson("/api/v1/users/{$owner->id}/watch-history")
+            ->assertForbidden()
+            ->assertJsonPath('reason', 'private');
+    }
+
+    public function test_friend_can_view_ratings_when_level_friends(): void
+    {
+        $owner = User::factory()->create(['privacy_ratings' => 'friends']);
+        $friend = User::factory()->create();
+        $this->befriend($owner, $friend);
+        $anime = Anime::factory()->create();
+        Rating::create(['user_id' => $owner->id, 'anime_id' => $anime->id, 'rating' => 4.5]);
+
+        $this->actingAs($friend, 'sanctum')
+            ->getJson("/api/v1/users/{$owner->id}/ratings")
+            ->assertOk()
+            ->assertJsonStructure(['data', 'pagination']);
+    }
+
+    public function test_stranger_blocked_from_ratings_when_level_friends(): void
+    {
+        $owner = User::factory()->create(['privacy_ratings' => 'friends']);
+        $stranger = User::factory()->create();
+
+        $this->actingAs($stranger, 'sanctum')
+            ->getJson("/api/v1/users/{$owner->id}/ratings")
             ->assertForbidden()
             ->assertJsonPath('reason', 'private');
     }
