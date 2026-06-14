@@ -5,6 +5,7 @@ namespace Tests\Feature\Api;
 use App\Models\Anime;
 use App\Models\Favorite;
 use App\Models\User;
+use App\Models\WatchHistory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
@@ -129,5 +130,36 @@ class ProfilePrivacyApiTest extends TestCase
         $this->actingAs($stranger, 'sanctum')
             ->getJson("/api/v1/users/{$owner->id}/favorites")
             ->assertOk();
+    }
+
+    public function test_friend_can_view_watch_history_when_level_friends(): void
+    {
+        $owner = User::factory()->create(['privacy_watch_history' => 'friends']);
+        $friend = User::factory()->create();
+        $this->befriend($owner, $friend);
+        $anime = Anime::factory()->create();
+        WatchHistory::create([
+            'user_id' => $owner->id,
+            'anime_id' => $anime->id,
+            'watch_time' => 100,
+            'watched_at' => now(),
+        ]);
+
+        $this->actingAs($friend, 'sanctum')
+            ->getJson("/api/v1/users/{$owner->id}/watch-history")
+            ->assertOk()
+            ->assertJsonStructure(['data', 'pagination']);
+    }
+
+    public function test_stranger_blocked_from_watch_history_when_nobody(): void
+    {
+        $owner = User::factory()->create(['privacy_watch_history' => 'nobody']);
+        $friend = User::factory()->create();
+        $this->befriend($owner, $friend);
+
+        $this->actingAs($friend, 'sanctum')
+            ->getJson("/api/v1/users/{$owner->id}/watch-history")
+            ->assertForbidden()
+            ->assertJsonPath('reason', 'private');
     }
 }

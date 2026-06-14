@@ -6,6 +6,8 @@ use App\Application\Actions\WatchHistory\SyncWatchProgressAction;
 use App\Application\Queries\WatchHistoryQuery;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateWatchHistoryRequest;
+use App\Models\User;
+use App\Services\ProfileVisibilityService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -20,6 +22,30 @@ class WatchHistoryController extends Controller
         private readonly WatchHistoryQuery $watchHistoryQuery,
         private readonly SyncWatchProgressAction $syncWatchProgress,
     ) {}
+
+    public function userHistory(Request $request, int $userId, ProfileVisibilityService $visibility): JsonResponse
+    {
+        $owner = User::findOrFail($userId);
+
+        if (! $visibility->canView($request->user(), $owner, 'watch_history')) {
+            return response()->json([
+                'message' => 'This list is private.',
+                'reason' => 'private',
+            ], 403);
+        }
+
+        $history = $this->watchHistoryQuery->paginatedForUser($owner->id);
+
+        return response()->json([
+            'data' => $history->items(),
+            'pagination' => [
+                'total' => $history->total(),
+                'per_page' => $history->perPage(),
+                'current_page' => $history->currentPage(),
+                'last_page' => $history->lastPage(),
+            ],
+        ]);
+    }
 
     /**
      * Список истории

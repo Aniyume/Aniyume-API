@@ -209,6 +209,8 @@ Route::prefix('v1')->group(function () {
             ->where('userId', '[0-9]+');
         Route::get('/users/{userId}/favorites', [FavoritesController::class, 'userFavorites'])
             ->where('userId', '[0-9]+');
+        Route::get('/users/{userId}/watch-history', [WatchHistoryController::class, 'userHistory'])
+            ->where('userId', '[0-9]+');
 
         Route::get('/chats', [DirectMessageController::class, 'conversations']);
         Route::get('/chats/{userId}', [DirectMessageController::class, 'show'])->where('userId', '[0-9]+');
