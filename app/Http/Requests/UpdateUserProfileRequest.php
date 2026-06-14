@@ -3,8 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Domain\Moderation\ModerationMode;
-use App\Http\Rules\PassesModeration;
 use App\Http\Rules\PassesAiModeration;
+use App\Http\Rules\PassesModeration;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -43,6 +43,8 @@ class UpdateUserProfileRequest extends FormRequest
             'custom_status' => $statusRules,
             'social_links' => ['sometimes', 'array', 'max:10'],
             'social_links.*' => ['required', 'url:http,https', 'max:500'],
+            'theme_value' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'theme_type' => ['sometimes', 'nullable', 'in:gradient,solid'],
         ];
     }
 

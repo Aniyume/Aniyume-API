@@ -104,8 +104,12 @@ class ProfileFrameService
     {
         $seconds = (int) DB::table('watch_history')->where('user_id', $user->id)->sum('watch_time');
         $minutes = max(0, intdiv($seconds, 60));
-        if ($minutes < 20) return 1;
-        if ($minutes < 50) return 2;
+        if ($minutes < 20) {
+            return 1;
+        }
+        if ($minutes < 50) {
+            return 2;
+        }
         $year = 365 * 3 * 60;
         $progress = min(1, ($minutes - 50) / max(1, $year - 50));
 

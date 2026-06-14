@@ -3,8 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Domain\Moderation\ModerationMode;
-use App\Http\Rules\PassesModeration;
 use App\Http\Rules\PassesAiModeration;
+use App\Http\Rules\PassesModeration;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreCommentRequest extends FormRequest

@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** @mixin \App\Models\Anime */
 class AdminAnimeResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -30,7 +31,7 @@ class AdminAnimeResource extends JsonResource
             'comments_count' => $this->comments_count ?? null,
             'ratings_count' => $this->ratings_count ?? null,
             'number_of_episodes' => $this->number_of_episodes,
-            'tags' => $this->whenLoaded('tags', fn () => $this->tags->map(fn ($tag) => [
+            'tags' => $this->whenLoaded('tags', fn () => $this->tags->map(fn (\App\Models\Tag $tag) => [
                 'id' => $tag->id,
                 'name' => $tag->name,
                 'slug' => $tag->slug,

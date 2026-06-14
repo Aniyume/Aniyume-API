@@ -18,17 +18,17 @@ class AntiScraperMiddleware
         $fingerprint = $request->header('X-Fingerprint-ID') ?: $request->ip();
 
         // Optional comma-separated admin fingerprints to bypass Anti-Scraper limits.
-        $adminFingerprints = $this->csv('ANTI_SCRAPER_ADMIN_FINGERPRINTS');
+        $adminFingerprints = config('security.anti_scraper.admin_fingerprints', []);
         if (in_array($fingerprint, $adminFingerprints, true)) {
             return $next($request);
         }
 
         $trustKey = "trust_score_{$fingerprint}";
-        $trustTtl = now()->addDays((int) env('ANTI_SCRAPER_TRUST_TTL_DAYS', 7));
+        $trustTtl = now()->addDays((int) config('security.anti_scraper.trust_ttl_days', 7));
 
         // Initialize trust score to 100 if not exists
         if (! \Illuminate\Support\Facades\Cache::has($trustKey)) {
-            $trustScore = (int) env('ANTI_SCRAPER_INITIAL_TRUST_SCORE', 100);
+            $trustScore = (int) config('security.anti_scraper.initial_trust_score', 100);
             \Illuminate\Support\Facades\Cache::put($trustKey, $trustScore, $trustTtl);
         } else {
             $trustScore = (int) \Illuminate\Support\Facades\Cache::get($trustKey);
@@ -42,9 +42,9 @@ class AntiScraperMiddleware
         }
 
         // Extremely low trust -> Block request
-        if ($trustScore <= (int) env('ANTI_SCRAPER_BLOCK_THRESHOLD', 20)) {
+        if ($trustScore <= (int) config('security.anti_scraper.block_threshold', 20)) {
             // Apply delay to waste scraper's time
-            $delay = min(5, max(0, (int) env('ANTI_SCRAPER_BLOCK_DELAY_SECONDS', 1)));
+            $delay = min(5, max(0, (int) config('security.anti_scraper.block_delay_seconds', 1)));
             if ($delay > 0) {
                 sleep($delay);
             }
@@ -66,7 +66,7 @@ class AntiScraperMiddleware
             \Illuminate\Support\Facades\Cache::put($rateLimitKey, 1, now()->addSeconds(60));
         }
 
-        if ($requestsCount > (int) env('ANTI_SCRAPER_RATE_LIMIT_PER_MINUTE', 100)) {
+        if ($requestsCount > (int) config('security.anti_scraper.rate_limit_per_minute', 100)) {
             // Decrease trust score by 5 for every spam burst
             $trustScore = max(0, $trustScore - 5);
             \Illuminate\Support\Facades\Cache::put($trustKey, $trustScore, $trustTtl);
@@ -84,18 +84,10 @@ class AntiScraperMiddleware
 
         $response = $next($request);
 
-        if ((bool) env('ANTI_SCRAPER_EXPOSE_TRUST_SCORE', false)) {
+        if ((bool) config('security.anti_scraper.expose_trust_score', false)) {
             $response->headers->set('X-Trust-Score', (string) $trustScore);
         }
 
         return $response;
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private function csv(string $key, string $default = ''): array
-    {
-        return array_values(array_filter(array_map('trim', explode(',', (string) env($key, $default)))));
     }
 }

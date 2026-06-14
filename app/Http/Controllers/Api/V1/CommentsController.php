@@ -211,7 +211,7 @@ class CommentsController extends Controller
             ->pluck('type', 'comment_id');
 
         $comments->each(function (Comment $comment) use ($reactions) {
-            $comment->viewer_reaction = $reactions[$comment->id] ?? null;
+            $comment->setAttribute('viewer_reaction', $reactions[$comment->id] ?? null);
         });
     }
 }

@@ -21,6 +21,8 @@ class User extends Authenticatable
         'is_online',
         'is_premium',
         'selected_profile_frame',
+        'theme_value',
+        'theme_type',
         'is_active',
         'is_banned',
         'ban_reason',

@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Admin\CommentController as AdminCommentController;
 use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Api\Admin\EpisodeController as AdminEpisodeController;
 use App\Http\Controllers\Api\Admin\ImportController as AdminImportController;
+use App\Http\Controllers\Api\Admin\MonitoringController as AdminMonitoringController;
 use App\Http\Controllers\Api\Admin\RatingController as AdminRatingController;
 use App\Http\Controllers\Api\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Api\Admin\SettingController as AdminSettingController;
@@ -79,6 +80,7 @@ Route::prefix('v1')->group(function () {
         ->group(function () {
             Route::get('/auth/me', AdminAuthMeController::class);
             Route::get('/dashboard', AdminDashboardController::class);
+            Route::get('/monitoring/health', [AdminMonitoringController::class, 'health']);
             Route::get('/anime', [AdminAnimeController::class, 'index']);
             Route::get('/anime/{anime}', [AdminAnimeController::class, 'show']);
             Route::post('/anime', [AdminAnimeController::class, 'store']);

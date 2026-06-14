@@ -9,6 +9,7 @@ use App\Models\Role;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
@@ -63,6 +64,48 @@ class AdminApiSkeletonTest extends TestCase
             ])
             ->assertJsonPath('data.summary.total_anime', 2)
             ->assertJsonPath('data.recent_imports.0.import_type', 'update');
+    }
+
+    public function test_admin_can_check_configured_monitoring_service(): void
+    {
+        $admin = $this->createAdminUser();
+        config(['services.monitoring.grafana.url' => 'http://grafana:3000']);
+        Http::fake([
+            'http://grafana:3000/api/health' => Http::response(['database' => 'ok'], 200),
+        ]);
+
+        $this->actingAs($admin, 'sanctum')
+            ->getJson('/api/v1/admin/monitoring/health?target=grafana')
+            ->assertOk()
+            ->assertJsonPath('data.configured', true)
+            ->assertJsonPath('data.ok', true)
+            ->assertJsonPath('data.status', 200);
+
+        Http::assertSent(fn ($request) => $request->url() === 'http://grafana:3000/api/health');
+    }
+
+    public function test_admin_monitoring_health_reports_unconfigured_service(): void
+    {
+        $admin = $this->createAdminUser();
+        config(['services.monitoring.understand-anything.url' => null]);
+
+        $this->actingAs($admin, 'sanctum')
+            ->getJson('/api/v1/admin/monitoring/health?target=understand-anything')
+            ->assertOk()
+            ->assertJsonPath('data.configured', false)
+            ->assertJsonPath('data.ok', false)
+            ->assertJsonPath('data.status', null);
+
+        Http::assertNothingSent();
+    }
+
+    public function test_admin_monitoring_health_rejects_unknown_target(): void
+    {
+        $admin = $this->createAdminUser();
+
+        $this->actingAs($admin, 'sanctum')
+            ->getJson('/api/v1/admin/monitoring/health?target=unknown')
+            ->assertUnprocessable();
     }
 
     public function test_admin_can_fetch_filtered_anime_list(): void

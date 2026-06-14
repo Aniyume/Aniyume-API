@@ -36,7 +36,7 @@ class AllAnimeService
 
     public function isEnabled(): bool
     {
-        return (bool) config('services.allanime.enabled', env('ALLANIME_ENABLED', false));
+        return (bool) config('services.allanime.enabled', false);
     }
 
     public function findBestMatch(Anime $anime, array $titleCandidates): ?array

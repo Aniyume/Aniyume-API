@@ -40,38 +40,38 @@ class ImportAnimeJob implements ShouldQueue
         }
 
         try {
-        $importLog = ImportLog::find($this->importLogId);
+            $importLog = ImportLog::find($this->importLogId);
 
-        if (! $importLog) {
-            Log::error('ImportLog not found', ['id' => $this->importLogId]);
+            if (! $importLog) {
+                Log::error('ImportLog not found', ['id' => $this->importLogId]);
 
-            return;
-        }
+                return;
+            }
 
-        $result = $importService->importPage($this->page, $this->isInitialImport, $importLog);
+            $result = $importService->importPage($this->page, $this->isInitialImport, $importLog);
 
-        if (! $result['success']) {
-            Log::error('Import page failed', [
-                'page' => $this->page,
-                'error' => $result['error'] ?? 'Unknown error',
+            if (! $result['success']) {
+                Log::error('Import page failed', [
+                    'page' => $this->page,
+                    'error' => $result['error'] ?? 'Unknown error',
+                ]);
+
+                $this->fail(new \Exception($result['error'] ?? 'Import failed'));
+
+                return;
+            }
+
+            if ($result['hasNextPage']) {
+                self::dispatch($this->page + 1, $this->isInitialImport, $this->importLogId)
+                    ->delay(now()->addSeconds(2));
+
+                return;
+            }
+
+            $importLog->update([
+                'status' => 'completed',
+                'finished_at' => now(),
             ]);
-
-            $this->fail(new \Exception($result['error'] ?? 'Import failed'));
-
-            return;
-        }
-
-        if ($result['hasNextPage']) {
-            self::dispatch($this->page + 1, $this->isInitialImport, $this->importLogId)
-                ->delay(now()->addSeconds(2));
-
-            return;
-        }
-
-        $importLog->update([
-            'status' => 'completed',
-            'finished_at' => now(),
-        ]);
         } finally {
             $lock->release();
         }

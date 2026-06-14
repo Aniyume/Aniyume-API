@@ -2,26 +2,133 @@
     "openapi": "3.0.0",
     "info": {
         "title": "AniYume API",
-        "description": "REST API for AniYume - Anime Streaming Platform",
-        "contact": {
-            "email": "zanshugurov07@gmail.com"
-        },
+        "description": "REST API for the AniYume user applications and Next.js admin panel.",
         "version": "1.0.0"
     },
     "servers": [
         {
-            "url": "http://127.0.0.1:8000/api/v1",
-            "description": "Development Server"
+            "url": "/api/v1",
+            "description": "Current AniYume backend"
         }
     ],
     "paths": {
-        "/register": {
+        "/public/anime": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "List anime",
+                "operationId": "22a4985d2d6124418780e5df58997433",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated anime list"
+                    }
+                }
+            }
+        },
+        "/public/anime/{anime}": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Get anime details",
+                "operationId": "8ffad08f8eecd1c617acb53cc46698ee",
+                "parameters": [
+                    {
+                        "name": "anime",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Anime details"
+                    },
+                    "404": {
+                        "description": "Anime not found"
+                    }
+                }
+            }
+        },
+        "/public/anime/{anime}/episodes": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "List anime episodes",
+                "operationId": "7e2693a63310f0bcdcc4f404448ec9ea",
+                "parameters": [
+                    {
+                        "name": "anime",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Episode list"
+                    }
+                }
+            }
+        },
+        "/public/schedule": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Get release schedule",
+                "operationId": "2a63d29f46e435c702f6f5cfb9a3f6bb",
+                "responses": {
+                    "200": {
+                        "description": "Weekly anime schedule"
+                    }
+                }
+            }
+        },
+        "/public/tags": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "List tags",
+                "operationId": "24e127a97484c020683977dc3360e86c",
+                "responses": {
+                    "200": {
+                        "description": "Anime tags"
+                    }
+                }
+            }
+        },
+        "/auth/register": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
-                "summary": "Register new user",
-                "operationId": "e6d1fcf1feab4f92eacb72353c6dfbcd",
+                "summary": "Register a user",
+                "operationId": "f0e28d1993764901392ef3fb0045ca0c",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -35,23 +142,19 @@
                                 ],
                                 "properties": {
                                     "name": {
-                                        "type": "string",
-                                        "example": "John Doe"
+                                        "type": "string"
                                     },
                                     "email": {
                                         "type": "string",
-                                        "format": "email",
-                                        "example": "john@example.com"
+                                        "format": "email"
                                     },
                                     "password": {
                                         "type": "string",
-                                        "format": "password",
-                                        "example": "password123"
+                                        "format": "password"
                                     },
                                     "password_confirmation": {
                                         "type": "string",
-                                        "format": "password",
-                                        "example": "password123"
+                                        "format": "password"
                                     }
                                 },
                                 "type": "object"
@@ -61,36 +164,21 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "User registered successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "token": {
-                                            "type": "string"
-                                        },
-                                        "user": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "description": "User registered"
                     },
                     "422": {
-                        "description": "Validation error"
+                        "description": "Validation failed"
                     }
                 }
             }
         },
-        "/login": {
+        "/auth/login": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
-                "summary": "Login user",
-                "operationId": "72bf786ad8ff53c7391309c836350a8d",
+                "summary": "Log in",
+                "operationId": "7ec52bed6073f630a1b82446b4085c1b",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -103,13 +191,11 @@
                                 "properties": {
                                     "email": {
                                         "type": "string",
-                                        "format": "email",
-                                        "example": "john@example.com"
+                                        "format": "email"
                                     },
                                     "password": {
                                         "type": "string",
-                                        "format": "password",
-                                        "example": "password123"
+                                        "format": "password"
                                     }
                                 },
                                 "type": "object"
@@ -119,55 +205,24 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Login successful",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "token": {
-                                            "type": "string"
-                                        },
-                                        "user": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "description": "User and bearer token"
                     },
                     "422": {
                         "description": "Invalid credentials"
-                    },
-                    "403": {
-                        "description": "Account not active"
                     }
                 }
             }
         },
-        "/logout": {
-            "post": {
+        "/profile/me": {
+            "get": {
                 "tags": [
-                    "Authentication"
+                    "Profile"
                 ],
-                "summary": "Logout user",
-                "operationId": "5660f1ae61b95f0283dfc205d5ffdad5",
+                "summary": "Get current user profile",
+                "operationId": "f266ccd96b2b3e67bf4476749b236b48",
                 "responses": {
                     "200": {
-                        "description": "Logout successful",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Logged out successfully"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "description": "Current user profile"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -175,41 +230,108 @@
                 },
                 "security": [
                     {
-                        "sanctum": []
+                        "bearerAuth": []
                     }
                 ]
             }
         },
-        "/user": {
+        "/admin/auth/me": {
             "get": {
                 "tags": [
-                    "Authentication"
+                    "Admin"
                 ],
-                "summary": "Get current user",
-                "operationId": "59b49a75cc04d469e841f57f587060b9",
+                "summary": "Verify admin access",
+                "operationId": "2623b3894a1cbfb2e687531d3056498e",
                 "responses": {
                     "200": {
-                        "description": "Current user data",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "description": "Current admin"
                     },
                     "401": {
                         "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Admin access required"
                     }
                 },
                 "security": [
                     {
-                        "sanctum": []
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/dashboard": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get admin dashboard",
+                "operationId": "75e3944b67b0f9a320e6869feace845d",
+                "responses": {
+                    "200": {
+                        "description": "Dashboard metrics"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/anime": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "List anime for administration",
+                "operationId": "756c80ac2c371e590c6fedea0b9dc590",
+                "responses": {
+                    "200": {
+                        "description": "Paginated anime list"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/users": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "List users",
+                "operationId": "96835e26238c0c80afde213138654b55",
+                "responses": {
+                    "200": {
+                        "description": "Paginated user list"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/comments": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "List comments for moderation",
+                "operationId": "6c97cf5fc845b01f7d99f91f8bf3c4d6",
+                "responses": {
+                    "200": {
+                        "description": "Paginated comment list"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
                     }
                 ]
             }
@@ -217,6 +339,11 @@
     },
     "components": {
         "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "Sanctum or Clerk JWT",
+                "scheme": "bearer"
+            },
             "sanctum": {
                 "type": "http",
                 "scheme": "bearer",
@@ -227,8 +354,20 @@
     },
     "tags": [
         {
+            "name": "Public",
+            "description": "Public catalog endpoints"
+        },
+        {
             "name": "Authentication",
-            "description": "Authentication"
+            "description": "User authentication"
+        },
+        {
+            "name": "Profile",
+            "description": "Authenticated user profile"
+        },
+        {
+            "name": "Admin",
+            "description": "Next.js admin panel API"
         }
     ]
 }

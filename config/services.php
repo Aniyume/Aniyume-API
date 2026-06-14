@@ -62,6 +62,25 @@ return [
         'token' => env('TMDB_BEARER_TOKEN'),
     ],
 
+    'monitoring' => [
+        'uptime' => [
+            'url' => env('UPTIME_KUMA_INTERNAL_URL'),
+            'health_path' => '/',
+        ],
+        'grafana' => [
+            'url' => env('GRAFANA_INTERNAL_URL'),
+            'health_path' => '/api/health',
+        ],
+        'nocodb' => [
+            'url' => env('NOCODB_INTERNAL_URL'),
+            'health_path' => '/',
+        ],
+        'understand-anything' => [
+            'url' => env('UNDERSTAND_ANYTHING_INTERNAL_URL'),
+            'health_path' => '/',
+        ],
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Optional external iframe players

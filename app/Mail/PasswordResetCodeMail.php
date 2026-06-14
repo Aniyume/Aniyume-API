@@ -15,8 +15,7 @@ class PasswordResetCodeMail extends Mailable
     public function __construct(
         public string $code,
         public int $ttlMinutes,
-    ) {
-    }
+    ) {}
 
     public function envelope(): Envelope
     {

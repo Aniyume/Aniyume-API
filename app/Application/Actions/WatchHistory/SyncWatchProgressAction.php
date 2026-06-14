@@ -3,8 +3,8 @@
 namespace App\Application\Actions\WatchHistory;
 
 use App\Models\Episode;
-use App\Models\WatchHistory;
 use App\Models\User;
+use App\Models\WatchHistory;
 use Illuminate\Support\Facades\Cache;
 
 class SyncWatchProgressAction

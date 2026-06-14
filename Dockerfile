@@ -42,6 +42,11 @@ CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
 
 FROM base AS prod-like
 
+ENV PHP_CLI_SERVER_WORKERS=4
+
 RUN php artisan package:discover --ansi || true
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+    CMD curl -fsS http://127.0.0.1:8000/ready || exit 1
 
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]

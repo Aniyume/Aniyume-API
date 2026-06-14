@@ -12,10 +12,10 @@ use App\Application\Queries\Friendships\ResolveFriendshipStatusQuery;
 use App\Application\Queries\Friendships\SearchUsersForFriendshipQuery;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\UserProfileService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Services\UserProfileService;
 
 class FriendshipController extends Controller
 {

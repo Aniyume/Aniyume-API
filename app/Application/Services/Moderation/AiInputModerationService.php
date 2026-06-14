@@ -2,8 +2,8 @@
 
 namespace App\Application\Services\Moderation;
 
-use App\Domain\Moderation\ModerationResult;
 use App\Domain\Moderation\ModerationMode;
+use App\Domain\Moderation\ModerationResult;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -53,6 +53,6 @@ class AiInputModerationService
 
     private function enabled(): bool
     {
-        return (bool) config('ai.api_key') && filter_var(env('AI_INPUT_MODERATION_ENABLED', true), FILTER_VALIDATE_BOOL);
+        return (bool) config('ai.api_key') && (bool) config('ai.input_moderation_enabled', true);
     }
 }

@@ -11,7 +11,7 @@ class SecurityShield
     public function handle(Request $request, Closure $next): Response
     {
         $host = $request->getHost();
-        $tunnelDomains = $this->csv('SECURITY_TUNNEL_DOMAINS', 'ngrok-free.app,ngrok.io,trycloudflare.com');
+        $tunnelDomains = config('security.tunnel_domains', []);
         $isTunnel = false;
 
         foreach ($tunnelDomains as $domain) {
@@ -26,10 +26,7 @@ class SecurityShield
         }
 
         if ($isTunnel && ! in_array($request->method(), ['GET', 'HEAD'])) {
-            $allowed = $this->csv(
-                'SECURITY_TUNNEL_WRITE_ALLOWED_PATHS',
-                'api/v1/auth/*,api/v1/profile/*,api/v1/watch-history*,api/v1/favorites*'
-            );
+            $allowed = config('security.tunnel_write_allowed_paths', []);
             $isAllowed = false;
             foreach ($allowed as $path) {
                 if ($request->is($path)) {
@@ -42,10 +39,7 @@ class SecurityShield
             }
         }
 
-        $badAgents = $this->csv(
-            'SECURITY_BAD_USER_AGENTS',
-            'binlar,casper,checkprivilege,clshttp,cmsworldmap,diavol,dotbot,extract,feedfinder,flicky,g00g1e,harvest,heritrix,httrack,kmccrew,loader,miner,nikto,nutch,planetwork,purebot,pycurl,skygrid,sqlmap,sucker,turnit,vikspider,zmeu'
-        );
+        $badAgents = config('security.bad_user_agents', []);
         $userAgent = strtolower((string) $request->userAgent());
         foreach ($badAgents as $agent) {
             if (str_contains($userAgent, $agent)) {
@@ -79,32 +73,14 @@ class SecurityShield
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-        $csp = env(
-            'SECURITY_CSP',
-            "default-src 'self'; ".
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.tailwindcss.com; ".
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; ".
-            "font-src 'self' data: https://fonts.gstatic.com; ".
-            "img-src 'self' data: https: http:; ".
-            "connect-src 'self' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:*; ".
-            "frame-ancestors 'none';"
-        );
+        $response->headers->set('Content-Security-Policy', (string) config('security.csp'));
 
-        $response->headers->set('Content-Security-Policy', $csp);
-
-        if ((bool) env('SECURITY_HSTS_ENABLED', $request->isSecure())) {
+        $hstsEnabled = config('security.hsts_enabled');
+        if (($hstsEnabled === null && $request->isSecure()) || $hstsEnabled === true) {
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
         }
 
         return $response;
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private function csv(string $key, string $default = ''): array
-    {
-        return array_values(array_filter(array_map('trim', explode(',', (string) env($key, $default)))));
     }
 
     /**

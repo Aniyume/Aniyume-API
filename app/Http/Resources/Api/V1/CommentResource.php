@@ -5,6 +5,7 @@ namespace App\Http\Resources\Api\V1;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** @mixin \App\Models\Comment */
 class CommentResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -18,7 +19,7 @@ class CommentResource extends JsonResource
             'parent_id' => $this->parent_id,
             'likes_count' => (int) ($this->likes_count ?? $this->reactions_count_like ?? 0),
             'dislikes_count' => (int) ($this->dislikes_count ?? $this->reactions_count_dislike ?? 0),
-            'viewer_reaction' => $this->viewer_reaction ?? null,
+            'viewer_reaction' => $this->resource->getAttribute('viewer_reaction'),
             'admin_hearted' => (bool) $this->admin_hearted_at,
             'admin_hearted_at' => $this->admin_hearted_at?->toISOString(),
             'created_at' => $this->created_at,
@@ -35,7 +36,10 @@ class CommentResource extends JsonResource
                 'slug' => $this->anime->slug,
                 'poster_url' => $this->anime->poster_url,
             ]),
-            'replies' => $this->whenLoaded('replies', fn () => CommentResource::collection($this->replies)->resolve($request)),
+            'replies' => $this->whenLoaded(
+                'replies',
+                fn () => CommentResource::collection($this->resource->getRelation('replies'))->resolve($request)
+            ),
         ];
     }
 }

@@ -37,7 +37,7 @@ Broadcast::channel('watch-party.{code}', function ($user, $code) {
     return [
         'id' => $user->id,
         'name' => $user->name,
-        'avatar' => $user->avatar ? '/api-storage/avatars/'.$user->avatar : null,
+        'avatar' => $user->avatar ? '/api-storage/'.$user->avatar : null,
         'is_host' => $room->host_user_id === $user->id,
     ];
 });

@@ -61,7 +61,7 @@ trait FormatsWatchPartyResponses
 
     protected function nullableAvatarUrl(?string $avatar): ?string
     {
-        return $avatar ? '/api-storage/avatars/'.$avatar : null;
+        return $avatar ? '/api-storage/'.$avatar : null;
     }
 
     protected function resolveEpisodeId(WatchPartyRoom $room): ?int
@@ -75,6 +75,6 @@ trait FormatsWatchPartyResponses
 
     protected function broadcastAvatarUrl(?string $avatar): string
     {
-        return $avatar ? '/api-storage/avatars/'.$avatar : '';
+        return $avatar ? '/api-storage/'.$avatar : '';
     }
 }

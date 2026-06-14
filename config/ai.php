@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'input_moderation_enabled' => (bool) env('AI_INPUT_MODERATION_ENABLED', true),
     'provider' => env('AI_PROVIDER', (env('AI_API_KEY') || env('DEEPSEEK_API_KEY')) ? 'deepseek' : 'stub'),
     'base_url' => env('AI_BASE_URL', env('DEEPSEEK_BASE_URL', 'https://api.deepseek.com')),
     'api_key' => env('AI_API_KEY') ?: env('DEEPSEEK_API_KEY'),

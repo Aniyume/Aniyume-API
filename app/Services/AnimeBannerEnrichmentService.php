@@ -120,8 +120,8 @@ GRAPHQL;
 
     private function fromTmdb(Anime $anime): array
     {
-        $token = config('services.tmdb.token') ?: env('TMDB_BEARER_TOKEN');
-        $apiKey = config('services.tmdb.key') ?: env('TMDB_API_KEY');
+        $token = config('services.tmdb.token');
+        $apiKey = config('services.tmdb.key');
 
         if (! $token && ! $apiKey) {
             return [];

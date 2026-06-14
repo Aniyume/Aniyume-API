@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use App\Application\Services\ProfileFrames\ProfileFrameService;
 use App\Models\User;
 use App\Models\WatchHistory;
-use App\Application\Services\ProfileFrames\ProfileFrameService;
 use Illuminate\Support\Facades\DB;
 
 class UserProfileService
@@ -21,6 +21,8 @@ class UserProfileService
                 'social_links' => $user->social_links ?? [],
                 'is_premium' => (bool) $user->is_premium,
                 'selected_profile_frame' => $user->selected_profile_frame ?: 'none',
+                'theme_value' => $user->theme_value,
+                'theme_type' => $user->theme_type,
                 'created_at' => $user->created_at,
             ],
             'stats' => $this->getAnimeStats($user->id),
