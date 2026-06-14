@@ -224,6 +224,10 @@ Route::prefix('v1')->group(function () {
         // === Watch Party ===
         Route::prefix('watch-party')->controller(WatchPartyController::class)->group(function () {
             Route::post('/', 'create');                        // POST /watch-party
+            // Приглашения — ДО /{code}, иначе "invites" матчится как код комнаты
+            Route::get('/invites', 'invites');                 // GET /watch-party/invites
+            Route::post('/invites/{invite}/accept', 'acceptInvite');   // POST /watch-party/invites/{id}/accept
+            Route::post('/invites/{invite}/decline', 'declineInvite'); // POST /watch-party/invites/{id}/decline
             Route::get('/{code}', 'show');                    // GET /watch-party/{code}
             Route::post('/{code}/join', 'join');               // POST /watch-party/{code}/join
             Route::post('/{code}/leave', 'leave');             // POST /watch-party/{code}/leave
